@@ -33,6 +33,8 @@ function selectAdminProduct(name){
   filterProductRuleCatalog();
   filterCategoryRuleOptions();
   filterProductSettings();
+  filterProductConditions();
+  filterProductAddons();
   filterProductAcceptance();
 }
 function setProductPage(name){
@@ -112,7 +114,7 @@ function filterProductCategories(){
   const count=document.getElementById('productCategoryCount');if(count)count.textContent=shown+' subcategorieën zichtbaar';
 }
 document.getElementById('productCategorySearch')?.addEventListener('input',filterProductCategories);
-document.getElementById('productAdminProduct')?.addEventListener('change',()=>{closeProductCategoryEdit();filterProductCategories();filterProductRuleCatalog();filterCategoryRuleOptions();filterProductSettings();filterProductAcceptance();});
+document.getElementById('productAdminProduct')?.addEventListener('change',()=>{closeProductCategoryEdit();filterProductCategories();filterProductRuleCatalog();filterCategoryRuleOptions();filterProductSettings();filterProductConditions();filterProductAddons();filterProductAcceptance();});
 
 
 const productChangeEditor=document.getElementById('productChangeEditor');
@@ -122,6 +124,7 @@ function toggleProductChangeEditor(show=true){if(productChangeEditor) productCha
 ['productNewChangeSet','productNewChangeSetInline'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',()=>{setProductPage('changes');toggleProductChangeEditor(true);});});
 document.querySelectorAll('.product-edit-draft').forEach(el=>el.addEventListener('click',()=>{setProductPage('changes');toggleProductChangeEditor(true);}));
 const productCloseChangeSet=document.getElementById('productCloseChangeSet');if(productCloseChangeSet)productCloseChangeSet.addEventListener('click',()=>toggleProductChangeEditor(false));
+document.getElementById('productSaveChangeSet')?.addEventListener('click',()=>showAdminToast('Wijzigingsset en interne notitie opgeslagen'));
 
 document.getElementById('productConfigView')?.addEventListener('change',()=>{ closeProductCategoryEdit(); });
 function applyCategoryInheritanceDisplay(){
@@ -302,6 +305,93 @@ document.getElementById('productSettingSave')?.addEventListener('click',()=>{
   filterProductSettings();showAdminToast('Productinstelling opgeslagen in de wijzigingsset');closeProductSettingEditor();
 });
 
+const productConditionCatalog={
+  'AV-GS-2026-01':{name:'Algemene voorwaarden GoSafe',version:'2026-01'},
+  'VW-APP-2026-01':{name:'Voorwaarden Apparatuurverzekering',version:'2026-01'},
+  'VW-INS-2026-01':{name:'Voorwaarden Instrumentenverzekering',version:'2026-01'}
+};
+let editingProductConditionsRow=null;
+function filterProductConditions(){
+  const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
+  document.querySelectorAll('.product-conditions-row').forEach(row=>row.style.display=row.dataset.product===product?'':'none');
+}
+function renderProductConditionsRow(row){
+  const ids=(row.dataset.conditionIds||'').split('|').filter(Boolean);
+  const names=row.querySelector('.product-condition-names');
+  if(names)names.innerHTML=ids.map(id=>'<div class="admin-primary">'+productEscape(productConditionCatalog[id]?.name||id)+'</div>').join('');
+  if(row.children[1])row.children[1].textContent=[...new Set(ids.map(id=>productConditionCatalog[id]?.version).filter(Boolean))].join(', ');
+}
+function openProductConditionsEditor(row){
+  if(!row)return;editingProductConditionsRow=row;
+  const product=row.dataset.product;
+  const selected=(row.dataset.conditionIds||'').split('|').filter(Boolean);
+  document.querySelectorAll('#productConditionOptions label').forEach(label=>{
+    const visible=(label.dataset.products||'').split('|').includes(product);label.hidden=!visible;
+    const input=label.querySelector('input');if(input)input.checked=visible&&selected.includes(input.value);
+  });
+  document.getElementById('productConditionsEditorError')?.classList.remove('visible');
+  document.getElementById('productConditionsEditor')?.classList.add('visible');
+}
+function closeProductConditionsEditor(){editingProductConditionsRow=null;document.getElementById('productConditionsEditor')?.classList.remove('visible');document.getElementById('productConditionsEditorError')?.classList.remove('visible');}
+document.querySelector('.product-conditions-table tbody')?.addEventListener('click',e=>{const button=e.target.closest('.product-edit-conditions');if(button)openProductConditionsEditor(button.closest('.product-conditions-row'));});
+['productConditionsEditorClose','productConditionsEditorCancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductConditionsEditor));
+document.getElementById('productConditionsSave')?.addEventListener('click',()=>{
+  if(!editingProductConditionsRow)return;
+  const ids=[...document.querySelectorAll('#productConditionOptions label:not([hidden]) input:checked')].map(input=>input.value);
+  if(!ids.length){document.getElementById('productConditionsEditorError')?.classList.add('visible');return;}
+  editingProductConditionsRow.dataset.conditionIds=ids.join('|');renderProductConditionsRow(editingProductConditionsRow);
+  showAdminToast('Voorwaarden opgeslagen in de wijzigingsset');closeProductConditionsEditor();
+});
+
+let editingProductAddonRow=null;
+function parseAddonTiers(value){return String(value||'').split('|').filter(Boolean).map(pair=>{const [amount,premium]=pair.split(':').map(Number);return {amount,premium};}).filter(tier=>Number.isFinite(tier.amount)&&Number.isFinite(tier.premium));}
+function formatAddonTierRange(tiers){
+  if(!tiers.length)return 'Geen staffel';
+  const amounts=tiers.map(tier=>tier.amount).sort((a,b)=>a-b);return formatProductEuro(amounts[0]).replace(',00','')+' – '+formatProductEuro(amounts.at(-1)).replace(',00','');
+}
+function filterProductAddons(){
+  const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
+  document.querySelectorAll('.product-addon-row').forEach(row=>row.style.display=row.dataset.product===product?'':'none');
+  const name=document.getElementById('productAddonsProductName');if(name)name.textContent=product;
+}
+function renderAddonTierRows(tiers){
+  const box=document.getElementById('productInhireTierRows');if(!box)return;
+  box.innerHTML=tiers.map(tier=>'<div class="product-tier-row"><div><span>€</span><input class="admin-input product-tier-amount" type="number" min="1" step="1" value="'+tier.amount+'"></div><div><span>€</span><input class="admin-input product-tier-premium" type="number" min="0" step="0.01" value="'+tier.premium+'"></div><button class="admin-btn text product-remove-tier" type="button" aria-label="Staffelregel verwijderen">Verwijder</button></div>').join('');
+}
+function openProductAddonEditor(row){
+  if(!row)return;editingProductAddonRow=row;
+  const inhire=row.dataset.addonType==='inhire';
+  document.getElementById('productAddonEditorTitle').textContent=inhire?'Inhuurstaffel bewerken':'Verhuurpercentage bewerken';
+  document.getElementById('productInhireTierEditor').hidden=!inhire;
+  document.getElementById('productRentalPercentageEditor').hidden=inhire;
+  if(inhire)renderAddonTierRows(parseAddonTiers(row.dataset.addonTiers));
+  else document.getElementById('productRentalPercentage').value=row.dataset.addonPercentage||'0';
+  document.getElementById('productAddonEditorError')?.classList.remove('visible');
+  document.getElementById('productAddonEditor')?.classList.add('visible');
+}
+function closeProductAddonEditor(){editingProductAddonRow=null;document.getElementById('productAddonEditor')?.classList.remove('visible');document.getElementById('productAddonEditorError')?.classList.remove('visible');}
+document.querySelector('.product-addons-table tbody')?.addEventListener('click',e=>{const button=e.target.closest('.product-edit-addon');if(button)openProductAddonEditor(button.closest('.product-addon-row'));});
+['productAddonEditorClose','productAddonEditorCancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductAddonEditor));
+document.getElementById('productAddInhireTier')?.addEventListener('click',()=>{const tiers=[...document.querySelectorAll('#productInhireTierRows .product-tier-row')].map(row=>({amount:Number(row.querySelector('.product-tier-amount')?.value)||0,premium:Number(row.querySelector('.product-tier-premium')?.value)||0}));const last=tiers.at(-1)||{amount:0,premium:0};tiers.push({amount:last.amount+5000,premium:last.premium+75});renderAddonTierRows(tiers);});
+document.getElementById('productInhireTierRows')?.addEventListener('click',e=>{const button=e.target.closest('.product-remove-tier');if(button)button.closest('.product-tier-row')?.remove();});
+document.getElementById('productAddonSave')?.addEventListener('click',()=>{
+  if(!editingProductAddonRow)return;
+  const error=document.getElementById('productAddonEditorError');
+  if(editingProductAddonRow.dataset.addonType==='inhire'){
+    const tiers=[...document.querySelectorAll('#productInhireTierRows .product-tier-row')].map(row=>({amount:Number(row.querySelector('.product-tier-amount')?.value),premium:Number(row.querySelector('.product-tier-premium')?.value)})).sort((a,b)=>a.amount-b.amount);
+    const invalid=!tiers.length||tiers.some(tier=>!Number.isFinite(tier.amount)||tier.amount<=0||!Number.isFinite(tier.premium)||tier.premium<0)||new Set(tiers.map(tier=>tier.amount)).size!==tiers.length;
+    if(invalid){if(error){error.textContent='Vul minimaal één unieke staffelregel met geldige bedragen in.';error.classList.add('visible');}return;}
+    editingProductAddonRow.dataset.addonTiers=tiers.map(tier=>tier.amount+':'+tier.premium).join('|');
+    const cell=editingProductAddonRow.querySelector('.product-addon-value');if(cell)cell.textContent=formatAddonTierRange(tiers);
+  }else{
+    const percentage=Number(document.getElementById('productRentalPercentage')?.value);
+    if(!Number.isFinite(percentage)||percentage<0){if(error){error.textContent='Vul een geldig toeslagpercentage in.';error.classList.add('visible');}return;}
+    editingProductAddonRow.dataset.addonPercentage=String(percentage);
+    const cell=editingProductAddonRow.querySelector('.product-addon-value');if(cell)cell.textContent=String(percentage).replace('.',',')+'%';
+  }
+  showAdminToast('Aanvullende dekking opgeslagen in de wijzigingsset');closeProductAddonEditor();
+});
+
 const acceptanceTypeDefinitions={
   max_item_amount:{name:'Maximaal verzekerd bedrag per item',code:'ACC-MAX-ITEM',unit:'EUR',outcome:'Handmatige beoordeling',defaultValue:'25000',description:'Ieder item wordt afzonderlijk vergeleken met het ingestelde maximumbedrag.'},
   max_item_count:{name:'Maximaal aantal objecten',code:'ACC-MAX-COUNT',unit:'objecten',outcome:'Handmatige beoordeling',defaultValue:'100',description:'Het systeem telt alle objecten in de aanvraag.'},
@@ -386,6 +476,8 @@ document.getElementById('productAcceptanceSave')?.addEventListener('click',()=>{
   renderAcceptanceRow(row);filterProductAcceptance();showAdminToast('Acceptatiecriterium opgeslagen in de wijzigingsset');closeAcceptanceEditor();
 });
 filterProductSettings();
+filterProductConditions();
+filterProductAddons();
 filterProductAcceptance();
 
 function runProductApiTest(){
@@ -394,7 +486,7 @@ function runProductApiTest(){
   const productName=document.getElementById('productApiProduct')?.value||document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
   const engine={application:'application_premium',mutation:'policy_mutation',renewal:'renewal_premium'}[scenario];
   const extra=scenario==='mutation'?{mutation_proration_divisor:365}:scenario==='renewal'?{resolve_on:'new_period_start'}:{acceptance:'automatic_or_manual'};
-  const data={product:productName==='Instrumentenverzekering'?'INS-NL':'APP-NL',scenario,peildatum:date,resolved:{subcategory:productName==='Instrumentenverzekering'?'strijkinstrumenten':'cinema_camera',premium_rate:productName==='Instrumentenverzekering'?0.00625:0.0125,deductible:250,category_rules:productName==='Instrumentenverzekering'?[]:['Serienummer verplicht'],minimum_annual_premium:100,policy_costs_renewal:5.00,administration_costs:2.50,acceptance_criteria:{max_item_amount:25000,max_item_count:100,max_total_amount:100000,allowed_country:'NL',computer_ratio:1.00},insurance_tax_rate:0.084,...extra},engine,calculation_snapshot:'stored'};
+  const data={product:productName==='Instrumentenverzekering'?'INS-NL':'APP-NL',scenario,peildatum:date,resolved:{subcategory:productName==='Instrumentenverzekering'?'strijkinstrumenten':'cinema_camera',premium_rate:productName==='Instrumentenverzekering'?0.00625:0.0125,deductible:250,category_rules:productName==='Instrumentenverzekering'?[]:['Serienummer verplicht'],minimum_annual_premium:100,policy_costs_renewal:5.00,administration_costs:2.50,policy_condition_ids:productName==='Instrumentenverzekering'?['AV-GS-2026-01','VW-INS-2026-01']:['AV-GS-2026-01','VW-APP-2026-01'],additional_coverages:{inhire_tiers:[{insured_amount:5000,annual_premium:75},{insured_amount:10000,annual_premium:150},{insured_amount:15000,annual_premium:225},{insured_amount:20000,annual_premium:300},{insured_amount:25000,annual_premium:375}],rental_surcharge_percentage:25},acceptance_criteria:{max_item_amount:25000,max_item_count:100,max_total_amount:100000,allowed_country:'NL',computer_ratio:1.00},insurance_tax_rate:0.084,...extra},engine,calculation_snapshot:'stored'};
   const pre=document.getElementById('productApiPreview');if(pre)pre.textContent=JSON.stringify(data,null,2);
 }
 const productApiRun=document.getElementById('productApiRun');if(productApiRun)productApiRun.addEventListener('click',runProductApiTest);
