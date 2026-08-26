@@ -34,6 +34,7 @@ function selectAdminProduct(name){
   filterCategoryRuleOptions();
   filterProductSettings();
   filterProductConditions();
+  filterProductIpids();
   filterProductAddons();
   filterProductAcceptance();
 }
@@ -95,6 +96,7 @@ function closeProductCategoryEdit(){
 document.querySelectorAll('.product-open-category').forEach(btn=>btn.addEventListener('click',e=>editProductCategory(e.currentTarget.closest('.product-category-row'))));
 ['productCloseCategoryEdit','productCancelCategoryEdit'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductCategoryEdit));
 document.getElementById('productSaveCategoryChange')?.addEventListener('click',e=>{
+  const row=document.querySelector('.product-category-row.selected');if(row){row.dataset.upcoming='Concept · Tarieven 2027';setProductNextVersion(row,'concept','Tarieven 2027');}
   e.currentTarget.textContent='Opgeslagen';
   window.setTimeout(()=>e.currentTarget.textContent='Opslaan',1200);
 });
@@ -114,7 +116,7 @@ function filterProductCategories(){
   const count=document.getElementById('productCategoryCount');if(count)count.textContent=shown+' subcategorieën zichtbaar';
 }
 document.getElementById('productCategorySearch')?.addEventListener('input',filterProductCategories);
-document.getElementById('productAdminProduct')?.addEventListener('change',()=>{closeProductCategoryEdit();filterProductCategories();filterProductRuleCatalog();filterCategoryRuleOptions();filterProductSettings();filterProductConditions();filterProductAddons();filterProductAcceptance();});
+document.getElementById('productAdminProduct')?.addEventListener('change',()=>{closeProductCategoryEdit();filterProductCategories();filterProductRuleCatalog();filterCategoryRuleOptions();filterProductSettings();filterProductConditions();filterProductIpids();filterProductAddons();filterProductAcceptance();});
 
 
 const productChangeEditor=document.getElementById('productChangeEditor');
@@ -126,7 +128,12 @@ document.querySelectorAll('.product-edit-draft').forEach(el=>el.addEventListener
 const productCloseChangeSet=document.getElementById('productCloseChangeSet');if(productCloseChangeSet)productCloseChangeSet.addEventListener('click',()=>toggleProductChangeEditor(false));
 document.getElementById('productSaveChangeSet')?.addEventListener('click',()=>showAdminToast('Wijzigingsset en interne notitie opgeslagen'));
 
-document.getElementById('productConfigView')?.addEventListener('change',()=>{ closeProductCategoryEdit(); });
+function syncProductVersionContext(){
+  const select=document.getElementById('productConfigView'),box=document.getElementById('productVersionContext');if(!select||!box)return;
+  const views={current:{chip:'green',label:'Actief',copy:'Geldig sinds 1 jan 2026'},'change-2027':{chip:'gray',label:'Concept',copy:'Tarieven 2027 · nog niet gepubliceerd'},'scheduled-2027':{chip:'blue',label:'Gepland',copy:'Productdocumenten 2027 · vanaf 1 mrt 2027'}};
+  const view=views[select.value]||views.current;box.innerHTML='<span class="admin-chip '+view.chip+'">'+view.label+'</span><small>'+view.copy+'</small>';
+}
+document.getElementById('productConfigView')?.addEventListener('change',()=>{closeProductCategoryEdit();syncProductVersionContext();});
 function applyCategoryInheritanceDisplay(){
   document.querySelectorAll('.product-category-row').forEach(row=>{
     const name=row.dataset.categoryName||'';
@@ -265,12 +272,45 @@ document.getElementById('productRuleSave')?.addEventListener('click',()=>{
   if(!row){row=document.createElement('tr');row.className='product-rule-row';document.querySelector('.product-category-rules-table tbody')?.prepend(row);}
   row.dataset.product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';row.dataset.ruleName=name;row.dataset.ruleCode=code;row.dataset.ruleType=type;row.dataset.ruleDescription=description;row.dataset.ruleStatus=status;row.dataset.ruleClause=type==='Clausule toevoegen'?clause:'';
   const chipClass=status==='Actief'?'green':status==='Concept'?'gray':'amber';
-  row.innerHTML='<td><div class="admin-primary">'+productEscape(name)+'</div><div class="admin-secondary">'+productEscape(code)+'</div></td><td>'+productEscape(type)+'</td><td>'+(editingProductRuleRow?productEscape(editingProductRuleRow.children[2]?.textContent||'Nog niet gekoppeld'):'Nog niet gekoppeld')+'</td><td><span class="admin-chip '+chipClass+'">'+productEscape(status)+'</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td>';
+  row.innerHTML='<td><div class="admin-primary">'+productEscape(name)+'</div><div class="admin-secondary">'+productEscape(code)+'</div></td><td>'+productEscape(type)+'</td><td>'+(editingProductRuleRow?productEscape(editingProductRuleRow.children[2]?.textContent||'Nog niet gekoppeld'):'Nog niet gekoppeld')+'</td><td><span class="admin-chip '+chipClass+'">'+productEscape(status)+'</span></td><td class="product-next-version"></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td>';
+  setProductNextVersion(row,'concept','Tarieven 2027');
   syncRuleLinkOption(row);const search=document.getElementById('productRuleSearch');const statusFilter=document.getElementById('productRuleStatusFilter');if(search)search.value='';if(statusFilter)statusFilter.value='';filterCategoryRuleOptions();filterProductRuleCatalog();showAdminToast(status==='Actief'?'Regel opgeslagen en direct beschikbaar om te koppelen':'Regel opgeslagen als '+status.toLowerCase());closeProductRuleEditor();
 });
 
 function formatProductEuro(value){return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR',minimumFractionDigits:Number(value)%1?2:0,maximumFractionDigits:2}).format(Number(value)||0);}
 function formatProductDate(value){if(!value)return '—';return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short',year:'numeric'}).format(new Date(value+'T12:00:00'));}
+
+function productNextVersionHtml(row){
+  const state=row.dataset.versionState||'none';
+  if(state==='concept')return '<div class="product-version-state"><span class="admin-chip gray">Concept</span><small>'+productEscape(row.dataset.versionSet||'Tarieven 2027')+'</small></div>';
+  if(state==='scheduled')return '<div class="product-version-state"><span class="admin-chip blue">Gepland</span><small>'+productEscape(formatProductDate(row.dataset.versionDate||'2027-01-01'))+'</small></div>';
+  return '<span class="product-version-none">Geen</span>';
+}
+function renderProductNextVersion(row){const cell=row?.querySelector('.product-next-version');if(cell)cell.innerHTML=productNextVersionHtml(row);}
+function setProductNextVersion(row,state='concept',setName='Tarieven 2027',date=''){
+  if(!row)return;row.dataset.versionState=state;row.dataset.versionSet=setName;row.dataset.versionDate=date;renderProductNextVersion(row);
+}
+function ensureProductVersionColumn(tableSelector,rowSelector){
+  const table=document.querySelector(tableSelector);if(!table)return;
+  const header=table.querySelector('thead tr');if(header&&!header.querySelector('.product-version-heading')){const th=document.createElement('th');th.className='product-version-heading';th.textContent='Volgende versie';header.insertBefore(th,header.lastElementChild);}
+  table.querySelectorAll(rowSelector).forEach(row=>{if(!row.querySelector('.product-next-version')){const td=document.createElement('td');td.className='product-next-version';row.insertBefore(td,row.lastElementChild);}renderProductNextVersion(row);});
+}
+function initializeProductVersionStates(){
+  document.querySelectorAll('.product-category-row').forEach(row=>{row.children[4]?.classList.add('product-next-version');if(row.dataset.upcoming)setProductNextVersion(row,'concept','Tarieven 2027');else setProductNextVersion(row,'none');});
+  ensureProductVersionColumn('.product-category-rules-table','.product-rule-row');
+  ensureProductVersionColumn('.product-settings-table','.product-setting-row');
+  ensureProductVersionColumn('.product-conditions-table','.product-conditions-row');
+  ensureProductVersionColumn('.product-ipid-table','.product-ipid-row');
+  ensureProductVersionColumn('.product-addons-table','.product-addon-row');
+  ensureProductVersionColumn('.product-acceptance-table','.product-acceptance-row');
+  document.querySelectorAll('.product-rule-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.ruleCode==='REG-SERIAL-REQ')setProductNextVersion(row,'concept','Tarieven 2027');else if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.ruleCode==='CLA-CL233')setProductNextVersion(row,'scheduled','', '2027-03-01');});
+  document.querySelectorAll('.product-setting-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.settingKey==='minimum_annual_premium')setProductNextVersion(row,'concept','Tarieven 2027');else if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.settingKey==='policy_costs_renewal')setProductNextVersion(row,'scheduled','', '2027-01-01');});
+  document.querySelectorAll('.product-conditions-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering')setProductNextVersion(row,'scheduled','', '2027-03-01');});
+  document.querySelectorAll('.product-ipid-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering')setProductNextVersion(row,'concept','Productdocumenten 2027');});
+  document.querySelectorAll('.product-addon-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.addonType==='inhire')setProductNextVersion(row,'concept','Tarieven 2027');else if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.addonType==='rental')setProductNextVersion(row,'scheduled','', '2027-01-01');});
+  document.querySelectorAll('.product-acceptance-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.acceptanceType==='computer_ratio')setProductNextVersion(row,'concept','Tarieven 2027');else if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.acceptanceType==='max_total_amount')setProductNextVersion(row,'scheduled','', '2027-01-01');});
+  syncProductVersionContext();
+}
 
 let editingProductSettingRow=null;
 function filterProductSettings(){
@@ -302,7 +342,7 @@ document.getElementById('productSettingSave')?.addEventListener('click',()=>{
   editingProductSettingRow.dataset.settingValue=String(value);editingProductSettingRow.dataset.settingEffective=effective;
   const valueCell=editingProductSettingRow.querySelector('.product-setting-value');if(valueCell)valueCell.textContent=formatProductEuro(value);
   if(editingProductSettingRow.children[3])editingProductSettingRow.children[3].textContent=formatProductDate(effective);
-  filterProductSettings();showAdminToast('Productinstelling opgeslagen in de wijzigingsset');closeProductSettingEditor();
+  setProductNextVersion(editingProductSettingRow,'concept','Tarieven 2027');filterProductSettings();showAdminToast('Productinstelling opgeslagen in de wijzigingsset');closeProductSettingEditor();
 });
 
 const productConditionCatalog={
@@ -339,9 +379,27 @@ document.getElementById('productConditionsSave')?.addEventListener('click',()=>{
   if(!editingProductConditionsRow)return;
   const ids=[...document.querySelectorAll('#productConditionOptions label:not([hidden]) input:checked')].map(input=>input.value);
   if(!ids.length){document.getElementById('productConditionsEditorError')?.classList.add('visible');return;}
-  editingProductConditionsRow.dataset.conditionIds=ids.join('|');renderProductConditionsRow(editingProductConditionsRow);
+  editingProductConditionsRow.dataset.conditionIds=ids.join('|');renderProductConditionsRow(editingProductConditionsRow);setProductNextVersion(editingProductConditionsRow,'concept','Productdocumenten 2027');
   showAdminToast('Voorwaarden opgeslagen in de wijzigingsset');closeProductConditionsEditor();
 });
+
+const productIpidCatalog={
+  'IPID-APP-2026-01':{name:'IPID Apparatuurverzekering',version:'2026-01'},
+  'IPID-INS-2026-01':{name:'IPID Instrumentenverzekering',version:'2026-01'},
+  'IPID-GS-2027-01':{name:'IPID GoSafe 2027',version:'2027-01'}
+};
+let editingProductIpidRow=null;
+function filterProductIpids(){const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';document.querySelectorAll('.product-ipid-row').forEach(row=>row.style.display=row.dataset.product===product?'':'none');}
+function renderProductIpidRow(row){const item=productIpidCatalog[row.dataset.ipidId]||{name:row.dataset.ipidId,version:'—'};const name=row.querySelector('.product-ipid-name');if(name)name.innerHTML='<div class="admin-primary">'+productEscape(item.name)+'</div>';if(row.children[1])row.children[1].textContent=item.version;}
+function openProductIpidEditor(row){
+  if(!row)return;editingProductIpidRow=row;const product=row.dataset.product;
+  document.querySelectorAll('#productIpidOptions label').forEach(label=>{const visible=(label.dataset.products||'').split('|').includes(product);label.hidden=!visible;const input=label.querySelector('input');if(input)input.checked=visible&&input.value===row.dataset.ipidId;});
+  document.getElementById('productIpidEditorError')?.classList.remove('visible');document.getElementById('productIpidEditor')?.classList.add('visible');
+}
+function closeProductIpidEditor(){editingProductIpidRow=null;document.getElementById('productIpidEditor')?.classList.remove('visible');document.getElementById('productIpidEditorError')?.classList.remove('visible');}
+document.querySelector('.product-ipid-table tbody')?.addEventListener('click',e=>{const button=e.target.closest('.product-edit-ipid');if(button)openProductIpidEditor(button.closest('.product-ipid-row'));});
+['productIpidEditorClose','productIpidEditorCancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductIpidEditor));
+document.getElementById('productIpidSave')?.addEventListener('click',()=>{if(!editingProductIpidRow)return;const selected=document.querySelector('#productIpidOptions label:not([hidden]) input:checked');if(!selected){document.getElementById('productIpidEditorError')?.classList.add('visible');return;}editingProductIpidRow.dataset.ipidId=selected.value;renderProductIpidRow(editingProductIpidRow);setProductNextVersion(editingProductIpidRow,'concept','Productdocumenten 2027');showAdminToast('IPID opgeslagen in de wijzigingsset');closeProductIpidEditor();});
 
 let editingProductAddonRow=null;
 function parseAddonTiers(value){return String(value||'').split('|').filter(Boolean).map(pair=>{const [amount,premium]=pair.split(':').map(Number);return {amount,premium};}).filter(tier=>Number.isFinite(tier.amount)&&Number.isFinite(tier.premium));}
@@ -389,7 +447,7 @@ document.getElementById('productAddonSave')?.addEventListener('click',()=>{
     editingProductAddonRow.dataset.addonPercentage=String(percentage);
     const cell=editingProductAddonRow.querySelector('.product-addon-value');if(cell)cell.textContent=String(percentage).replace('.',',')+'%';
   }
-  showAdminToast('Aanvullende dekking opgeslagen in de wijzigingsset');closeProductAddonEditor();
+  setProductNextVersion(editingProductAddonRow,'concept','Tarieven 2027');showAdminToast('Aanvullende dekking opgeslagen in de wijzigingsset');closeProductAddonEditor();
 });
 
 const acceptanceTypeDefinitions={
@@ -419,7 +477,7 @@ function renderAcceptanceRow(row){
   const statusClass=status==='Actief'?'green':status==='Inactief'?'amber':'gray';
   const outcome=row.dataset.acceptanceOutcome||'Handmatige beoordeling';
   const outcomeClass=outcome==='Uitval'?'red':'amber';
-  row.innerHTML='<td><div class="admin-primary">'+productEscape(row.dataset.acceptanceName)+'</div><div class="admin-secondary">'+productEscape(row.dataset.acceptanceCode)+'</div></td><td class="product-acceptance-setting">'+acceptanceSettingHtml(row)+'</td><td><span class="admin-chip '+outcomeClass+'">'+(outcome==='Uitval'?'Uitval':'Handmatig')+'</span></td><td><span class="admin-chip '+statusClass+'">'+productEscape(status)+'</span></td><td><button class="admin-btn text product-edit-acceptance" type="button">Bewerken</button></td>';
+  row.innerHTML='<td><div class="admin-primary">'+productEscape(row.dataset.acceptanceName)+'</div><div class="admin-secondary">'+productEscape(row.dataset.acceptanceCode)+'</div></td><td class="product-acceptance-setting">'+acceptanceSettingHtml(row)+'</td><td><span class="admin-chip '+outcomeClass+'">'+(outcome==='Uitval'?'Uitval':'Handmatig')+'</span></td><td><span class="admin-chip '+statusClass+'">'+productEscape(status)+'</span></td><td class="product-next-version"></td><td><button class="admin-btn text product-edit-acceptance" type="button">Bewerken</button></td>';
 }
 function filterProductAcceptance(){
   const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
@@ -473,10 +531,12 @@ document.getElementById('productAcceptanceSave')?.addEventListener('click',()=>{
   const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
   const row=editingAcceptanceRow;
   row.dataset.product=product;row.dataset.acceptanceType=type;row.dataset.acceptanceCode=definition.code+(product==='Instrumentenverzekering'?'-INS':'');row.dataset.acceptanceName=definition.name;row.dataset.acceptanceValue=value;row.dataset.acceptanceUnit=definition.unit;row.dataset.acceptanceOutcome=definition.outcome;row.dataset.acceptanceStatus=status;row.dataset.acceptanceEffective=effective;row.dataset.acceptanceCategories=type==='computer_ratio'?categories.join('|'):'';
-  renderAcceptanceRow(row);filterProductAcceptance();showAdminToast('Acceptatiecriterium opgeslagen in de wijzigingsset');closeAcceptanceEditor();
+  renderAcceptanceRow(row);setProductNextVersion(row,'concept','Tarieven 2027');filterProductAcceptance();showAdminToast('Acceptatiecriterium opgeslagen in de wijzigingsset');closeAcceptanceEditor();
 });
+initializeProductVersionStates();
 filterProductSettings();
 filterProductConditions();
+filterProductIpids();
 filterProductAddons();
 filterProductAcceptance();
 
@@ -486,7 +546,7 @@ function runProductApiTest(){
   const productName=document.getElementById('productApiProduct')?.value||document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
   const engine={application:'application_premium',mutation:'policy_mutation',renewal:'renewal_premium'}[scenario];
   const extra=scenario==='mutation'?{mutation_proration_divisor:365}:scenario==='renewal'?{resolve_on:'new_period_start'}:{acceptance:'automatic_or_manual'};
-  const data={product:productName==='Instrumentenverzekering'?'INS-NL':'APP-NL',scenario,peildatum:date,resolved:{subcategory:productName==='Instrumentenverzekering'?'strijkinstrumenten':'cinema_camera',premium_rate:productName==='Instrumentenverzekering'?0.00625:0.0125,deductible:250,category_rules:productName==='Instrumentenverzekering'?[]:['Serienummer verplicht'],minimum_annual_premium:100,policy_costs_renewal:5.00,administration_costs:2.50,policy_condition_ids:productName==='Instrumentenverzekering'?['AV-GS-2026-01','VW-INS-2026-01']:['AV-GS-2026-01','VW-APP-2026-01'],additional_coverages:{inhire_tiers:[{insured_amount:5000,annual_premium:75},{insured_amount:10000,annual_premium:150},{insured_amount:15000,annual_premium:225},{insured_amount:20000,annual_premium:300},{insured_amount:25000,annual_premium:375}],rental_surcharge_percentage:25},acceptance_criteria:{max_item_amount:25000,max_item_count:100,max_total_amount:100000,allowed_country:'NL',computer_ratio:1.00},insurance_tax_rate:0.084,...extra},engine,calculation_snapshot:'stored'};
+  const data={product:productName==='Instrumentenverzekering'?'INS-NL':'APP-NL',scenario,peildatum:date,resolved:{subcategory:productName==='Instrumentenverzekering'?'strijkinstrumenten':'cinema_camera',premium_rate:productName==='Instrumentenverzekering'?0.00625:0.0125,deductible:250,category_rules:productName==='Instrumentenverzekering'?[]:['Serienummer verplicht'],minimum_annual_premium:100,policy_costs_renewal:5.00,administration_costs:2.50,policy_condition_ids:productName==='Instrumentenverzekering'?['AV-GS-2026-01','VW-INS-2026-01']:['AV-GS-2026-01','VW-APP-2026-01'],ipid_document_version_id:productName==='Instrumentenverzekering'?'IPID-INS-2026-01':'IPID-APP-2026-01',additional_coverages:{inhire_tiers:[{insured_amount:5000,annual_premium:75},{insured_amount:10000,annual_premium:150},{insured_amount:15000,annual_premium:225},{insured_amount:20000,annual_premium:300},{insured_amount:25000,annual_premium:375}],rental_surcharge_percentage:25},acceptance_criteria:{max_item_amount:25000,max_item_count:100,max_total_amount:100000,allowed_country:'NL',computer_ratio:1.00},insurance_tax_rate:0.084,...extra},engine,calculation_snapshot:'stored'};
   const pre=document.getElementById('productApiPreview');if(pre)pre.textContent=JSON.stringify(data,null,2);
 }
 const productApiRun=document.getElementById('productApiRun');if(productApiRun)productApiRun.addEventListener('click',runProductApiTest);
