@@ -773,6 +773,12 @@ button{cursor:pointer}
 
 .product-admin-bar-quiet .product-picker small{display:block;margin-top:4px;color:var(--muted);font-size:8px}.product-rule-chip{display:inline-flex;align-items:center;padding:3px 6px;border-radius:999px;background:#edf5f1;color:#315846;font-size:8px;font-weight:850}.product-rule-inherit{display:inline-flex;align-items:center;gap:5px;color:#617068;font-size:9px;font-weight:850}.product-rule-inherit:before{content:'↳';font-size:13px;color:#8a9991}.product-rule-effective{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.product-rule-effective-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 8px;border:1px solid #e6ebe8;border-radius:7px;background:#f8faf9}.product-rule-effective-row strong{font-size:9px}.product-rule-effective-row small{font-size:8px;color:var(--muted)}.product-rule-linker{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.product-rule-linker label>span{display:block;font-size:9px;color:var(--muted);font-weight:800;margin-bottom:5px}.product-own-rule-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.product-own-rule-list:empty{display:none}.product-category-rules-table td:nth-child(1){min-width:170px}.product-category-rules-table td:nth-child(3){min-width:160px}
 
+/* Productbeheer v5 - expliciete productkeuze en beheerbare categorieregels */
+.product-choice-screen{padding:28px;border:1px solid var(--line);border-radius:12px;background:#fff}.product-choice-screen h2{margin:0;font-size:20px}.product-choice-screen>p{margin:7px 0 20px;color:var(--muted);font-size:11px}.product-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.product-choice-card{appearance:none;text-align:left;border:1px solid #d8e0dc;border-radius:11px;background:#fff;padding:18px;cursor:pointer;transition:.15s ease}.product-choice-card:hover{border-color:var(--brand);box-shadow:0 8px 20px rgba(32,74,55,.08);transform:translateY(-1px)}.product-choice-card span{display:block;color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.product-choice-card strong{display:block;margin:7px 0 5px;font-size:16px}.product-choice-card small{display:block;color:var(--muted);font-size:10px;line-height:1.45}.product-choice-card em{display:inline-block;margin-top:15px;color:var(--brand);font-size:10px;font-weight:900;font-style:normal}.product-admin-page.choosing-product .product-admin-bar,.product-admin-page.choosing-product .product-subpage,.product-admin-page.choosing-product #productNewChangeSet{display:none!important}.product-admin-page:not(.choosing-product) .product-choice-screen{display:none}.product-admin-bar-quiet{grid-template-columns:minmax(320px,1fr) minmax(300px,430px)}.product-selected-context{display:flex;align-items:center;gap:12px}.product-selected-icon{width:42px;height:42px;border-radius:9px;background:#e8f2ed;color:var(--brand);display:grid;place-items:center;font-size:15px;font-weight:950}.product-selected-copy span{display:block;color:var(--muted);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.product-selected-copy strong{display:block;font-size:15px;margin:2px 0}.product-selected-copy small{display:block;color:var(--muted);font-size:8px}.product-change-product{margin-left:auto}.product-hidden-select{display:none}
+.product-rule-linker{display:block}.product-rule-linker>span{display:block;font-size:9px;color:var(--muted);font-weight:800;margin-bottom:5px}.product-rule-multiselect{border:1px solid #dbe2de;border-radius:8px;background:#fff;overflow:hidden}.product-rule-search{border:0;border-bottom:1px solid #e4e9e6;border-radius:0}.product-rule-options{max-height:172px;overflow:auto;padding:4px}.product-rule-option{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:center;padding:8px;border-radius:6px;cursor:pointer}.product-rule-option:hover{background:#f5f8f6}.product-rule-option input{margin:0}.product-rule-option strong{display:block;font-size:9px}.product-rule-option small{display:block;color:var(--muted);font-size:8px;margin-top:2px}.product-rule-option em{font-size:8px;color:#567066;background:#edf4f0;padding:3px 5px;border-radius:999px;font-style:normal}.product-rule-option.filtered-out{display:none}.product-rule-link-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}.product-rule-selection-count{font-size:8px;color:var(--muted);font-weight:800}
+.product-rule-editor{display:none;margin-top:12px}.product-rule-editor.visible{display:block}.product-rule-editor-grid{display:grid;grid-template-columns:170px 1fr 170px;gap:10px}.product-rule-editor label>span{display:block;margin-bottom:5px;color:var(--muted);font-size:9px;font-weight:800}.product-rule-editor .wide{grid-column:1/-1}.product-rule-editor textarea{min-height:82px;resize:vertical}.product-rule-editor-note{margin-top:10px;padding:9px 10px;border-radius:7px;background:#f6f8f7;color:var(--muted);font-size:9px;line-height:1.45}.product-rule-editor-error{display:none;margin-top:8px;color:#a43a32;font-size:9px;font-weight:800}.product-rule-editor-error.visible{display:block}.product-rule-row td:last-child{white-space:nowrap}.product-rule-chip+.product-rule-chip{margin-left:4px}
+.mobile .product-choice-grid,.mobile .product-rule-editor-grid{grid-template-columns:1fr}.mobile .product-selected-context{align-items:flex-start;flex-wrap:wrap}.mobile .product-change-product{margin-left:54px}@media(max-width:850px){.product-choice-grid{grid-template-columns:1fr}.product-rule-editor-grid{grid-template-columns:1fr}.product-rule-editor .wide{grid-column:auto}}
+
 </style>
 </head>
 <body>
@@ -1677,14 +1683,23 @@ Je kunt de verzekering wel ter acceptatie aanbieden. Een collega van GoSafe beoo
   </div>
 </div>
 
-<div class="admin-page" data-admin-page="products">
+<div class="admin-page product-admin-page choosing-product" data-admin-page="products">
   <div class="admin-page-head product-admin-head">
     <div><h1>Productbeheer</h1></div>
     <div class="admin-actions"><button class="admin-btn primary" id="productNewChangeSet" type="button">Nieuwe wijzigingsset</button></div>
   </div>
 
+  <section class="product-choice-screen" id="productAdminChooser" aria-labelledby="productChoiceTitle">
+    <h2 id="productChoiceTitle">Welk product wil je beheren?</h2>
+    <p>Kies eerst een product. De actieve productcontext blijft daarna zichtbaar op iedere beheerpagina.</p>
+    <div class="product-choice-grid">
+      <button class="product-choice-card" type="button" data-product-choice="Apparatuurverzekering"><span>Product</span><strong>Apparatuurverzekering</strong><small>Categorieën voor camera-, video-, licht- en geluidsapparatuur.</small><em>Open productbeheer →</em></button>
+      <button class="product-choice-card" type="button" data-product-choice="Instrumentenverzekering"><span>Product</span><strong>Instrumentenverzekering</strong><small>Categorieën voor instrumenten, versterking en bijbehorende accessoires.</small><em>Open productbeheer →</em></button>
+    </div>
+  </section>
+
   <div class="product-admin-bar product-admin-bar-quiet">
-    <label class="product-config-view product-picker"><span>Product</span><select class="admin-input" id="productAdminProduct"><option value="Apparatuurverzekering">Apparatuurverzekering</option><option value="Instrumentenverzekering">Instrumentenverzekering</option></select><small>Nederland · EUR · Actief</small></label>
+    <div class="product-selected-context"><div class="product-selected-icon" aria-hidden="true">P</div><div class="product-selected-copy"><span>Je beheert nu</span><strong id="productCurrentName">—</strong><small>Nederland · EUR · Actief</small></div><button class="admin-btn product-change-product" id="productChangeProduct" type="button">Ander product kiezen</button><select class="product-hidden-select" id="productAdminProduct" aria-hidden="true" tabindex="-1"><option value="Apparatuurverzekering">Apparatuurverzekering</option><option value="Instrumentenverzekering">Instrumentenverzekering</option></select></div>
     <label class="product-config-view"><span>Weergave</span><select class="admin-input" id="productConfigView"><option value="current">Huidige configuratie</option><option value="change-2027">Na wijzigingsset Tarieven 2027 · 1 jan 2027</option><option value="change-2026">Na wijzigingsset Productinstellingen 2026 · 1 jan 2026</option></select></label>
   </div>
 
@@ -1705,7 +1720,7 @@ Je kunt de verzekering wel ter acceptatie aanbieden. Een collega van GoSafe beoo
           <div class="product-edit-set-context compact"><span>Wijzigingsset</span><strong>Tarieven 2027 · 1 jan 2027</strong></div>
           <div class="product-detail-section"><h3>Premie</h3><div class="product-detail-grid"><label><span>Instelling</span><select class="admin-input product-inherit-mode" id="productCategoryRateMode"><option value="inherit">Overnemen</option><option value="override">Eigen waarde</option></select></label><label><span>Percentage</span><input class="admin-input" id="productCategoryRate" value="" placeholder="0,00%"></label></div><div class="product-field-source" id="productCategoryRateSource"></div><span id="productCategoryEffectiveRate" hidden></span></div>
           <div class="product-detail-section"><h3>Eigen risico</h3><div class="product-detail-grid"><label><span>Instelling</span><select class="admin-input product-inherit-mode" id="productCategoryDeductibleMode"><option value="inherit">Overnemen</option><option value="override">Eigen waarde</option></select></label><label><span>Bedrag</span><input class="admin-input" id="productCategoryDeductible" value="" placeholder="€ 0"></label></div><div class="product-field-source" id="productCategoryDeductibleSource"></div><span id="productCategoryEffectiveDeductible" hidden></span></div>
-          <div class="product-detail-section"><h3>Regels</h3><div class="product-rule-effective" id="productCategoryInheritedRules"></div><div class="product-rule-linker"><label><span>Regel koppelen</span><select class="admin-input" id="productCategoryRuleSelect"><option value="">Selecteer regel...</option><option value="Serienummer verplicht">Serienummer verplicht</option><option value="Serienummer optioneel">Serienummer optioneel</option><option value="CL233">CL233</option><option value="Aankoopbewijs controle">Aankoopbewijs controle</option></select></label><button class="admin-btn" id="productCategoryAddRule" type="button">Koppelen</button></div><div class="product-own-rule-list" id="productCategoryOwnRules"></div></div>
+          <div class="product-detail-section"><h3>Regels</h3><div class="product-rule-effective" id="productCategoryInheritedRules"></div><div class="product-rule-linker"><span>Regels koppelen op dit niveau</span><div class="product-rule-multiselect"><input class="admin-input product-rule-search" id="productCategoryRuleSearch" type="search" placeholder="Zoek op naam, code of type..." autocomplete="off"><div class="product-rule-options" id="productCategoryRuleOptions"><label class="product-rule-option" data-product="Apparatuurverzekering" data-rule-search="serienummer verplicht reg-serial-req itemcontrole"><input type="checkbox" value="Serienummer verplicht"><span><strong>Serienummer verplicht</strong><small>REG-SERIAL-REQ</small></span><em>Itemcontrole</em></label><label class="product-rule-option" data-product="Instrumentenverzekering" data-rule-search="serienummer optioneel reg-serial-opt itemcontrole"><input type="checkbox" value="Serienummer optioneel"><span><strong>Serienummer optioneel</strong><small>REG-SERIAL-OPT</small></span><em>Itemcontrole</em></label><label class="product-rule-option" data-product="Apparatuurverzekering" data-rule-search="cl233 cla-cl233 clausule"><input type="checkbox" value="CL233"><span><strong>CL233</strong><small>CLA-CL233</small></span><em>Clausule</em></label><label class="product-rule-option" data-product="Apparatuurverzekering" data-rule-search="aankoopbewijs controle reg-receipt-check itemcontrole"><input type="checkbox" value="Aankoopbewijs controle"><span><strong>Aankoopbewijs controle</strong><small>REG-RECEIPT-CHECK</small></span><em>Itemcontrole</em></label><label class="product-rule-option" data-product="Apparatuurverzekering" data-rule-search="maximumbedrag per item reg-max-item acceptatie"><input type="checkbox" value="Maximumbedrag per item"><span><strong>Maximumbedrag per item</strong><small>REG-MAX-ITEM</small></span><em>Acceptatie</em></label><label class="product-rule-option" data-product="Apparatuurverzekering" data-rule-search="handmatige beoordeling reg-manual acceptatie"><input type="checkbox" value="Handmatige beoordeling"><span><strong>Handmatige beoordeling</strong><small>REG-MANUAL</small></span><em>Acceptatie</em></label></div></div><div class="product-rule-link-actions"><span class="product-rule-selection-count" id="productCategoryRuleSelection">0 regels geselecteerd</span><button class="admin-btn" id="productCategoryAddRule" type="button" disabled>Koppel geselecteerde regels</button></div></div><div class="product-own-rule-list" id="productCategoryOwnRules"></div></div>
           <div class="product-detail-section product-upcoming-section"><h3>Komende wijziging</h3><div class="product-upcoming-detail compact" id="productCategoryUpcoming">Geen</div></div>
           <div class="admin-actions product-detail-actions"><button class="admin-btn" id="productCancelCategoryEdit" type="button">Annuleren</button><button class="admin-btn primary" id="productSaveCategoryChange" type="button">Opslaan</button></div>
         </div>
@@ -1714,14 +1729,17 @@ Je kunt de verzekering wel ter acceptatie aanbieden. Een collega van GoSafe beoo
   </div>
 
   <div class="product-subpage" data-product-page="category-rules">
-    <div class="product-subpage-head product-subpage-head-quiet"><div><h2>Categorieregels</h2></div><button class="admin-btn primary" type="button">Nieuwe regel</button></div>
-    <div class="admin-filterbar product-filterbar"><input id="productRuleSearch" type="search" placeholder="Zoek regel..."><span class="admin-result-count" id="productRuleCount">Regels</span></div>
+    <div class="product-subpage-head product-subpage-head-quiet"><div><h2>Categorieregels</h2><p>Beheer de herbruikbare regels die je op product-, hoofd- of subcategorieniveau koppelt.</p></div><button class="admin-btn primary" id="productNewCategoryRule" type="button">Nieuwe regel</button></div>
+    <div class="admin-filterbar product-filterbar"><input id="productRuleSearch" type="search" placeholder="Zoek op naam, code, type of omschrijving..."><select id="productRuleStatusFilter"><option value="">Alle statussen</option><option value="Actief">Actief</option><option value="Concept">Concept</option><option value="Inactief">Inactief</option></select><span class="admin-result-count" id="productRuleCount">Regels</span></div>
     <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table product-category-rules-table"><thead><tr><th>Regel</th><th>Type</th><th>Toepassing</th><th>Status</th><th></th></tr></thead><tbody>
-      <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="Serienummer verplicht"><td><div class="admin-primary">Serienummer verplicht</div><div class="admin-secondary">REG-SERIAL-REQ</div></td><td>Itemcontrole</td><td>Camera’s + onderliggende categorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text" type="button">Bewerken</button></td></tr>
-      <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="CL233"><td><div class="admin-primary">CL233</div><div class="admin-secondary">Clausule</div></td><td>Clausule</td><td>Lenzen &amp; Optiek + onderliggende categorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text" type="button">Bewerken</button></td></tr>
-      <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="Aankoopbewijs controle"><td><div class="admin-primary">Aankoopbewijs controle</div><div class="admin-secondary">REG-RECEIPT-CHECK</div></td><td>Itemcontrole</td><td>Nog niet gekoppeld</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text" type="button">Bewerken</button></td></tr>
-      <tr class="product-rule-row" data-product="Instrumentenverzekering" data-rule-name="Serienummer optioneel"><td><div class="admin-primary">Serienummer optioneel</div><div class="admin-secondary">REG-SERIAL-OPT</div></td><td>Itemcontrole</td><td>Productbasis + onderliggende categorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text" type="button">Bewerken</button></td></tr>
+      <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="Serienummer verplicht" data-rule-code="REG-SERIAL-REQ" data-rule-type="Itemcontrole" data-rule-description="Een serienummer is verplicht voordat het item kan worden verzekerd." data-rule-status="Actief"><td><div class="admin-primary">Serienummer verplicht</div><div class="admin-secondary">REG-SERIAL-REQ</div></td><td>Itemcontrole</td><td>Camera’s + 6 subcategorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td></tr>
+      <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="CL233" data-rule-code="CLA-CL233" data-rule-type="Clausule" data-rule-description="Voegt clausule CL233 toe aan de polisdocumenten." data-rule-status="Actief"><td><div class="admin-primary">CL233</div><div class="admin-secondary">CLA-CL233</div></td><td>Clausule</td><td>Lenzen &amp; Optiek + 6 subcategorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td></tr>
+      <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="Aankoopbewijs controle" data-rule-code="REG-RECEIPT-CHECK" data-rule-type="Itemcontrole" data-rule-description="Controleert of voor het item een aankoopbewijs aanwezig is." data-rule-status="Actief"><td><div class="admin-primary">Aankoopbewijs controle</div><div class="admin-secondary">REG-RECEIPT-CHECK</div></td><td>Itemcontrole</td><td>Nog niet gekoppeld</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td></tr>
+      <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="Maximumbedrag per item" data-rule-code="REG-MAX-ITEM" data-rule-type="Acceptatie" data-rule-description="Stuurt een item boven de ingestelde grens naar handmatige beoordeling." data-rule-status="Actief"><td><div class="admin-primary">Maximumbedrag per item</div><div class="admin-secondary">REG-MAX-ITEM</div></td><td>Acceptatie</td><td>Lenzen &amp; Optiek + 6 subcategorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td></tr>
+      <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="Handmatige beoordeling" data-rule-code="REG-MANUAL" data-rule-type="Acceptatie" data-rule-description="Plaatst het item in de werkvoorraad wanneer automatische acceptatie niet mogelijk is." data-rule-status="Actief"><td><div class="admin-primary">Handmatige beoordeling</div><div class="admin-secondary">REG-MANUAL</div></td><td>Acceptatie</td><td>Nog niet gekoppeld</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td></tr>
+      <tr class="product-rule-row" data-product="Instrumentenverzekering" data-rule-name="Serienummer optioneel" data-rule-code="REG-SERIAL-OPT" data-rule-type="Itemcontrole" data-rule-description="Het serienummer kan worden vastgelegd maar blokkeert de aanvraag niet." data-rule-status="Actief"><td><div class="admin-primary">Serienummer optioneel</div><div class="admin-secondary">REG-SERIAL-OPT</div></td><td>Itemcontrole</td><td>Productbasis + onderliggende categorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td></tr>
     </tbody></table></div></div>
+    <div class="admin-card product-rule-editor" id="productRuleEditor" aria-live="polite"><div class="admin-card-head"><div><h2 id="productRuleEditorTitle">Nieuwe categorieregel</h2><p>Leg de functionele regel vast. Uitvoerbare code en vrije formules worden hier niet ingevoerd.</p></div><button class="admin-btn text" id="productRuleEditorClose" type="button">Sluiten</button></div><div class="admin-card-body"><div class="product-rule-editor-grid"><label><span>Code</span><input class="admin-input" id="productRuleCode" placeholder="REG-..."></label><label><span>Naam</span><input class="admin-input" id="productRuleName" placeholder="Naam van de regel"></label><label><span>Type</span><select class="admin-input" id="productRuleType"><option>Itemcontrole</option><option>Acceptatie</option><option>Clausule</option><option>Calculatie</option><option>Document</option></select></label><label class="wide"><span>Omschrijving</span><textarea class="admin-input" id="productRuleDescription" placeholder="Beschrijf wat de regel functioneel doet en wanneer deze van toepassing is."></textarea></label><label><span>Status</span><select class="admin-input" id="productRuleStatus"><option>Concept</option><option>Actief</option><option>Inactief</option></select></label></div><div class="product-rule-editor-note">Alleen actieve regels kunnen aan categorieën worden gekoppeld. Een gebruikte regel wordt geïnactiveerd in plaats van verwijderd.</div><div class="product-rule-editor-error" id="productRuleEditorError">Vul code, naam en omschrijving in.</div><div class="admin-actions product-detail-actions"><button class="admin-btn" id="productRuleEditorCancel" type="button">Annuleren</button><button class="admin-btn primary" id="productRuleSave" type="button">Regel opslaan</button></div></div></div>
   </div>
 
   <div class="product-subpage" data-product-page="costs">
@@ -2611,6 +2629,27 @@ updateSlotAcceptanceState();
 
 
 // Productbeheer prototype interactions
+const productAdminPage=document.querySelector('.product-admin-page');
+let selectedAdminProduct='';
+let pendingProductPage='categories';
+function showProductChooser(){
+  selectedAdminProduct='';
+  productAdminPage?.classList.add('choosing-product');
+  const current=document.getElementById('productCurrentName');if(current)current.textContent='—';
+  closeProductCategoryEdit();
+}
+function selectAdminProduct(name){
+  selectedAdminProduct=name;
+  const select=document.getElementById('productAdminProduct');if(select)select.value=name;
+  const current=document.getElementById('productCurrentName');if(current)current.textContent=name;
+  const apiProduct=document.getElementById('productApiProduct');if(apiProduct)apiProduct.value=name;
+  productAdminPage?.classList.remove('choosing-product');
+  setProductPage(pendingProductPage||'categories');
+  closeProductCategoryEdit();
+  filterProductCategories();
+  filterProductRuleCatalog();
+  filterCategoryRuleOptions();
+}
 function setProductPage(name){
   document.querySelectorAll('[data-product-page]').forEach(el=>el.classList.toggle('active',el.dataset.productPage===name));
   document.querySelectorAll('[data-product-target]').forEach(el=>el.classList.toggle('active',el.dataset.productTarget===name));
@@ -2618,9 +2657,13 @@ function setProductPage(name){
 }
 document.querySelectorAll('[data-product-target]').forEach(btn=>btn.addEventListener('click',()=>{
   setAdminPage('products');
-  setProductPage(btn.dataset.productTarget);
+  pendingProductPage=btn.dataset.productTarget;
+  if(selectedAdminProduct)setProductPage(pendingProductPage);else showProductChooser();
 }));
-document.querySelector('.admin-nav[data-admin-target="products"]')?.addEventListener('click',()=>setProductPage('categories'));
+document.querySelector('.admin-nav[data-admin-target="products"]')?.addEventListener('click',()=>{pendingProductPage='categories';showProductChooser();});
+document.querySelectorAll('[data-product-choice]').forEach(btn=>btn.addEventListener('click',()=>selectAdminProduct(btn.dataset.productChoice)));
+document.getElementById('productChangeProduct')?.addEventListener('click',showProductChooser);
+function productEscape(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));}
 
 function editProductCategory(row){
   if(!row)return;
@@ -2645,14 +2688,17 @@ function editProductCategory(row){
   const rateInput=document.getElementById('productCategoryRate');if(rateInput){rateInput.value=rate;rateInput.disabled=(rateSource!==name&&level!=='root');}
   const deductibleInput=document.getElementById('productCategoryDeductible');if(deductibleInput){deductibleInput.value=deductible;deductibleInput.disabled=(deductibleSource!==name&&level!=='root');}
   const upcoming=document.getElementById('productCategoryUpcoming');if(upcoming)upcoming.innerHTML=row.dataset.upcoming?'<span class="admin-chip amber">'+row.dataset.upcoming+'</span>':'Geen';
-  const rule=row.dataset.rule||'', ruleSource=row.dataset.ruleSource||'';
+  const rules=(row.dataset.rule||'').split('|').map(value=>value.trim()).filter(Boolean), ruleSource=row.dataset.ruleSource||'';
   const inheritedRules=document.getElementById('productCategoryInheritedRules');
   const ownRules=document.getElementById('productCategoryOwnRules');
   if(inheritedRules){
-    inheritedRules.innerHTML=(rule&&ruleSource&&ruleSource!==name)?'<div class="product-rule-effective-row"><div><strong>'+rule+'</strong><small>Overgenomen van '+ruleSource+'</small></div><span class="product-rule-inherit">Overgenomen</span></div>':'';
+    inheritedRules.innerHTML=(rules.length&&ruleSource&&ruleSource!==name)?rules.map(rule=>'<div class="product-rule-effective-row"><div><strong>'+productEscape(rule)+'</strong><small>Overgenomen van '+productEscape(ruleSource)+'</small></div><span class="product-rule-inherit">Overgenomen</span></div>').join(''):'';
   }
-  if(ownRules){ownRules.innerHTML=(rule&&ruleSource===name)?'<span class="product-rule-chip">'+rule+' <button type="button" class="product-rule-remove" aria-label="Regel ontkoppelen">×</button></span>':'';}
-  const ruleSelect=document.getElementById('productCategoryRuleSelect');if(ruleSelect)ruleSelect.value='';
+  if(ownRules){ownRules.innerHTML=(rules.length&&ruleSource===name)?rules.map(rule=>'<span class="product-rule-chip" data-rule-name="'+productEscape(rule)+'">'+productEscape(rule)+' <button type="button" class="product-rule-remove" aria-label="Regel ontkoppelen">×</button></span>').join(''):'';}
+  document.querySelectorAll('#productCategoryRuleOptions input').forEach(input=>input.checked=false);
+  const ruleSearch=document.getElementById('productCategoryRuleSearch');if(ruleSearch)ruleSearch.value='';
+  filterCategoryRuleOptions();
+  updateCategoryRuleSelection();
   document.getElementById('productCategoryDetail')?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
 }
 function closeProductCategoryEdit(){
@@ -2681,7 +2727,7 @@ function filterProductCategories(){
   const count=document.getElementById('productCategoryCount');if(count)count.textContent=shown+' subcategorieën zichtbaar';
 }
 document.getElementById('productCategorySearch')?.addEventListener('input',filterProductCategories);
-document.getElementById('productAdminProduct')?.addEventListener('change',()=>{closeProductCategoryEdit();filterProductCategories();filterProductRuleCatalog();});
+document.getElementById('productAdminProduct')?.addEventListener('change',()=>{closeProductCategoryEdit();filterProductCategories();filterProductRuleCatalog();filterCategoryRuleOptions();});
 
 
 const productChangeEditor=document.getElementById('productChangeEditor');
@@ -2705,11 +2751,11 @@ function applyCategoryInheritanceDisplay(){
         if(cell){cell.innerHTML='<span class="product-inherit-mark" title="Overgenomen van '+source+'">Overgenomen</span>';}
       }
     });
-    const rule=row.dataset.rule||'', ruleSource=row.dataset.ruleSource||'', ruleCell=row.children[3];
+    const rules=(row.dataset.rule||'').split('|').map(value=>value.trim()).filter(Boolean), ruleSource=row.dataset.ruleSource||'', ruleCell=row.children[3];
     if(ruleCell){
-      if(!rule){ruleCell.innerHTML='<span class="admin-secondary">—</span>';}
-      else if(ruleSource&&ruleSource!==name){ruleCell.innerHTML='<span class="product-rule-inherit" title="Overgenomen van '+ruleSource+': '+rule+'">Overgenomen</span>';}
-      else{ruleCell.innerHTML='<span class="product-rule-chip">'+rule+'</span>';}
+      if(!rules.length){ruleCell.innerHTML='<span class="admin-secondary">—</span>';}
+      else if(ruleSource&&ruleSource!==name){ruleCell.innerHTML='<span class="product-rule-inherit" title="Overgenomen van '+productEscape(ruleSource)+': '+productEscape(rules.join(', '))+'">'+rules.length+' overgenomen</span>';}
+      else{ruleCell.innerHTML=rules.map(rule=>'<span class="product-rule-chip">'+productEscape(rule)+'</span>').join('');}
     }
   });
 }
@@ -2721,28 +2767,95 @@ function syncInheritanceInput(modeId,inputId,sourceId){
 }
 syncInheritanceInput('productCategoryRateMode','productCategoryRate','productCategoryRateSource');
 syncInheritanceInput('productCategoryDeductibleMode','productCategoryDeductible','productCategoryDeductibleSource');
+document.querySelectorAll('.product-category-row[data-product="Apparatuurverzekering"]').forEach(row=>{
+  if(row.dataset.mainCategory==='Camera’s'){row.dataset.rule='Serienummer verplicht|Aankoopbewijs controle';row.dataset.ruleSource='Camera’s';}
+  if(row.dataset.mainCategory==='Lenzen & Optiek'){row.dataset.rule='CL233|Maximumbedrag per item';row.dataset.ruleSource='Lenzen & Optiek';}
+});
 applyCategoryInheritanceDisplay();
 filterProductCategories();
 
+function filterCategoryRuleOptions(){
+  const q=(document.getElementById('productCategoryRuleSearch')?.value||'').trim().toLowerCase();
+  const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
+  document.querySelectorAll('.product-rule-option').forEach(option=>option.classList.toggle('filtered-out',option.dataset.product!==product||(Boolean(q)&&!(option.dataset.ruleSearch||'').includes(q))));
+}
+function updateCategoryRuleSelection(){
+  const selected=[...document.querySelectorAll('#productCategoryRuleOptions input:checked')];
+  const count=document.getElementById('productCategoryRuleSelection');if(count)count.textContent=selected.length+(selected.length===1?' regel geselecteerd':' regels geselecteerd');
+  const button=document.getElementById('productCategoryAddRule');if(button)button.disabled=!selected.length;
+}
+document.getElementById('productCategoryRuleSearch')?.addEventListener('input',filterCategoryRuleOptions);
+document.getElementById('productCategoryRuleOptions')?.addEventListener('change',updateCategoryRuleSelection);
 document.getElementById('productCategoryAddRule')?.addEventListener('click',()=>{
-  const select=document.getElementById('productCategoryRuleSelect'), list=document.getElementById('productCategoryOwnRules');
-  const value=select?.value||''; if(!value||!list)return;
-  if(![...list.querySelectorAll('.product-rule-chip')].some(el=>el.textContent.trim().replace('×','').trim()===value)){
-    const chip=document.createElement('span');chip.className='product-rule-chip';chip.innerHTML=value+' <button type="button" class="product-rule-remove" aria-label="Regel ontkoppelen">×</button>';list.appendChild(chip);
-  }
-  select.value='';
+  const list=document.getElementById('productCategoryOwnRules');if(!list)return;
+  const existing=new Set([...list.querySelectorAll('.product-rule-chip')].map(el=>el.dataset.ruleName));
+  [...document.querySelectorAll('#productCategoryRuleOptions input:checked')].forEach(input=>{
+    if(!existing.has(input.value)){
+      const chip=document.createElement('span');chip.className='product-rule-chip';chip.dataset.ruleName=input.value;chip.innerHTML=productEscape(input.value)+' <button type="button" class="product-rule-remove" aria-label="Regel ontkoppelen">×</button>';list.appendChild(chip);existing.add(input.value);
+    }
+    input.checked=false;
+  });
+  const selectedRow=document.querySelector('.product-category-row.selected');
+  if(selectedRow){selectedRow.dataset.rule=[...existing].join('|');selectedRow.dataset.ruleSource=selectedRow.dataset.categoryName||'';const cell=selectedRow.children[3];if(cell)cell.innerHTML=[...existing].map(rule=>'<span class="product-rule-chip">'+productEscape(rule)+'</span>').join('');}
+  updateCategoryRuleSelection();
 });
-document.getElementById('productCategoryOwnRules')?.addEventListener('click',e=>{if(e.target.closest('.product-rule-remove'))e.target.closest('.product-rule-chip')?.remove();});
+document.getElementById('productCategoryOwnRules')?.addEventListener('click',e=>{
+  const remove=e.target.closest('.product-rule-remove');if(!remove)return;
+  remove.closest('.product-rule-chip')?.remove();
+  const selectedRow=document.querySelector('.product-category-row.selected');
+  if(selectedRow){const rules=[...document.querySelectorAll('#productCategoryOwnRules .product-rule-chip')].map(el=>el.dataset.ruleName);selectedRow.dataset.rule=rules.join('|');const cell=selectedRow.children[3];if(cell)cell.innerHTML=rules.length?rules.map(rule=>'<span class="product-rule-chip">'+productEscape(rule)+'</span>').join(''):'<span class="admin-secondary">—</span>';}
+});
 
 function filterProductRuleCatalog(){
   const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
   const q=(document.getElementById('productRuleSearch')?.value||'').trim().toLowerCase();
+  const status=document.getElementById('productRuleStatusFilter')?.value||'';
   let shown=0;
-  document.querySelectorAll('.product-rule-row').forEach(row=>{const visible=row.dataset.product===product&&(!q||(row.dataset.ruleName||'').toLowerCase().includes(q));row.style.display=visible?'':'none';if(visible)shown++;});
+  document.querySelectorAll('.product-rule-row').forEach(row=>{const hay=[row.dataset.ruleName,row.dataset.ruleCode,row.dataset.ruleType,row.dataset.ruleDescription].join(' ').toLowerCase();const visible=row.dataset.product===product&&(!q||hay.includes(q))&&(!status||row.dataset.ruleStatus===status);row.style.display=visible?'':'none';if(visible)shown++;});
   const count=document.getElementById('productRuleCount');if(count)count.textContent=shown+' regels';
 }
 document.getElementById('productRuleSearch')?.addEventListener('input',filterProductRuleCatalog);
+document.getElementById('productRuleStatusFilter')?.addEventListener('change',filterProductRuleCatalog);
 filterProductRuleCatalog();
+
+let editingProductRuleRow=null;
+function openProductRuleEditor(row=null){
+  editingProductRuleRow=row;
+  const title=document.getElementById('productRuleEditorTitle');if(title)title.textContent=row?'Categorieregel bewerken':'Nieuwe categorieregel';
+  document.getElementById('productRuleCode').value=row?.dataset.ruleCode||'';
+  document.getElementById('productRuleName').value=row?.dataset.ruleName||'';
+  document.getElementById('productRuleType').value=row?.dataset.ruleType||'Itemcontrole';
+  document.getElementById('productRuleDescription').value=row?.dataset.ruleDescription||'';
+  document.getElementById('productRuleStatus').value=row?.dataset.ruleStatus||'Concept';
+  document.getElementById('productRuleEditorError')?.classList.remove('visible');
+  document.getElementById('productRuleEditor')?.classList.add('visible');
+  document.getElementById('productRuleEditor')?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+}
+function closeProductRuleEditor(){editingProductRuleRow=null;document.getElementById('productRuleEditor')?.classList.remove('visible');document.getElementById('productRuleEditorError')?.classList.remove('visible');}
+document.getElementById('productNewCategoryRule')?.addEventListener('click',()=>openProductRuleEditor());
+['productRuleEditorClose','productRuleEditorCancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductRuleEditor));
+document.querySelector('.product-category-rules-table tbody')?.addEventListener('click',e=>{const button=e.target.closest('.product-edit-rule');if(button)openProductRuleEditor(button.closest('.product-rule-row'));});
+function syncRuleLinkOption(row){
+  const options=document.getElementById('productCategoryRuleOptions');if(!options)return;
+  let option=[...options.querySelectorAll('.product-rule-option')].find(el=>el.dataset.ruleCode===row.dataset.ruleCode||el.querySelector('input')?.value===row.dataset.ruleName);
+  if(row.dataset.ruleStatus!=='Actief'){option?.remove();return;}
+  if(!option){option=document.createElement('label');option.className='product-rule-option';option.innerHTML='<input type="checkbox"><span><strong></strong><small></small></span><em></em>';options.appendChild(option);}
+  option.dataset.product=row.dataset.product;option.dataset.ruleCode=row.dataset.ruleCode;option.dataset.ruleSearch=[row.dataset.ruleName,row.dataset.ruleCode,row.dataset.ruleType].join(' ').toLowerCase();option.querySelector('input').value=row.dataset.ruleName;option.querySelector('strong').textContent=row.dataset.ruleName;option.querySelector('small').textContent=row.dataset.ruleCode;option.querySelector('em').textContent=row.dataset.ruleType;
+}
+document.getElementById('productRuleSave')?.addEventListener('click',()=>{
+  const code=document.getElementById('productRuleCode').value.trim().toUpperCase();
+  const name=document.getElementById('productRuleName').value.trim();
+  const type=document.getElementById('productRuleType').value;
+  const description=document.getElementById('productRuleDescription').value.trim();
+  const status=document.getElementById('productRuleStatus').value;
+  if(!code||!name||!description){document.getElementById('productRuleEditorError')?.classList.add('visible');return;}
+  let row=editingProductRuleRow;
+  if(!row){row=document.createElement('tr');row.className='product-rule-row';document.querySelector('.product-category-rules-table tbody')?.prepend(row);}
+  row.dataset.product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';row.dataset.ruleName=name;row.dataset.ruleCode=code;row.dataset.ruleType=type;row.dataset.ruleDescription=description;row.dataset.ruleStatus=status;
+  const chipClass=status==='Actief'?'green':status==='Concept'?'gray':'amber';
+  row.innerHTML='<td><div class="admin-primary">'+productEscape(name)+'</div><div class="admin-secondary">'+productEscape(code)+'</div></td><td>'+productEscape(type)+'</td><td>'+(editingProductRuleRow?productEscape(editingProductRuleRow.children[2]?.textContent||'Nog niet gekoppeld'):'Nog niet gekoppeld')+'</td><td><span class="admin-chip '+chipClass+'">'+productEscape(status)+'</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td>';
+  syncRuleLinkOption(row);filterCategoryRuleOptions();filterProductRuleCatalog();closeProductRuleEditor();
+});
 
 function runProductApiTest(){
   const scenario=document.getElementById('productApiScenario')?.value||'application';
