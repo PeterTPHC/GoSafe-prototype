@@ -109,6 +109,8 @@ function renderDossier(key){
   if(pending){pending.hidden=!data.pendingMutation;pending.innerHTML=data.pendingMutation?`<div class="admin-future-mutation-head"><div><span class="admin-future-mutation-label">Komende wijziging</span><strong>${adminEscape(data.pendingMutation.reference)}</strong><small>Gestart door ${adminEscape(data.pendingMutation.initiator)} op ${adminEscape(data.pendingMutation.created)}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">${adminEscape(data.pendingMutation.status)}</span></div></div><div class="admin-mutation-change-list">${(data.pendingMutation.changes||[]).map(renderPendingChange).join('')}</div>`:'';}
   const mutate=document.getElementById('dossierStartMutation');
   if(mutate)mutate.hidden=data.phase!=='Polis';
+  const editHolder=document.getElementById('dossierEditHolder');
+  if(editHolder)editHolder.hidden=data.phase!=='Polis';
   set('dossierAddonDetails',renderDetailRows(data.addons));
   set('dossierAcceptanceSummary',`<div class="admin-acceptance-result"><div><strong>${adminEscape(data.acceptance.label)}</strong><p>${adminEscape(data.acceptance.text)}</p></div><span class="admin-chip ${adminEscape(data.acceptance.className)}">${adminEscape(data.acceptance.label)}</span></div>`);
   set('dossierApplicationMeta',`<div><span>Ingediend op</span><strong>${adminEscape(data.application.submitted)}</strong></div><div><span>Bron</span><strong>${adminEscape(data.application.source)}</strong></div><div><span>Taal</span><strong>${adminEscape(data.application.language)}</strong></div><div><span>Vastgelegd onder</span><strong>${adminEscape(data.dossier)}</strong></div>`);
@@ -118,7 +120,7 @@ function renderDossier(key){
   ].join(''));
   const itemSummary=document.getElementById('dossierItemSummary');if(itemSummary)itemSummary.textContent=data.items.length+' items · totaal '+data.amount;
   const activeItemRows=data.items.map(item=>{const change=pendingChangeForItem(data,item.name);return `<tr class="${change?.type==='Verwijderd'?'admin-item-pending-remove':''}"><td><div class="admin-primary">${adminEscape(item.name)}</div></td><td>${adminEscape(item.category)}</td><td>${adminEscape(item.serial)}</td><td>${adminEscape(item.receipt)}</td><td class="admin-money">${adminEscape(item.amount)}</td><td class="admin-money">${adminEscape(item.premium)}</td><td>${change?renderPendingChange(change):'<span class="admin-value-muted">Geen</span>'}</td></tr>`;}).join('');
-  const addedItemRows=(data.pendingMutation?.changes||[]).filter(change=>change.type==='Toegevoegd').map(change=>`<tr class="admin-item-pending-add"><td><div class="admin-primary">${adminEscape(change.item)}</div><div class="admin-secondary">Nog niet actief</div></td><td>${adminEscape(change.fields.find(field=>field.label==='Categorie')?.new||'—')}</td><td>—</td><td>—</td><td class="admin-money">${adminEscape(change.fields.find(field=>field.label==='Verzekerd bedrag')?.new||'—')}</td><td>—</td><td>${renderPendingChange(change)}</td></tr>`).join('');
+  const addedItemRows=(data.pendingMutation?.changes||[]).filter(change=>change.type==='Toegevoegd').map(change=>{const category=change.fields.find(field=>field.label==='Categorie')?.new||[change.fields.find(field=>field.label==='Hoofdcategorie')?.new,change.fields.find(field=>field.label==='Subcategorie')?.new].filter(Boolean).join(' / ')||'—';return `<tr class="admin-item-pending-add"><td><div class="admin-primary">${adminEscape(change.item)}</div><div class="admin-secondary">Nog niet actief</div></td><td>${adminEscape(category)}</td><td>${adminEscape(change.fields.find(field=>field.label==='Serienummer')?.new||'—')}</td><td>${adminEscape(change.fields.find(field=>field.label==='Aankoopbewijs')?.new||'—')}</td><td class="admin-money">${adminEscape(change.fields.find(field=>field.label==='Verzekerd bedrag')?.new||'—')}</td><td>—</td><td>${renderPendingChange(change)}</td></tr>`;}).join('');
   set('dossierItemsBody',activeItemRows+addedItemRows);
   set('dossierHolderDetails',[
     renderDetailSection('Verzekeringnemer',[['Naam',data.holder.name],['Type',data.holder.type],['KvK-nummer',data.holder.kvk],['Adres',data.holder.address],['BTW',data.holder.tax]]),
@@ -148,18 +150,22 @@ let adminMutationItems=[];
 let mutationInitialRentalIn=false;
 let mutationInitialRentalOut=false;
 let mutationInitialRentalLimit='10000';
+let mutationInitialHolder={};
+let mutationHolderDraft={};
+let editingMutationItemIndex=-1;
 const mutationToday='2026-08-27';
 const mutationPolicyCosts=5;
 const mutationInsuranceTax=.084;
-const equipmentMutationCategories=['Camera’s / Cinema camera','Camera’s / Professionele videocamera','Lenzen & Optiek / Zoomlens','Belichting / Gimbals & light rigs','Belichting / LED-lampen','Computers & Tablets / Laptops','Drones / Cameradrone','Geluidsapparatuur / Recorder'];
-const instrumentMutationCategories=['Snaarinstrumenten / Elektrische gitaar','Snaarinstrumenten / Akoestische gitaar','Snaarinstrumenten / Cello','Toetsinstrumenten / Vleugel','Toetsinstrumenten / Keyboard','Slagwerk / Drumstel','Studioapparatuur / Mengpaneel'];
+const equipmentMutationCategories={'Camera’s':['Cinema camera','Professionele videocamera','Fotocamera'],'Lenzen & Optiek':['Zoomlens','Prime lens'],'Belichting':['Gimbals & light rigs','LED-lampen'],'Computers & Tablets':['Laptops','Tablets'],'Drones':['Cameradrone'],'Geluidsapparatuur':['Recorder','Microfoon']};
+const instrumentMutationCategories={'Snaarinstrumenten':['Elektrische gitaar','Akoestische gitaar','Cello'],'Toetsinstrumenten':['Vleugel','Keyboard'],'Slagwerk':['Drumstel'],'Studioapparatuur':['Mengpaneel']};
 function adminEuroNumber(value){return Number(String(value||'0').replace(/[^0-9,-]/g,'').replaceAll('.','').replace(',','.'))||0;}
 function adminFormatEuro(value){return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(value);}
 function formatMutationDate(value){if(!value)return '—';return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short',year:'numeric'}).format(new Date(value+'T00:00:00'));}
 function mutationRenewalIso(data){if(data.start.startsWith('25 aug'))return '2027-08-25';if(data.start.startsWith('4 mei'))return '2027-05-04';return '2026-10-12';}
 function mutationDaysBetween(start,end){return Math.max(0,Math.ceil((new Date(end+'T00:00:00')-new Date(start+'T00:00:00'))/86400000));}
 function mutationItemName(item){return [item.brand,item.model].filter(Boolean).join(' ').trim()||'Nieuw item';}
-function mutationCategories(data){return data.product==='Instrumentenverzekering'?instrumentMutationCategories:equipmentMutationCategories;}
+function mutationCategoryMap(data){return data.product==='Instrumentenverzekering'?instrumentMutationCategories:equipmentMutationCategories;}
+function mutationItemCategory(item){return [item.mainCategory,item.subCategory].filter(Boolean).join(' / ');}
 function mutationReceipts(data){return ['Geen aankoopbewijs',...new Set([...data.items.map(item=>item.receipt).filter(Boolean),...data.itemDocuments.filter(documentItem=>documentItem.type==='Aankoopbewijs'||documentItem.type==='Taxatierapport').map(documentItem=>documentItem.name)])];}
 function mutationSelectOptions(values,selected){return values.map(value=>`<option ${value===selected?'selected':''}>${adminEscape(value)}</option>`).join('');}
 function buildAdminMutationChanges(){
@@ -167,10 +173,11 @@ function buildAdminMutationChanges(){
   adminMutationItems.forEach(item=>{
     const name=mutationItemName(item);
     if(item.removed){changes.push({type:'Verwijderd',className:'red',item:item.original?.name||name,fields:[{label:'Status',old:'Meeverzekerd',new:'Verwijderd'}]});return;}
-    if(item.isNew){changes.push({type:'Toegevoegd',className:'green',item:name,fields:[{label:'Categorie',old:'—',new:item.category},{label:'Serienummer',old:'—',new:item.serial||'—'},{label:'Aankoopbewijs',old:'—',new:item.receipt||'Geen aankoopbewijs'},{label:'Verzekerd bedrag',old:'—',new:adminFormatEuro(item.amountNumber)}]});return;}
+    const category=mutationItemCategory(item);
+    if(item.isNew){changes.push({type:'Toegevoegd',className:'green',item:name,fields:[{label:'Hoofdcategorie',old:'—',new:item.mainCategory},{label:'Subcategorie',old:'—',new:item.subCategory},{label:'Serienummer',old:'—',new:item.serial||'—'},{label:'Aankoopbewijs',old:'—',new:item.receipt||'Geen aankoopbewijs'},{label:'Verzekerd bedrag',old:'—',new:adminFormatEuro(item.amountNumber)}]});return;}
     const fields=[];const original=item.original;
     if(name!==original.name)fields.push({label:'Item',old:original.name,new:name});
-    if(item.category!==original.category)fields.push({label:'Categorie',old:original.category,new:item.category});
+    if(category!==original.category){fields.push({label:'Hoofdcategorie',old:original.mainCategory,new:item.mainCategory});fields.push({label:'Subcategorie',old:original.subCategory,new:item.subCategory});}
     if(item.serial!==original.serial)fields.push({label:'Serienummer',old:original.serial||'—',new:item.serial||'—'});
     if(item.receipt!==original.receipt)fields.push({label:'Aankoopbewijs',old:original.receipt||'Geen aankoopbewijs',new:item.receipt||'Geen aankoopbewijs'});
     if(item.amountNumber!==original.amountNumber)fields.push({label:'Verzekerd bedrag',old:adminFormatEuro(original.amountNumber),new:adminFormatEuro(item.amountNumber)});
@@ -185,6 +192,9 @@ function buildAdminMutationChanges(){
     changes.push({type:rentalIn?(mutationInitialRentalIn?'Gewijzigd':'Toegevoegd'):'Verwijderd',className:rentalIn?(mutationInitialRentalIn?'blue':'green'):'red',item:'Aanvullende dekking · Inhuur',fields:[{label:'Verzekerd bedrag',old:oldValue,new:newValue}]});
   }
   if(rentalOut!==mutationInitialRentalOut)changes.push({type:rentalOut?'Toegevoegd':'Verwijderd',className:rentalOut?'green':'red',item:'Aanvullende dekking · Verhuur',fields:[{label:'Status',old:mutationInitialRentalOut?'Meeverzekerd':'Niet meeverzekerd',new:rentalOut?'Meeverzekerd':'Niet meeverzekerd'}]});
+  const holderFields=[];
+  [['name','Naam / bedrijfsnaam'],['email','E-mailadres'],['phone','Telefoonnummer'],['address','Adres'],['country','Land'],['iban','IBAN']].forEach(([key,label])=>{if((mutationHolderDraft[key]||'')!==(mutationInitialHolder[key]||''))holderFields.push({label,old:mutationInitialHolder[key]||'—',new:mutationHolderDraft[key]||'—'});});
+  if(holderFields.length)changes.push({type:'Gewijzigd',className:'blue',item:'Verzekeringnemer',fields:holderFields});
   return changes;
 }
 function adminMutationCalculation(){
@@ -211,8 +221,33 @@ function adminMutationCalculation(){
   const tax=(prorated+costs)*mutationInsuranceTax;
   return {currentAmount,total,currentPremium,newPremium,annualDifference,remaining,prorated,costs,tax,mutationTotal:prorated+costs+tax,validDate,renewal,hasChanges};
 }
+function adminMutationValidation(){
+  const activeItems=adminMutationItems.filter(item=>!item.removed);
+  const total=activeItems.reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
+  const computerTotal=activeItems.filter(item=>item.mainCategory==='Computers & Tablets').reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
+  const otherTotal=total-computerTotal;
+  const completeItems=activeItems.every(item=>item.brand?.trim()&&item.model?.trim()&&item.mainCategory&&item.subCategory&&item.serial?.trim()&&Number(item.amountNumber)>0);
+  const completeHolder=['name','email','phone','address','country','iban'].every(key=>String(mutationHolderDraft[key]||'').trim());
+  const checks=[
+    {label:'Items compleet',ok:completeItems,detail:completeItems?'Alle verplichte itemgegevens zijn ingevuld.':'Vul alle verplichte itemgegevens in.'},
+    {label:'Maximaal € 25.000 per item',ok:activeItems.every(item=>Number(item.amountNumber||0)<=25000),detail:'Harde productgrens'},
+    {label:'Maximaal € 100.000 totaal',ok:total<=100000,detail:`Nieuw totaal ${adminFormatEuro(total)}`},
+    {label:'Maximaal 100 items',ok:activeItems.length<=100,detail:`${activeItems.length} items`},
+    {label:'Vestigingsland Nederland',ok:mutationHolderDraft.country==='Nederland',detail:mutationHolderDraft.country||'Niet ingevuld'},
+    {label:'Computerapparatuur ≤ overige items',ok:computerTotal===0||computerTotal<=otherTotal,detail:`${adminFormatEuro(computerTotal)} tegenover ${adminFormatEuro(otherTotal)}`},
+    {label:'Verzekeringnemer compleet',ok:completeHolder,detail:completeHolder?'Alle verplichte gegevens zijn ingevuld.':'Vul alle verplichte gegevens in.'}
+  ];
+  return {checks,blocked:checks.some(check=>!check.ok)};
+}
+function renderAdminMutationValidation(){
+  const validation=adminMutationValidation();
+  const target=document.getElementById('adminMutationValidation');
+  if(target)target.innerHTML=`<div class="admin-mutation-validation-head"><strong>Volmachtregels</strong><span class="admin-chip ${validation.blocked?'red':'green'}">${validation.blocked?'Geblokkeerd':'Akkoord'}</span></div><div class="admin-mutation-validation-list">${validation.checks.map(check=>`<div class="${check.ok?'ok':'blocked'}"><b>${check.ok?'✓':'!'}</b><span><strong>${adminEscape(check.label)}</strong><small>${adminEscape(check.detail)}</small></span></div>`).join('')}</div>`;
+  return validation;
+}
 function refreshAdminMutationTotals(){
   const calculation=adminMutationCalculation();
+  const validation=renderAdminMutationValidation();
   document.getElementById('mutationCurrentAmount').textContent=adminFormatEuro(calculation.currentAmount);
   document.getElementById('mutationNewAmount').textContent=adminFormatEuro(calculation.total);
   document.getElementById('mutationCurrentPremium').textContent=adminFormatEuro(calculation.currentPremium);
@@ -225,26 +260,63 @@ function refreshAdminMutationTotals(){
   document.getElementById('mutationTotalLabel').textContent=calculation.mutationTotal<0?'Terug te ontvangen':'Nu te betalen';
   document.getElementById('mutationTotal').textContent=calculation.validDate?adminFormatEuro(Math.abs(calculation.mutationTotal)):'—';
   document.getElementById('mutationFormula').textContent=calculation.validDate?`(${adminFormatEuro(calculation.newPremium)} − ${adminFormatEuro(calculation.currentPremium)}) ÷ 365 × ${calculation.remaining} dagen = ${adminFormatEuro(calculation.prorated)} premieverschil.`:'Kies een geldige ingangsdatum vóór de prolongatiedatum.';
-  const submit=document.getElementById('mutationSubmit');if(submit){submit.disabled=!calculation.validDate||!calculation.hasChanges;submit.textContent='Wijziging inplannen';}
+  const submit=document.getElementById('mutationSubmit');if(submit){submit.disabled=!calculation.validDate||!calculation.hasChanges||validation.blocked;submit.textContent=validation.blocked?'Geblokkeerd door volmachtregels':'Wijziging inplannen';}
   document.getElementById('mutationRentalLimit').disabled=!document.getElementById('mutationRentalIn').checked;
 }
-function renderAdminMutation(){
+function populateMutationSubcategories(mainCategory,selected){
   const data=dossierData[activeDossierKey]||dossierData['policy-main'];
-  const categories=mutationCategories(data),receipts=mutationReceipts(data);
+  const values=mutationCategoryMap(data)[mainCategory]||[];
+  const select=document.getElementById('mutationItemSubcategory');
+  if(select)select.innerHTML=mutationSelectOptions(values,values.includes(selected)?selected:values[0]);
+}
+function closeMutationItemEditor(){
+  editingMutationItemIndex=-1;
+  const editor=document.getElementById('mutationItemEditor');if(editor)editor.hidden=true;
+  const error=document.getElementById('mutationItemEditorError');if(error)error.hidden=true;
+}
+function cancelMutationItemEditor(){
+  const item=adminMutationItems[editingMutationItemIndex];
+  if(item?.isDraft)adminMutationItems.splice(editingMutationItemIndex,1);
+  closeMutationItemEditor();renderAdminMutation();
+}
+function openMutationItemEditor(index){
+  const item=adminMutationItems[index];if(!item||item.removed)return;
+  const data=dossierData[activeDossierKey]||dossierData['policy-main'];
+  editingMutationItemIndex=index;
+  const mainCategories=Object.keys(mutationCategoryMap(data));
+  document.getElementById('mutationItemEditorTitle').textContent=item.isNew?'Item toevoegen':'Item wijzigen';
+  document.getElementById('mutationItemBrand').value=item.brand||'';
+  document.getElementById('mutationItemModel').value=item.model||'';
+  document.getElementById('mutationItemMainCategory').innerHTML=mutationSelectOptions(mainCategories,item.mainCategory||mainCategories[0]);
+  populateMutationSubcategories(item.mainCategory||mainCategories[0],item.subCategory);
+  document.getElementById('mutationItemSerial').value=item.serial||'';
+  document.getElementById('mutationItemReceipt').innerHTML=mutationSelectOptions(mutationReceipts(data),item.receipt||'Geen aankoopbewijs');
+  document.getElementById('mutationItemAmount').value=Number(item.amountNumber||0)||'';
+  document.getElementById('mutationItemEditorError').hidden=true;
+  const editor=document.getElementById('mutationItemEditor');if(editor){editor.hidden=false;editor.scrollIntoView?.({behavior:'smooth',block:'nearest'});}
+}
+function saveMutationItemEditor(){
+  const item=adminMutationItems[editingMutationItemIndex];if(!item)return;
+  const values={brand:document.getElementById('mutationItemBrand').value.trim(),model:document.getElementById('mutationItemModel').value.trim(),mainCategory:document.getElementById('mutationItemMainCategory').value,subCategory:document.getElementById('mutationItemSubcategory').value,serial:document.getElementById('mutationItemSerial').value.trim(),receipt:document.getElementById('mutationItemReceipt').value,amountNumber:Number(document.getElementById('mutationItemAmount').value||0)};
+  const valid=values.brand&&values.model&&values.mainCategory&&values.subCategory&&values.serial&&values.amountNumber>0;
+  document.getElementById('mutationItemEditorError').hidden=Boolean(valid);
+  if(!valid)return;
+  Object.assign(item,values,{category:[values.mainCategory,values.subCategory].join(' / '),isDraft:false});
+  closeMutationItemEditor();renderAdminMutation();
+}
+function renderAdminMutation(){
   const body=document.getElementById('mutationItemsBody');if(!body)return;
-  body.innerHTML=adminMutationItems.map((item,index)=>`<tr class="${item.removed?'admin-mutation-row-removed':item.isNew?'admin-mutation-row-added':''}"><td><input class="admin-input admin-mutation-brand" data-mutation-brand="${index}" value="${adminEscape(item.brand)}" aria-label="Merk" ${item.removed?'disabled':''}></td><td><input class="admin-input admin-mutation-model" data-mutation-model="${index}" value="${adminEscape(item.model)}" aria-label="Type of model" ${item.removed?'disabled':''}></td><td><select class="admin-input admin-mutation-category" data-mutation-category="${index}" aria-label="Categorie" ${item.removed?'disabled':''}>${mutationSelectOptions(categories,item.category)}</select></td><td><input class="admin-input admin-mutation-serial" data-mutation-serial="${index}" value="${adminEscape(item.serial)}" aria-label="Serienummer" ${item.removed?'disabled':''}></td><td><select class="admin-input admin-mutation-receipt" data-mutation-receipt="${index}" aria-label="Aankoopbewijs" ${item.removed?'disabled':''}>${mutationSelectOptions(receipts,item.receipt||'Geen aankoopbewijs')}</select></td><td><div class="admin-mutation-amount"><span>€</span><input class="admin-input" data-mutation-amount="${index}" type="number" min="0" step="50" value="${item.amountNumber}" ${item.removed?'disabled':''}></div></td><td><div class="admin-mutation-row-status"><span class="admin-chip ${item.removed?'red':item.isNew?'green':'gray'}">${item.removed?'Verwijderd':item.isNew?'Toegevoegd':'Actief'}</span><button class="admin-btn text" data-mutation-remove="${index}" type="button">${item.removed?'Herstellen':'Verwijderen'}</button></div></td></tr>`).join('');
+  const changedNames=new Set(buildAdminMutationChanges().filter(change=>change.type==='Gewijzigd').map(change=>change.item));
+  body.innerHTML=adminMutationItems.map((item,index)=>{const status=item.removed?'Verwijderd':item.isNew?'Toegevoegd':changedNames.has(item.original?.name)?'Gewijzigd':'Actief';const statusClass=item.removed?'red':item.isNew?'green':status==='Gewijzigd'?'blue':'gray';return `<div class="admin-mutation-item-row ${item.removed?'removed':item.isNew?'added':status==='Gewijzigd'?'changed':''}"><div class="admin-mutation-item-main"><strong>${adminEscape(mutationItemName(item))}</strong><span>${adminEscape(mutationItemCategory(item))}</span></div><div><span>Serienummer</span><strong>${adminEscape(item.serial||'—')}</strong></div><div><span>Aankoopbewijs</span><strong>${adminEscape(item.receipt||'Geen aankoopbewijs')}</strong></div><div class="admin-money"><span>Verzekerd bedrag</span><strong>${adminEscape(adminFormatEuro(item.amountNumber))}</strong></div><div class="admin-mutation-item-actions"><span class="admin-chip ${statusClass}">${status}</span><button class="admin-btn text" data-mutation-edit="${index}" type="button" ${item.removed?'disabled':''}>Bewerken</button><button class="admin-btn text" data-mutation-remove="${index}" type="button">${item.removed?'Herstellen':'Verwijderen'}</button></div></div>`;}).join('');
   refreshAdminMutationTotals();
-  body.querySelectorAll('[data-mutation-brand]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationBrand)].brand=input.value;refreshAdminMutationTotals();}));
-  body.querySelectorAll('[data-mutation-model]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationModel)].model=input.value;refreshAdminMutationTotals();}));
-  body.querySelectorAll('[data-mutation-category]').forEach(select=>select.addEventListener('change',()=>{adminMutationItems[Number(select.dataset.mutationCategory)].category=select.value;refreshAdminMutationTotals();}));
-  body.querySelectorAll('[data-mutation-serial]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationSerial)].serial=input.value;refreshAdminMutationTotals();}));
-  body.querySelectorAll('[data-mutation-receipt]').forEach(select=>select.addEventListener('change',()=>{adminMutationItems[Number(select.dataset.mutationReceipt)].receipt=select.value;refreshAdminMutationTotals();}));
-  body.querySelectorAll('[data-mutation-amount]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationAmount)].amountNumber=Number(input.value||0);refreshAdminMutationTotals();}));
-  body.querySelectorAll('[data-mutation-remove]').forEach(button=>button.addEventListener('click',()=>{const item=adminMutationItems[Number(button.dataset.mutationRemove)];item.removed=!item.removed;renderAdminMutation();}));
+  body.querySelectorAll('[data-mutation-edit]').forEach(button=>button.addEventListener('click',()=>openMutationItemEditor(Number(button.dataset.mutationEdit))));
+  body.querySelectorAll('[data-mutation-remove]').forEach(button=>button.addEventListener('click',()=>{const item=adminMutationItems[Number(button.dataset.mutationRemove)];item.removed=!item.removed;if(editingMutationItemIndex===Number(button.dataset.mutationRemove))closeMutationItemEditor();renderAdminMutation();}));
 }
 function openAdminMutation(){
   const data=dossierData[activeDossierKey]||dossierData['policy-main'];if(data.phase!=='Polis')return;
-  adminMutationItems=data.items.map((item,index)=>{const parts=item.name.split(' ');const brand=parts.shift()||'';const model=parts.join(' ');const amountNumber=adminEuroNumber(item.amount);return {...item,id:`existing-${index}`,brand,model,amountNumber,isNew:false,removed:false,original:{...item,name:item.name,brand,model,amountNumber}};});
+  adminMutationItems=data.items.map((item,index)=>{const parts=item.name.split(' ');const brand=parts.shift()||'';const model=parts.join(' ');const [mainCategory='',...subcategoryParts]=String(item.category||'').split(' / ');const subCategory=subcategoryParts.join(' / ');const amountNumber=adminEuroNumber(item.amount);return {...item,id:`existing-${index}`,brand,model,mainCategory,subCategory,amountNumber,isNew:false,removed:false,original:{...item,name:item.name,brand,model,mainCategory,subCategory,amountNumber}};});
+  mutationInitialHolder={...data.holder,country:data.holder.country||'Nederland'};
+  mutationHolderDraft={...mutationInitialHolder};
   mutationInitialRentalIn=!data.addons[0][1].startsWith('Niet');
   mutationInitialRentalOut=!data.addons[1][1].startsWith('Niet');
   mutationInitialRentalLimit='10000';
@@ -254,18 +326,25 @@ function openAdminMutation(){
   document.getElementById('mutationRentalOut').checked=mutationInitialRentalOut;
   document.getElementById('mutationRentalLimit').value=mutationInitialRentalLimit;
   document.getElementById('mutationEffectiveDate').value='2026-09-01';
+  [['mutationHolderName','name'],['mutationHolderKvk','kvk'],['mutationHolderEmail','email'],['mutationHolderPhone','phone'],['mutationHolderAddress','address'],['mutationHolderCountry','country'],['mutationHolderIban','iban']].forEach(([id,key])=>{const field=document.getElementById(id);if(field)field.value=mutationHolderDraft[key]||'';});
   document.getElementById('adminMutationSuccess').hidden=true;
-  renderAdminMutation();setAdminPage('policy-mutation');
+  closeMutationItemEditor();renderAdminMutation();setAdminPage('policy-mutation');
 }
 document.getElementById('dossierStartMutation')?.addEventListener('click',openAdminMutation);
+document.getElementById('dossierEditHolder')?.addEventListener('click',()=>{openAdminMutation();setTimeout(()=>document.getElementById('mutationHolderName')?.focus(),0);});
 document.getElementById('mutationBackButton')?.addEventListener('click',()=>{renderDossier(activeDossierKey);setAdminPage('dossier');});
-document.getElementById('mutationAddItem')?.addEventListener('click',()=>{const data=dossierData[activeDossierKey];adminMutationItems.push({id:`new-${Date.now()}`,brand:'',model:'',category:mutationCategories(data)[0],serial:'',receipt:'Geen aankoopbewijs',amountNumber:0,isNew:true,removed:false});renderAdminMutation();});
+document.getElementById('mutationAddItem')?.addEventListener('click',()=>{const data=dossierData[activeDossierKey];const map=mutationCategoryMap(data);const mainCategory=Object.keys(map)[0];adminMutationItems.push({id:`new-${Date.now()}`,brand:'',model:'',mainCategory,subCategory:map[mainCategory][0],serial:'',receipt:'Geen aankoopbewijs',amountNumber:0,isNew:true,isDraft:true,removed:false});renderAdminMutation();openMutationItemEditor(adminMutationItems.length-1);});
+document.getElementById('mutationItemMainCategory')?.addEventListener('change',event=>populateMutationSubcategories(event.target.value,''));
+document.getElementById('mutationItemEditorSave')?.addEventListener('click',saveMutationItemEditor);
+document.getElementById('mutationItemEditorCancel')?.addEventListener('click',cancelMutationItemEditor);
+document.getElementById('mutationItemEditorClose')?.addEventListener('click',cancelMutationItemEditor);
+[['mutationHolderName','name'],['mutationHolderEmail','email'],['mutationHolderPhone','phone'],['mutationHolderAddress','address'],['mutationHolderCountry','country'],['mutationHolderIban','iban']].forEach(([id,key])=>document.getElementById(id)?.addEventListener('input',event=>{mutationHolderDraft[key]=event.target.value;refreshAdminMutationTotals();}));
 document.getElementById('mutationRentalIn')?.addEventListener('change',refreshAdminMutationTotals);
 document.getElementById('mutationRentalOut')?.addEventListener('change',refreshAdminMutationTotals);
 document.getElementById('mutationRentalLimit')?.addEventListener('change',refreshAdminMutationTotals);
 document.getElementById('mutationEffectiveDate')?.addEventListener('change',refreshAdminMutationTotals);
 document.getElementById('mutationSubmit')?.addEventListener('click',()=>{
-  const data=dossierData[activeDossierKey];const effective=document.getElementById('mutationEffectiveDate')?.value;const changes=buildAdminMutationChanges();const calculation=adminMutationCalculation();if(!data||!effective||!calculation.validDate||!changes.length)return;
+  const data=dossierData[activeDossierKey];const effective=document.getElementById('mutationEffectiveDate')?.value;const changes=buildAdminMutationChanges();const calculation=adminMutationCalculation();if(!data||!effective||!calculation.validDate||!changes.length||adminMutationValidation().blocked)return;
   data.pendingMutation={reference:'MUT-2026-00129',effective:formatMutationDate(effective),created:'27 aug 2026 · 10:15',initiator:'Medewerker',status:'Gepland',changes};
   data.activities.unshift({date:'27 aug 2026 · 10:15',actor:'Medewerker',source:'GoSafe Admin',title:'Polismutatie ingepland',change:`${changes.length} wijzigingsregels klaargezet voor ${data.pendingMutation.effective}.`,detail:`Referentie: ${data.pendingMutation.reference} · Actor: Medewerker · Totaal verrekening: ${adminFormatEuro(calculation.mutationTotal)}`});
   const success=document.getElementById('adminMutationSuccess');if(success){success.hidden=false;success.innerHTML=`<div class="admin-future-mutation-head"><div><span class="admin-future-mutation-label">Wijziging opgeslagen</span><strong>${adminEscape(data.pendingMutation.reference)}</strong><small>${changes.length} technische wijzigingsregels · totaal verrekening ${adminEscape(adminFormatEuro(calculation.mutationTotal))}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">Gepland</span></div></div><div class="admin-mutation-change-list">${changes.map(renderPendingChange).join('')}</div>`;}
