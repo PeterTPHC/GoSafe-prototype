@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GoSafe – adminprototype</title>
-<link rel="stylesheet" href="assets/prototype.css?v=20260827-mutation-v4">
+<link rel="stylesheet" href="assets/prototype.css?v=20260827-mutation-v5">
 </head>
 <body><div class="prototype-toolbar admin-prototype-toolbar"><strong>GoSafe prototype</strong><div class="toolbar-group"><span class="toolbar-context">Adminomgeving</span><a class="toolbar-btn" href="index.html">← Naar klantflow</a></div></div><section class="screen active" id="screen-admin">
 <div class="admin-shell">
@@ -338,6 +338,7 @@
     <button data-dossier-tab="item-documents" type="button">Itemdocumenten</button>
     <button data-dossier-tab="policy-documents" type="button">Polisdocumenten</button>
     <button data-dossier-tab="activities" type="button">Activiteiten</button>
+    <button class="admin-dossier-context-tab" id="dossierContextTab" data-dossier-tab="context" type="button" hidden>Wijzigen</button>
   </div>
   <div class="admin-dossier-panel active" data-dossier-panel="overview">
     <div class="admin-future-mutation" id="dossierPendingMutation" hidden></div>
@@ -382,7 +383,7 @@
   <div class="admin-page-head admin-dossier-back"><div><button class="admin-btn text" id="relationMutationBackButton" type="button">← Terug naar dossier</button></div></div>
   <div class="admin-page-head"><div><h1 id="relationMutationTitle">Relatie wijzigen</h1><p id="relationMutationMeta"></p></div></div>
   <div class="admin-relation-mutation-layout">
-    <div class="admin-card"><div class="admin-card-head"><div><h2>Relatiegegevens</h2></div></div><div class="admin-card-body"><div class="admin-mutation-holder-form"><label><span>Naam / bedrijfsnaam *</span><input class="admin-input" id="relationHolderName"></label><label><span>KvK-nummer</span><input class="admin-input" id="relationHolderKvk" disabled></label><label><span>E-mailadres *</span><input class="admin-input" id="relationHolderEmail" type="email"></label><label><span>Telefoonnummer *</span><input class="admin-input" id="relationHolderPhone"></label><label class="wide"><span>Adres *</span><input class="admin-input" id="relationHolderAddress"></label><label><span>Land *</span><select class="admin-input" id="relationHolderCountry"><option>Nederland</option><option>België</option><option>Duitsland</option></select></label></div></div></div>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Relatiegegevens</h2></div></div><div class="admin-card-body"><div class="admin-mutation-holder-form"><label><span>Naam / bedrijfsnaam *</span><input class="admin-input" id="relationHolderName"></label><label><span>KvK-nummer</span><input class="admin-input" id="relationHolderKvk" disabled></label><label><span>E-mailadres *</span><input class="admin-input" id="relationHolderEmail" type="email"></label><label><span>Telefoonnummer *</span><input class="admin-input" id="relationHolderPhone"></label></div><div class="admin-address-editor"><div class="admin-address-editor-head"><div><strong>Vestigingsadres</strong><small>Zoek met postcode en huisnummer; straat en woonplaats worden automatisch ingevuld.</small></div></div><div class="admin-address-search-row"><label><span>Postcode *</span><input class="admin-input" id="relationAddressPostalCode" autocomplete="postal-code"></label><label><span>Huisnummer *</span><input class="admin-input" id="relationAddressHouseNumber" inputmode="numeric"></label><label><span>Toevoeging</span><input class="admin-input" id="relationAddressAddition"></label><button class="admin-btn" id="relationAddressSearch" type="button">Adres zoeken</button></div><div class="admin-address-lookup-status" id="relationAddressLookupStatus"></div><div class="admin-address-result-grid"><label><span>Straat *</span><input class="admin-input" id="relationAddressStreet" readonly></label><label><span>Woonplaats *</span><input class="admin-input" id="relationAddressCity" readonly></label><label><span>Land *</span><select class="admin-input" id="relationHolderCountry"><option value="NL">Nederland</option><option value="BE">België</option><option value="DE">Duitsland</option></select></label></div></div></div></div>
     <aside><div class="admin-card"><div class="admin-card-head"><div><h2>Betaling</h2></div></div><div class="admin-card-body"><div class="admin-detail-row"><span>IBAN</span><strong id="relationHolderIban">—</strong></div><p class="admin-relation-iban-note">Het IBAN kan hier niet worden gewijzigd. De klant past dit zelf aan en geeft daarbij opnieuw akkoord op de incassomachtiging.</p></div></div><div class="admin-card"><div class="admin-card-head"><div><h2>Controle</h2></div></div><div class="admin-card-body"><div id="relationMutationValidation"></div><button class="admin-btn primary admin-relation-submit" id="relationMutationSubmit" type="button">Relatiewijziging opslaan</button></div></div></aside>
   </div>
   <div class="admin-card admin-relation-success" id="relationMutationSuccess" hidden></div>
@@ -391,6 +392,6 @@
 </main>
 </div>
 </div>
-</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260827-mutation-v4"></script>
+</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260827-mutation-v5"></script>
 </body>
 </html>
