@@ -1,14 +1,122 @@
 // GoSafe Admin framework navigation
+let dossierReturnPage='applications';
 function setAdminPage(name){
   document.querySelectorAll('[data-admin-page]').forEach(el=>el.classList.toggle('active',el.dataset.adminPage===name));
-  document.querySelectorAll('.admin-nav[data-admin-target]').forEach(el=>el.classList.toggle('active',el.dataset.adminTarget===name));
+  const navName=name==='dossier'?dossierReturnPage:name;
+  document.querySelectorAll('.admin-nav[data-admin-target]').forEach(el=>el.classList.toggle('active',el.dataset.adminTarget===navName));
   document.querySelector('.admin-main')?.scrollTo?.({top:0,behavior:'smooth'});
 }
 document.querySelectorAll('[data-admin-target]').forEach(btn=>btn.addEventListener('click',()=>setAdminPage(btn.dataset.adminTarget)));
-document.querySelectorAll('.admin-open-dossier').forEach(btn=>btn.addEventListener('click',()=>setAdminPage('dossier')));
 document.getElementById('adminGlobalSearch')?.addEventListener('keydown',e=>{
   if(e.key==='Enter' && e.currentTarget.value.trim()) setAdminPage('relations');
 });
+
+// Polisadministratie: één dossier dat van aanvraag naar polis verandert
+const equipmentItems=[
+  {name:'Sony FX6',category:'Camera’s / Cinema camera',serial:'SFX6-492188',receipt:'MediaMarkt Pro · 12-08-2026',amount:'€ 8.500',premium:'€ 106,25'},
+  {name:'Canon RF 70-200mm F2.8',category:'Lenzen & Optiek / Zoomlens',serial:'CRF-771204',receipt:'Kamera Express · 04-02-2025',amount:'€ 3.200',premium:'€ 40,00'},
+  {name:'DJI RS 4 Pro',category:'Belichting / Gimbals & light rigs',serial:'DJI-RS4-8831',receipt:'Geen aankoopbewijs',amount:'€ 1.250',premium:'€ 15,63'},
+  {name:'MacBook Pro 16',category:'Computers & Tablets / Laptops',serial:'C02Z45LRLVDN',receipt:'Apple Store · 18-05-2026',amount:'€ 4.100',premium:'€ 51,25'},
+  {name:'Aputure lichtset',category:'Belichting / LED-lampen',serial:'APT-LS-14022',receipt:'Foto de Vakman · 09-07-2026',amount:'€ 22.800',premium:'€ 285,00'}
+];
+const instrumentItems=[
+  {name:'Fender American Professional II',category:'Snaarinstrumenten / Elektrische gitaar',serial:'US22041877',receipt:'Bax Music · 12-03-2026',amount:'€ 2.240',premium:'€ 14,00'},
+  {name:'Fender 1965 Stratocaster',category:'Snaarinstrumenten / Elektrische gitaar',serial:'L89214',receipt:'Vintage Guitar Shop · 06-01-2024',amount:'€ 24.000',premium:'€ 150,00'}
+];
+const dossierData={
+  'application-main':{
+    phase:'Aanvraag',status:'Ter akkoord',statusClass:'amber',dossier:'DOS-2026-00831',policy:'—',holder:{name:'Voorbeeld Media B.V.',type:'Zakelijk',kvk:'12345678',email:'sanne@voorbeeld.nl',phone:'020 123 45 67',address:'Wibautstraat 131-D, 1091 GL Amsterdam',iban:'NL45 RABO 0123 4567 89',tax:'BTW aftrekbaar'},product:'Apparatuurverzekering',received:'26 aug 2026 · 07:04',start:'1 sep 2026',amount:'€ 39.850',premium:'€ 498,13',items:equipmentItems,addons:[['Inhuur','Niet meeverzekerd'],['Verhuur','Wel meeverzekerd · 25% toeslag']],acceptance:{label:'Criteria akkoord',className:'green',text:'Alle vijf productcriteria zijn akkoord. Het dossier staat klaar voor verdere automatische verwerking.'},application:{source:'Aanvraagstraat',language:'Nederlands',submitted:'26 aug 2026 · 07:04',customerType:'Zakelijk',start:'1 sep 2026',slot:'Akkoord',privacy:'Akkoord',collection:'Akkoord met automatische incasso'},documents:[{name:'Aanvraagbevestiging DOS-2026-00831',type:'Aanvraag',date:'26 aug 2026',source:'Aanvraagstraat',status:'Opgeslagen',className:'blue'},{name:'Aankoopbewijs MediaMarkt Pro',type:'Aankoopbewijs',date:'12 aug 2026',source:'Klant',status:'Gekoppeld',className:'green'},{name:'Aankoopbewijs Kamera Express',type:'Aankoopbewijs',date:'4 feb 2025',source:'Klant',status:'Gekoppeld',className:'green'}],activities:[
+      {date:'26 aug 2026 · 07:04',actor:'Klant',source:'Aanvraagstraat',title:'Aanvraag ingediend',change:'Fase ingesteld op Aanvraag; status ingesteld op Ter akkoord.',detail:'Fase: — → Aanvraag · Status: — → Ter akkoord'},
+      {date:'26 aug 2026 · 07:03',actor:'Product API',source:'Aanvraagstraat',title:'Acceptatiecriteria gecontroleerd',change:'Alle vijf productcriteria zijn akkoord.',detail:'Resultaat: akkoord'},
+      {date:'26 aug 2026 · 06:58',actor:'Klant',source:'Aanvraagstraat',title:'Aanvullende dekking gekozen',change:'Verhuur van eigen apparatuur toegevoegd.',detail:'Verhuur: Nee → Ja'},
+      {date:'26 aug 2026 · 06:51',actor:'Klant',source:'Aanvraagstraat',title:'Item toegevoegd',change:'MacBook Pro 16 toegevoegd aan het dossier.',detail:'Verzekerd bedrag: € 35.750 → € 39.850'}
+    ]
+  },
+  'application-fallout':{
+    phase:'Aanvraag',status:'Uitval',statusClass:'red',dossier:'DOS-2026-00829',policy:'—',holder:{name:'J. de Vries',type:'Particulier',kvk:'—',email:'j.devries@example.nl',phone:'06 12 34 56 78',address:'Spaarndammerdijk 18, 1161 AA Zwanenburg',iban:'NL23 INGB 0001 2345 67',tax:'Niet van toepassing'},product:'Instrumentenverzekering',received:'25 aug 2026 · 21:18',start:'5 sep 2026',amount:'€ 112.500',premium:'€ 703,13',items:[{name:'Steinway & Sons vleugel',category:'Toetsinstrumenten / Vleugel',serial:'S-418228',receipt:'Piano Atelier · 14-06-2025',amount:'€ 87.500',premium:'€ 546,88'},{name:'Franse cello',category:'Snaarinstrumenten / Cello',serial:'CEL-1884-021',receipt:'Taxatierapport · 11-08-2026',amount:'€ 25.000',premium:'€ 156,25'}],addons:[['Inhuur','Niet meeverzekerd'],['Verhuur','Niet meeverzekerd']],acceptance:{label:'Uitval',className:'red',text:'Het totaal verzekerd bedrag is € 112.500 en overschrijdt de productgrens van € 100.000.'},application:{source:'Aanvraagstraat',language:'Nederlands',submitted:'25 aug 2026 · 21:18',customerType:'Particulier',start:'5 sep 2026',slot:'Akkoord',privacy:'Akkoord',collection:'Akkoord met automatische incasso'},documents:[{name:'Aanvraagbevestiging DOS-2026-00829',type:'Aanvraag',date:'25 aug 2026',source:'Aanvraagstraat',status:'Opgeslagen',className:'blue'},{name:'Taxatierapport cello',type:'Aankoopbewijs',date:'11 aug 2026',source:'Klant',status:'Gekoppeld',className:'green'}],activities:[
+      {date:'25 aug 2026 · 21:19',actor:'Product API',source:'Aanvraagstraat',title:'Aanvraag uitgevallen',change:'Totaal verzekerd bedrag overschrijdt de productgrens.',detail:'Status: Ter akkoord → Uitval · € 112.500 > € 100.000'},
+      {date:'25 aug 2026 · 21:18',actor:'Klant',source:'Aanvraagstraat',title:'Aanvraag ingediend',change:'Dossier aangemaakt in de fase Aanvraag.',detail:'Fase: — → Aanvraag · Status: — → Ter akkoord'}
+    ]
+  },
+  'policy-main':{
+    phase:'Polis',status:'Actief',statusClass:'green',dossier:'DOS-2026-00812',policy:'POL-2026-00184',holder:{name:'Voorbeeld Media B.V.',type:'Zakelijk',kvk:'12345678',email:'sanne@voorbeeld.nl',phone:'020 123 45 67',address:'Wibautstraat 131-D, 1091 GL Amsterdam',iban:'NL45 RABO 0123 4567 89',tax:'BTW aftrekbaar'},product:'Apparatuurverzekering',received:'25 aug 2026 · 15:30',start:'25 aug 2026',amount:'€ 39.850',premium:'€ 498,13',items:equipmentItems,addons:[['Inhuur','Niet meeverzekerd'],['Verhuur','Wel meeverzekerd · 25% toeslag']],acceptance:{label:'Geaccepteerd',className:'green',text:'Alle product- en compliancecontroles zijn akkoord. De verzekering is gesloten.'},application:{source:'Aanvraagstraat',language:'Nederlands',submitted:'25 aug 2026 · 15:30',customerType:'Zakelijk',start:'25 aug 2026',slot:'Akkoord',privacy:'Akkoord',collection:'Akkoord met automatische incasso'},documents:[{name:'Polis POL-2026-00184',type:'Polis',date:'25 aug 2026 · versie 1',source:'PDF-engine',status:'Definitief',className:'green'},{name:'Nota N-2026-010812',type:'Nota',date:'26 aug 2026',source:'PDF-engine',status:'Definitief',className:'green'},{name:'GoSafe Apparatuur NL 2026-01',type:'Voorwaarden',date:'Versie 2026-01',source:'Productconfiguratie',status:'Gekoppeld',className:'blue'},{name:'IPID Apparatuur NL 2026-01',type:'IPID',date:'Versie 2026-01',source:'Productconfiguratie',status:'Gekoppeld',className:'blue'},{name:'Aankoopbewijs MediaMarkt Pro',type:'Aankoopbewijs',date:'12 aug 2026',source:'Klant',status:'Gekoppeld',className:'green'}],activities:[
+      {date:'26 aug 2026 · 07:18',actor:'PDF-engine',source:'Systeem',title:'Nota aangemaakt',change:'Nota N-2026-010812 aan het dossier toegevoegd.',detail:'Document: — → N-2026-010812'},
+      {date:'25 aug 2026 · 15:35',actor:'Mail-engine',source:'Systeem',title:'Polisbevestiging verzonden',change:'Polis, voorwaarden en IPID verzonden aan sanne@voorbeeld.nl.',detail:'Resultaat: verzonden'},
+      {date:'25 aug 2026 · 15:32',actor:'Acceptatieproces',source:'Systeem',title:'Aanvraag omgezet naar polis',change:'Hetzelfde dossier is van fase en status veranderd en heeft een polisnummer gekregen.',detail:'Fase: Aanvraag → Polis · Status: Ter akkoord → Actief · Polisnummer: — → POL-2026-00184'},
+      {date:'25 aug 2026 · 15:31',actor:'Complianceproces',source:'Systeem',title:'Compliancecontrole afgerond',change:'Sanctie- en UBO-controle zijn zonder hit afgerond.',detail:'Resultaat: akkoord'},
+      {date:'25 aug 2026 · 15:30',actor:'Klant',source:'Aanvraagstraat',title:'Aanvraag ingediend',change:'Dossier aangemaakt in de fase Aanvraag.',detail:'Fase: — → Aanvraag · Status: — → Ter akkoord'},
+      {date:'25 aug 2026 · 15:12',actor:'Klant',source:'Aanvraagstraat',title:'Item toegevoegd',change:'Sony FX6 toegevoegd aan het dossier.',detail:'Aantal items: 4 → 5'}
+    ]
+  }
+};
+dossierData['application-sound']={...dossierData['application-main'],dossier:'DOS-2026-00824',holder:{...dossierData['application-main'].holder,name:'Sound Crew B.V.',kvk:'77440128',email:'info@soundcrew.nl',phone:'023 76 54 321'},received:'25 aug 2026 · 15:32',amount:'€ 58.400',premium:'€ 730,00'};
+dossierData['application-camera']={...dossierData['application-fallout'],dossier:'DOS-2026-00807',holder:{...dossierData['application-main'].holder,name:'Camera Works B.V.',kvk:'66120988',email:'administratie@cameraworks.nl',phone:'020 88 12 400'},product:'Apparatuurverzekering',received:'24 aug 2026 · 10:22',amount:'€ 26.300',premium:'€ 328,75',acceptance:{label:'Uitval',className:'red',text:'De aanvraag is uitgevallen omdat één object het maximum van € 25.000 overschrijdt.'}};
+dossierData['policy-jdevries']={...dossierData['policy-main'],dossier:'DOS-2026-00481',policy:'POL-2026-00312',holder:{...dossierData['application-fallout'].holder},product:'Instrumentenverzekering',received:'4 mei 2026 · 10:41',start:'4 mei 2026',amount:'€ 26.240',premium:'€ 164,00',items:instrumentItems};
+dossierData['policy-studio']={...dossierData['policy-main'],dossier:'DOS-2025-01228',policy:'POL-2025-00917',holder:{...dossierData['application-main'].holder,name:'Studio Noord B.V.',kvk:'87654321',email:'finance@studionoord.nl',phone:'050 22 18 880',address:'Helperpark 274, 9723 ZA Groningen'},received:'12 okt 2025 · 09:12',start:'12 okt 2025',amount:'€ 38.600',premium:'€ 482,50'};
+
+function adminEscape(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));}
+function renderDetailRows(rows){return rows.map(([label,value])=>`<div class="admin-detail-row"><span>${adminEscape(label)}</span><strong>${adminEscape(value)}</strong></div>`).join('');}
+function renderDetailSection(title,rows){return `<section class="admin-detail-section"><h3>${adminEscape(title)}</h3><div class="admin-detail-list">${renderDetailRows(rows)}</div></section>`;}
+function setDossierTab(name){
+  document.querySelectorAll('[data-dossier-tab]').forEach(button=>button.classList.toggle('active',button.dataset.dossierTab===name));
+  document.querySelectorAll('[data-dossier-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.dossierPanel===name));
+  document.querySelector('.admin-main')?.scrollTo?.({top:0,behavior:'smooth'});
+}
+function renderDossier(key){
+  const data=dossierData[key]||dossierData['policy-main'];
+  const set=(id,html)=>{const element=document.getElementById(id);if(element)element.innerHTML=html;};
+  const name=document.getElementById('dossierHolderName');if(name)name.textContent=data.holder.name;
+  const meta=document.getElementById('dossierHolderMeta');if(meta)meta.textContent=[data.holder.type,data.holder.kvk!=='—'?'KvK '+data.holder.kvk:null,data.holder.email,data.holder.phone].filter(Boolean).join(' · ');
+  set('dossierHeaderChips',`<span class="admin-chip blue">${adminEscape(data.phase)}</span><span class="admin-chip ${adminEscape(data.statusClass)}">${adminEscape(data.status)}</span><span class="admin-chip outline">${adminEscape(data.product)}</span>`);
+  set('dossierHeaderIdentifiers',`<div class="admin-dossier-identifier"><span>Dossiernummer</span><strong>${adminEscape(data.dossier)}</strong></div><div class="admin-dossier-identifier"><span>Polisnummer</span><strong class="${data.policy==='—'?'admin-value-muted':''}">${adminEscape(data.policy)}</strong></div><div class="admin-dossier-identifier"><span>${data.phase==='Polis'?'Ingangsdatum':'Ontvangen'}</span><strong>${adminEscape(data.phase==='Polis'?data.start:data.received.split(' · ')[0])}</strong></div>`);
+  set('dossierOverviewDetails',renderDetailRows([['Fase',data.phase],['Status',data.status],['Product',data.product],['Aanvraag ontvangen',data.received],['Gewenste / actuele ingang',data.start],['Verzekerd bedrag',data.amount],['Jaarpremie',data.premium]]));
+  set('dossierAddonDetails',renderDetailRows(data.addons));
+  set('dossierAcceptanceSummary',`<div class="admin-acceptance-result"><div><strong>${adminEscape(data.acceptance.label)}</strong><p>${adminEscape(data.acceptance.text)}</p></div><span class="admin-chip ${adminEscape(data.acceptance.className)}">${adminEscape(data.acceptance.label)}</span></div>`);
+  set('dossierApplicationMeta',`<div><span>Ingediend op</span><strong>${adminEscape(data.application.submitted)}</strong></div><div><span>Bron</span><strong>${adminEscape(data.application.source)}</strong></div><div><span>Taal</span><strong>${adminEscape(data.application.language)}</strong></div><div><span>Vastgelegd onder</span><strong>${adminEscape(data.dossier)}</strong></div>`);
+  set('dossierApplicationDetails',[
+    renderDetailSection('Verzekeringskeuze',[['Product',data.product],['Gewenste ingangsdatum',data.application.start],['Verzekerd bedrag',data.amount],['Jaarpremie',data.premium],['Aantal items',String(data.items.length)]]),
+    renderDetailSection('Akkoorden',[['Slotbepalingen',data.application.slot],['Privacyverklaring',data.application.privacy],['Automatische incasso',data.application.collection],['Type verzekeringnemer',data.application.customerType]])
+  ].join(''));
+  const itemSummary=document.getElementById('dossierItemSummary');if(itemSummary)itemSummary.textContent=data.items.length+' items · totaal '+data.amount;
+  set('dossierItemsBody',data.items.map(item=>`<tr><td><div class="admin-primary">${adminEscape(item.name)}</div></td><td>${adminEscape(item.category)}</td><td>${adminEscape(item.serial)}</td><td>${adminEscape(item.receipt)}</td><td class="admin-money">${adminEscape(item.amount)}</td><td class="admin-money">${adminEscape(item.premium)}</td></tr>`).join(''));
+  set('dossierHolderDetails',[
+    renderDetailSection('Verzekeringnemer',[['Naam',data.holder.name],['Type',data.holder.type],['KvK-nummer',data.holder.kvk],['Adres',data.holder.address],['BTW',data.holder.tax]]),
+    renderDetailSection('Contact en betaling',[['E-mailadres',data.holder.email],['Telefoonnummer',data.holder.phone],['IBAN',data.holder.iban],['Incassomachtiging',data.application.collection]])
+  ].join(''));
+  set('dossierDocumentsBody',data.documents.map(documentItem=>`<tr><td><div class="admin-document-name">${adminEscape(documentItem.name)}</div></td><td>${adminEscape(documentItem.type)}</td><td>${adminEscape(documentItem.date)}</td><td>${adminEscape(documentItem.source)}</td><td><span class="admin-chip ${adminEscape(documentItem.className)}">${adminEscape(documentItem.status)}</span></td></tr>`).join(''));
+  set('dossierRecentActivities',data.activities.slice(0,5).map(activity=>`<div class="admin-event"><div class="admin-event-time">${adminEscape(activity.date.replace(' 2026','').replace(' 2025',''))}</div><div class="admin-event-mark"></div><div><div class="admin-event-title">${adminEscape(activity.title)}</div><div class="admin-event-copy">${adminEscape(activity.actor)} · ${adminEscape(activity.change)}</div></div></div>`).join(''));
+  set('dossierActivitiesBody',data.activities.map(activity=>`<tr><td>${adminEscape(activity.date)}</td><td><div class="admin-primary">${adminEscape(activity.actor)}</div></td><td>${adminEscape(activity.source)}</td><td><div class="admin-primary">${adminEscape(activity.title)}</div></td><td class="admin-activity-change"><strong>${adminEscape(activity.change)}</strong><code>${adminEscape(activity.detail)}</code></td></tr>`).join(''));
+  setDossierTab('overview');
+}
+function openDossier(trigger){
+  dossierReturnPage=trigger.closest('[data-admin-page]')?.dataset.adminPage||'applications';
+  if(!['applications','policies','relations','workqueue','overview'].includes(dossierReturnPage))dossierReturnPage='applications';
+  renderDossier(trigger.dataset.dossierKey||'policy-main');
+  const back=document.getElementById('dossierBackButton');if(back)back.textContent='← Terug naar '+({applications:'aanvragen',policies:'polissen',relations:'relaties',workqueue:'werkvoorraad',overview:'overzicht'}[dossierReturnPage]||'overzicht');
+  setAdminPage('dossier');
+}
+document.addEventListener('click',event=>{const trigger=event.target.closest('[data-open-dossier],.admin-open-dossier');if(trigger)openDossier(trigger);});
+document.querySelectorAll('.admin-dossier-row').forEach(row=>row.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openDossier(row);}}));
+document.getElementById('dossierBackButton')?.addEventListener('click',()=>setAdminPage(dossierReturnPage));
+document.querySelectorAll('[data-dossier-tab]').forEach(button=>button.addEventListener('click',()=>setDossierTab(button.dataset.dossierTab)));
+document.querySelector('[data-show-dossier-activities]')?.addEventListener('click',()=>setDossierTab('activities'));
+
+function setupDossierList({bodyId,searchId,statusId,productId,dateId,countId,singular,plural}){
+  const body=document.getElementById(bodyId);if(!body)return;
+  const controls=[searchId,statusId,productId,dateId].map(id=>document.getElementById(id));
+  const apply=()=>{
+    const [search,status,product,date]=controls.map(control=>(control?.value||'').trim().toLowerCase());
+    let visible=0;
+    body.querySelectorAll('.admin-dossier-row').forEach(row=>{
+      const matches=(!search||(row.dataset.search||'').includes(search))&&(!status||row.dataset.status===status)&&(!product||row.dataset.product===product)&&(!date||(row.dataset.date||'').includes(date));
+      row.hidden=!matches;if(matches)visible++;
+    });
+    const count=document.getElementById(countId);if(count)count.textContent=visible+' '+(visible===1?singular:plural);
+  };
+  controls.forEach(control=>control?.addEventListener(control.tagName==='INPUT'?'input':'change',apply));
+}
+setupDossierList({bodyId:'applicationListBody',searchId:'applicationListSearch',statusId:'applicationStatusFilter',productId:'applicationProductFilter',dateId:'applicationDateFilter',countId:'applicationResultCount',singular:'aanvraag',plural:'aanvragen'});
+setupDossierList({bodyId:'policyListBody',searchId:'policyListSearch',statusId:'policyStatusFilter',productId:'policyProductFilter',dateId:'policyDateFilter',countId:'policyResultCount',singular:'polis',plural:'polissen'});
 
 
 // Productbeheer prototype interactions
