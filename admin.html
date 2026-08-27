@@ -330,7 +330,7 @@
 
 <div class="admin-page" data-admin-page="dossier">
   <div class="admin-page-head admin-dossier-back"><div><button class="admin-btn text" id="dossierBackButton" type="button">← Terug naar overzicht</button></div></div>
-  <div class="admin-dossier-head admin-insurance-dossier-head"><div><div class="admin-dossier-kicker">Verzekeringsdossier</div><div class="admin-dossier-name" id="dossierHolderName">Voorbeeld Media B.V.</div><div class="admin-dossier-meta" id="dossierHolderMeta"></div><div class="admin-dossier-chips" id="dossierHeaderChips"></div></div><div class="admin-dossier-head-side"><div class="admin-dossier-identifiers" id="dossierHeaderIdentifiers"></div><a class="admin-btn primary admin-dossier-mutate" id="dossierStartMutation" href="index.html?context=admin">Polis wijzigen</a></div></div>
+  <div class="admin-dossier-head admin-insurance-dossier-head"><div><div class="admin-dossier-kicker">Verzekeringsdossier</div><div class="admin-dossier-name" id="dossierHolderName">Voorbeeld Media B.V.</div><div class="admin-dossier-meta" id="dossierHolderMeta"></div><div class="admin-dossier-chips" id="dossierHeaderChips"></div></div><div class="admin-dossier-head-side"><div class="admin-dossier-identifiers" id="dossierHeaderIdentifiers"></div><button class="admin-btn primary admin-dossier-mutate" id="dossierStartMutation" type="button">Polis wijzigen</button></div></div>
   <div class="admin-dossier-tabs" role="tablist" aria-label="Dossieronderdelen">
     <button class="active" data-dossier-tab="overview" type="button">Overzicht</button>
     <button data-dossier-tab="items" type="button">Verzekerde items</button>
@@ -361,6 +361,17 @@
   <div class="admin-dossier-panel" data-dossier-panel="activities">
     <div class="admin-card"><div class="admin-card-head"><div><h2>Activiteitenlog</h2><p>Alle dossiermutaties, inclusief actor, bron en gewijzigde waarden.</p></div></div><div class="admin-table-wrap"><table class="admin-table admin-activity-table"><thead><tr><th>Datum / tijd</th><th>Actor</th><th>Bron</th><th>Activiteit</th><th>Wijziging</th></tr></thead><tbody id="dossierActivitiesBody"></tbody></table></div></div>
   </div>
+</div>
+
+<div class="admin-page" data-admin-page="policy-mutation">
+  <div class="admin-page-head admin-dossier-back"><div><button class="admin-btn text" id="mutationBackButton" type="button">← Terug naar dossier</button></div></div>
+  <div class="admin-page-head"><div><h1 id="mutationPageTitle">Polis wijzigen</h1><p id="mutationPageMeta"></p></div></div>
+  <div class="admin-mutation-context"><strong>Wijzigen als beheerder</strong><span>Dezelfde poliswijziging als in Mijn GoSafe. De medewerker, bron en gewijzigde waarden worden vastgelegd in het activiteitenlog.</span></div>
+  <div class="admin-future-mutation" id="adminMutationSuccess" hidden></div>
+  <div class="admin-mutation-layout"><div>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Verzekerde items</h2></div><button class="admin-btn" id="mutationAddItem" type="button">Item toevoegen</button></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Item</th><th>Categorie</th><th>Serienummer</th><th>Verzekerd bedrag</th><th></th></tr></thead><tbody id="mutationItemsBody"></tbody></table></div></div>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Aanvullende dekkingen</h2></div></div><div class="admin-card-body admin-mutation-options"><label><input id="mutationRentalIn" type="checkbox"><span><strong>Ingehuurde apparatuur</strong><small>Verzekerd bedrag € 10.000 · € 150 per jaar</small></span></label><label><input id="mutationRentalOut" type="checkbox"><span><strong>Verhuur eigen apparatuur</strong><small>25% toeslag op de itempremie</small></span></label></div></div>
+  </div><aside class="admin-card admin-mutation-summary"><div class="admin-card-head"><div><h2>Wijziging controleren</h2></div></div><div class="admin-card-body"><label class="admin-mutation-date"><span>Ingangsdatum wijziging</span><input class="admin-input" id="mutationEffectiveDate" type="date" value="2026-09-01" min="2026-08-27"></label><div class="admin-detail-list"><div class="admin-detail-row"><span>Huidig verzekerd bedrag</span><strong id="mutationCurrentAmount">€ 0</strong></div><div class="admin-detail-row"><span>Nieuw verzekerd bedrag</span><strong id="mutationNewAmount">€ 0</strong></div><div class="admin-detail-row"><span>Huidige jaarpremie</span><strong id="mutationCurrentPremium">€ 0</strong></div><div class="admin-detail-row"><span>Nieuwe jaarpremie</span><strong id="mutationNewPremium">€ 0</strong></div></div><p class="admin-mutation-note">Bij een toekomstige ingangsdatum blijft de actieve polis ongewijzigd. De nieuwe polisversie en nota worden pas op die datum gegenereerd.</p><button class="admin-btn primary admin-mutation-submit" id="mutationSubmit" type="button">Wijziging inplannen</button></div></aside></div>
 </div>
 
 </main>
