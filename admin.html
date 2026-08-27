@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GoSafe – adminprototype</title>
-<link rel="stylesheet" href="assets/prototype.css?v=20260827-polisdossier">
+<link rel="stylesheet" href="assets/prototype.css?v=20260827-policy-mutations">
 </head>
 <body><div class="prototype-toolbar admin-prototype-toolbar"><strong>GoSafe prototype</strong><div class="toolbar-group"><span class="toolbar-context">Adminomgeving</span><a class="toolbar-btn" href="index.html">← Naar klantflow</a></div></div><section class="screen active" id="screen-admin">
 <div class="admin-shell">
@@ -117,10 +117,10 @@
 <div class="admin-page" data-admin-page="policies">
   <div class="admin-page-head"><div><h1>Polissen</h1><p>Alle dossiers die zich in de fase Polis bevinden.</p></div></div>
   <div class="admin-filterbar"><input class="grow" id="policyListSearch" type="search" placeholder="Zoek polis, dossier, naam of e-mailadres"/><select id="policyStatusFilter"><option value="">Alle statussen</option><option value="actief">Actief</option></select><select id="policyProductFilter"><option value="">Alle producten</option><option value="apparatuurverzekering">Apparatuurverzekering</option><option value="instrumentenverzekering">Instrumentenverzekering</option></select><select id="policyDateFilter"><option value="">Alle ingangsdatums</option><option value="deze maand">Deze maand</option><option value="dit jaar">Dit jaar</option></select><span class="admin-result-count" id="policyResultCount">3 polissen</span></div>
-  <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-dossier-list"><thead><tr><th>Polis</th><th>Verzekeringnemer</th><th>Product</th><th>Ingangsdatum</th><th>Verzekerd bedrag</th><th>Jaarpremie</th><th>Status</th><th>Laatste activiteit</th></tr></thead><tbody id="policyListBody">
-    <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="policy-main" data-search="pol-2026-00184 dos-2026-00812 voorbeeld media b.v. sanne@voorbeeld.nl" data-status="actief" data-product="apparatuurverzekering" data-date="deze maand dit jaar"><td><div class="admin-primary admin-link">POL-2026-00184</div><div class="admin-secondary">DOS-2026-00812</div></td><td><div class="admin-primary">Voorbeeld Media B.V.</div><div class="admin-secondary">sanne@voorbeeld.nl</div></td><td>Apparatuurverzekering</td><td>25 aug 2026</td><td class="admin-money">€ 39.850</td><td class="admin-money">€ 498,13</td><td><span class="admin-chip green">Actief</span></td><td>26 aug · 07:18</td></tr>
-    <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="policy-jdevries" data-search="pol-2026-00312 dos-2026-00481 j. de vries j.devries@example.nl" data-status="actief" data-product="instrumentenverzekering" data-date="dit jaar"><td><div class="admin-primary admin-link">POL-2026-00312</div><div class="admin-secondary">DOS-2026-00481</div></td><td><div class="admin-primary">J. de Vries</div><div class="admin-secondary">j.devries@example.nl</div></td><td>Instrumentenverzekering</td><td>4 mei 2026</td><td class="admin-money">€ 26.240</td><td class="admin-money">€ 164,00</td><td><span class="admin-chip green">Actief</span></td><td>4 mei · 10:44</td></tr>
-    <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="policy-studio" data-search="pol-2025-00917 dos-2025-01228 studio noord b.v. finance@studionoord.nl" data-status="actief" data-product="apparatuurverzekering" data-date=""><td><div class="admin-primary admin-link">POL-2025-00917</div><div class="admin-secondary">DOS-2025-01228</div></td><td><div class="admin-primary">Studio Noord B.V.</div><div class="admin-secondary">finance@studionoord.nl</div></td><td>Apparatuurverzekering</td><td>12 okt 2025</td><td class="admin-money">€ 38.600</td><td class="admin-money">€ 482,50</td><td><span class="admin-chip green">Actief</span></td><td>9 mrt · 14:06</td></tr>
+  <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-dossier-list"><thead><tr><th>Polis</th><th>Verzekeringnemer</th><th>Product</th><th>Ingangsdatum</th><th>Prolongatiedatum</th><th>Verzekerd bedrag</th><th>Jaarpremie</th><th>Status</th><th>Komende wijziging</th><th>Laatste activiteit</th></tr></thead><tbody id="policyListBody">
+    <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="policy-main" data-search="pol-2026-00184 dos-2026-00812 voorbeeld media b.v. sanne@voorbeeld.nl mut-2026-00128" data-status="actief" data-product="apparatuurverzekering" data-date="deze maand dit jaar"><td><div class="admin-primary admin-link">POL-2026-00184</div><div class="admin-secondary">DOS-2026-00812</div></td><td><div class="admin-primary">Voorbeeld Media B.V.</div><div class="admin-secondary">sanne@voorbeeld.nl</div></td><td>Apparatuurverzekering</td><td>25 aug 2026</td><td><strong>25 aug 2027</strong></td><td class="admin-money">€ 39.850</td><td class="admin-money">€ 498,13</td><td><span class="admin-chip green">Actief</span></td><td><span class="admin-chip amber">Per 1 sep 2026</span><div class="admin-secondary">MUT-2026-00128</div></td><td>27 aug · 09:42</td></tr>
+    <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="policy-jdevries" data-search="pol-2026-00312 dos-2026-00481 j. de vries j.devries@example.nl" data-status="actief" data-product="instrumentenverzekering" data-date="dit jaar"><td><div class="admin-primary admin-link">POL-2026-00312</div><div class="admin-secondary">DOS-2026-00481</div></td><td><div class="admin-primary">J. de Vries</div><div class="admin-secondary">j.devries@example.nl</div></td><td>Instrumentenverzekering</td><td>4 mei 2026</td><td><strong>4 mei 2027</strong></td><td class="admin-money">€ 26.240</td><td class="admin-money">€ 164,00</td><td><span class="admin-chip green">Actief</span></td><td><span class="admin-value-muted">Geen</span></td><td>4 mei · 10:44</td></tr>
+    <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="policy-studio" data-search="pol-2025-00917 dos-2025-01228 studio noord b.v. finance@studionoord.nl" data-status="actief" data-product="apparatuurverzekering" data-date=""><td><div class="admin-primary admin-link">POL-2025-00917</div><div class="admin-secondary">DOS-2025-01228</div></td><td><div class="admin-primary">Studio Noord B.V.</div><div class="admin-secondary">finance@studionoord.nl</div></td><td>Apparatuurverzekering</td><td>12 okt 2025</td><td><strong>12 okt 2026</strong></td><td class="admin-money">€ 38.600</td><td class="admin-money">€ 482,50</td><td><span class="admin-chip green">Actief</span></td><td><span class="admin-value-muted">Geen</span></td><td>9 mrt · 14:06</td></tr>
   </tbody></table></div></div>
 </div>
 
@@ -330,16 +330,16 @@
 
 <div class="admin-page" data-admin-page="dossier">
   <div class="admin-page-head admin-dossier-back"><div><button class="admin-btn text" id="dossierBackButton" type="button">← Terug naar overzicht</button></div></div>
-  <div class="admin-dossier-head admin-insurance-dossier-head"><div><div class="admin-dossier-kicker">Verzekeringsdossier</div><div class="admin-dossier-name" id="dossierHolderName">Voorbeeld Media B.V.</div><div class="admin-dossier-meta" id="dossierHolderMeta"></div><div class="admin-dossier-chips" id="dossierHeaderChips"></div></div><div class="admin-dossier-identifiers" id="dossierHeaderIdentifiers"></div></div>
+  <div class="admin-dossier-head admin-insurance-dossier-head"><div><div class="admin-dossier-kicker">Verzekeringsdossier</div><div class="admin-dossier-name" id="dossierHolderName">Voorbeeld Media B.V.</div><div class="admin-dossier-meta" id="dossierHolderMeta"></div><div class="admin-dossier-chips" id="dossierHeaderChips"></div></div><div class="admin-dossier-head-side"><div class="admin-dossier-identifiers" id="dossierHeaderIdentifiers"></div><a class="admin-btn primary admin-dossier-mutate" id="dossierStartMutation" href="index.html?context=admin">Polis wijzigen</a></div></div>
   <div class="admin-dossier-tabs" role="tablist" aria-label="Dossieronderdelen">
     <button class="active" data-dossier-tab="overview" type="button">Overzicht</button>
-    <button data-dossier-tab="application" type="button">Aanvraaggegevens</button>
     <button data-dossier-tab="items" type="button">Verzekerde items</button>
     <button data-dossier-tab="holder" type="button">Verzekeringnemer</button>
     <button data-dossier-tab="documents" type="button">Documenten</button>
     <button data-dossier-tab="activities" type="button">Activiteiten</button>
   </div>
   <div class="admin-dossier-panel active" data-dossier-panel="overview">
+    <div class="admin-future-mutation" id="dossierPendingMutation" hidden></div>
     <div class="admin-dossier-layout"><div>
       <div class="admin-card"><div class="admin-card-head"><div><h2>Dossiergegevens</h2></div></div><div class="admin-card-body"><div class="admin-detail-list" id="dossierOverviewDetails"></div></div></div>
       <div class="admin-card"><div class="admin-card-head"><div><h2>Aanvullende dekkingen</h2></div></div><div class="admin-card-body"><div class="admin-detail-list" id="dossierAddonDetails"></div></div></div>
@@ -348,9 +348,6 @@
       <div class="admin-card"><div class="admin-card-head"><div><h2>Laatste activiteiten</h2></div><button class="admin-card-link admin-card-link-button" data-show-dossier-activities type="button">Alles bekijken</button></div><div class="admin-card-body"><div class="admin-timeline" id="dossierRecentActivities"></div></div></div>
     </div></div>
   </div>
-  <div class="admin-dossier-panel" data-dossier-panel="application">
-    <div class="admin-card"><div class="admin-card-head"><div><h2>Oorspronkelijke aanvraag</h2><p>De gegevens zoals de verzekeringnemer deze heeft ingediend.</p></div></div><div class="admin-card-body"><div class="admin-application-meta" id="dossierApplicationMeta"></div><div class="admin-detail-section-grid" id="dossierApplicationDetails"></div></div></div>
-  </div>
   <div class="admin-dossier-panel" data-dossier-panel="items">
     <div class="admin-card"><div class="admin-card-head"><div><h2>Verzekerde items</h2><p id="dossierItemSummary"></p></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Item</th><th>Categorie</th><th>Serienummer</th><th>Aankoopbewijs</th><th>Verzekerd bedrag</th><th>Jaarpremie</th></tr></thead><tbody id="dossierItemsBody"></tbody></table></div></div>
   </div>
@@ -358,7 +355,8 @@
     <div class="admin-detail-section-grid" id="dossierHolderDetails"></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="documents">
-    <div class="admin-card"><div class="admin-card-head"><div><h2>Documenten</h2><p>Documenten die bij dit dossier zijn opgeslagen.</p></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Type</th><th>Versie / datum</th><th>Bron</th><th>Status</th></tr></thead><tbody id="dossierDocumentsBody"></tbody></table></div></div>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Itemdocumenten</h2><p>Bewijsstukken die aan één of meer verzekerde items zijn gekoppeld.</p></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Soort</th><th>Gekoppeld item</th><th>Datum</th><th>Status</th></tr></thead><tbody id="dossierItemDocumentsBody"></tbody></table></div></div>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Polisdocumenten</h2><p>Alle polissen, nota's en creditnota's die voor dit dossier zijn afgegeven.</p></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Soort</th><th>Afgegeven</th><th>Geldig vanaf</th><th>Status</th></tr></thead><tbody id="dossierPolicyDocumentsBody"></tbody></table></div></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="activities">
     <div class="admin-card"><div class="admin-card-head"><div><h2>Activiteitenlog</h2><p>Alle dossiermutaties, inclusief actor, bron en gewijzigde waarden.</p></div></div><div class="admin-table-wrap"><table class="admin-table admin-activity-table"><thead><tr><th>Datum / tijd</th><th>Actor</th><th>Bron</th><th>Activiteit</th><th>Wijziging</th></tr></thead><tbody id="dossierActivitiesBody"></tbody></table></div></div>
@@ -368,6 +366,6 @@
 </main>
 </div>
 </div>
-</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260827-polisdossier"></script>
+</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260827-policy-mutations"></script>
 </body>
 </html>
