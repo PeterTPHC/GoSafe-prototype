@@ -77,12 +77,20 @@ Object.values(dossierData).forEach(data=>{
     {name:`Nota ${data.policy.replace('POL','N')}-01`,type:'Nota',issued:data.start,valid:data.start,status:'Afgegeven',className:'blue'}
   ]:[];
 });
-dossierData['policy-main'].pendingMutation={reference:'MUT-2026-00128',effective:'1 sep 2026',created:'27 aug 2026 · 09:42',initiator:'Klant',summary:'Sony FX6 vervangen en verzekerd bedrag gewijzigd naar € 41.250',status:'Gepland'};
+dossierData['policy-main'].pendingMutation={reference:'MUT-2026-00128',effective:'1 sep 2026',created:'27 aug 2026 · 09:42',initiator:'Klant',status:'Gepland',changes:[
+  {type:'Gewijzigd',className:'blue',item:'Sony FX6',fields:[{label:'Categorie',old:'Camera’s / Cinema camera',new:'Camera’s / Professionele videocamera'},{label:'Verzekerd bedrag',old:'€ 8.500',new:'€ 9.000'}]},
+  {type:'Verwijderd',className:'red',item:'DJI RS 4 Pro',fields:[{label:'Status',old:'Meeverzekerd',new:'Verwijderd'}]},
+  {type:'Toegevoegd',className:'green',item:'Canon EOS R5 C',fields:[{label:'Categorie',old:'—',new:'Camera’s / Cinema camera'},{label:'Verzekerd bedrag',old:'—',new:'€ 2.650'}]}
+]};
 dossierData['policy-main'].activities.unshift({date:'27 aug 2026 · 09:42',actor:'Klant',source:'Mijn GoSafe',title:'Polismutatie ingepland',change:'Een wijziging is klaargezet en gaat op 1 september 2026 in.',detail:'Referentie: MUT-2026-00128 · Status: Gepland'});
 
 function adminEscape(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));}
 function renderDetailRows(rows){return rows.map(([label,value])=>`<div class="admin-detail-row"><span>${adminEscape(label)}</span><strong>${adminEscape(value)}</strong></div>`).join('');}
 function renderDetailSection(title,rows){return `<section class="admin-detail-section"><h3>${adminEscape(title)}</h3><div class="admin-detail-list">${renderDetailRows(rows)}</div></section>`;}
+function renderPendingChange(change){
+  return `<div class="admin-mutation-change"><div><span class="admin-chip ${adminEscape(change.className)}">${adminEscape(change.type)}</span><strong>${adminEscape(change.item)}</strong></div><div>${change.fields.map(field=>`<span><b>${adminEscape(field.label)}</b><code>${adminEscape(field.old)}</code><i>→</i><code>${adminEscape(field.new)}</code></span>`).join('')}</div></div>`;
+}
+function pendingChangeForItem(data,itemName){return data.pendingMutation?.changes?.find(change=>change.item===itemName);}
 function setDossierTab(name){
   document.querySelectorAll('[data-dossier-tab]').forEach(button=>button.classList.toggle('active',button.dataset.dossierTab===name));
   document.querySelectorAll('[data-dossier-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.dossierPanel===name));
@@ -98,7 +106,7 @@ function renderDossier(key){
   set('dossierHeaderIdentifiers',`<div class="admin-dossier-identifier"><span>Dossiernummer</span><strong>${adminEscape(data.dossier)}</strong></div><div class="admin-dossier-identifier"><span>Polisnummer</span><strong class="${data.policy==='—'?'admin-value-muted':''}">${adminEscape(data.policy)}</strong></div><div class="admin-dossier-identifier"><span>${data.phase==='Polis'?'Ingangsdatum':'Ontvangen'}</span><strong>${adminEscape(data.phase==='Polis'?data.start:data.received.split(' · ')[0])}</strong></div>${data.phase==='Polis'?`<div class="admin-dossier-identifier"><span>Prolongatiedatum</span><strong>${adminEscape(data.renewalDate)}</strong></div>`:''}`);
   set('dossierOverviewDetails',renderDetailRows([['Fase',data.phase],['Status',data.status],['Product',data.product],['Aanvraag ontvangen',data.received],['Gewenste / actuele ingang',data.start],...(data.phase==='Polis'?[['Prolongatiedatum',data.renewalDate]]:[]),['Verzekerd bedrag',data.amount],['Jaarpremie',data.premium],['Voorwaarden',data.terms],['IPID',data.ipid]]));
   const pending=document.getElementById('dossierPendingMutation');
-  if(pending){pending.hidden=!data.pendingMutation;pending.innerHTML=data.pendingMutation?`<div><span class="admin-future-mutation-label">Komende wijziging</span><strong>${adminEscape(data.pendingMutation.summary)}</strong><small>${adminEscape(data.pendingMutation.reference)} · gestart door ${adminEscape(data.pendingMutation.initiator)} op ${adminEscape(data.pendingMutation.created)}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">${adminEscape(data.pendingMutation.status)}</span></div>`:'';}
+  if(pending){pending.hidden=!data.pendingMutation;pending.innerHTML=data.pendingMutation?`<div class="admin-future-mutation-head"><div><span class="admin-future-mutation-label">Komende wijziging</span><strong>${adminEscape(data.pendingMutation.reference)}</strong><small>Gestart door ${adminEscape(data.pendingMutation.initiator)} op ${adminEscape(data.pendingMutation.created)}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">${adminEscape(data.pendingMutation.status)}</span></div></div><div class="admin-mutation-change-list">${(data.pendingMutation.changes||[]).map(renderPendingChange).join('')}</div>`:'';}
   const mutate=document.getElementById('dossierStartMutation');
   if(mutate)mutate.hidden=data.phase!=='Polis';
   set('dossierAddonDetails',renderDetailRows(data.addons));
@@ -109,7 +117,9 @@ function renderDossier(key){
     renderDetailSection('Akkoorden',[['Slotbepalingen',data.application.slot],['Privacyverklaring',data.application.privacy],['Automatische incasso',data.application.collection],['Type verzekeringnemer',data.application.customerType]])
   ].join(''));
   const itemSummary=document.getElementById('dossierItemSummary');if(itemSummary)itemSummary.textContent=data.items.length+' items · totaal '+data.amount;
-  set('dossierItemsBody',data.items.map(item=>`<tr><td><div class="admin-primary">${adminEscape(item.name)}</div></td><td>${adminEscape(item.category)}</td><td>${adminEscape(item.serial)}</td><td>${adminEscape(item.receipt)}</td><td class="admin-money">${adminEscape(item.amount)}</td><td class="admin-money">${adminEscape(item.premium)}</td></tr>`).join(''));
+  const activeItemRows=data.items.map(item=>{const change=pendingChangeForItem(data,item.name);return `<tr class="${change?.type==='Verwijderd'?'admin-item-pending-remove':''}"><td><div class="admin-primary">${adminEscape(item.name)}</div></td><td>${adminEscape(item.category)}</td><td>${adminEscape(item.serial)}</td><td>${adminEscape(item.receipt)}</td><td class="admin-money">${adminEscape(item.amount)}</td><td class="admin-money">${adminEscape(item.premium)}</td><td>${change?renderPendingChange(change):'<span class="admin-value-muted">Geen</span>'}</td></tr>`;}).join('');
+  const addedItemRows=(data.pendingMutation?.changes||[]).filter(change=>change.type==='Toegevoegd').map(change=>`<tr class="admin-item-pending-add"><td><div class="admin-primary">${adminEscape(change.item)}</div><div class="admin-secondary">Nog niet actief</div></td><td>${adminEscape(change.fields.find(field=>field.label==='Categorie')?.new||'—')}</td><td>—</td><td>—</td><td class="admin-money">${adminEscape(change.fields.find(field=>field.label==='Verzekerd bedrag')?.new||'—')}</td><td>—</td><td>${renderPendingChange(change)}</td></tr>`).join('');
+  set('dossierItemsBody',activeItemRows+addedItemRows);
   set('dossierHolderDetails',[
     renderDetailSection('Verzekeringnemer',[['Naam',data.holder.name],['Type',data.holder.type],['KvK-nummer',data.holder.kvk],['Adres',data.holder.address],['BTW',data.holder.tax]]),
     renderDetailSection('Contact en betaling',[['E-mailadres',data.holder.email],['Telefoonnummer',data.holder.phone],['IBAN',data.holder.iban],['Incassomachtiging',data.application.collection]])
@@ -133,55 +143,134 @@ document.getElementById('dossierBackButton')?.addEventListener('click',()=>setAd
 document.querySelectorAll('[data-dossier-tab]').forEach(button=>button.addEventListener('click',()=>setDossierTab(button.dataset.dossierTab)));
 document.querySelector('[data-show-dossier-activities]')?.addEventListener('click',()=>setDossierTab('activities'));
 
-// De beheerder gebruikt dezelfde mutatieonderdelen als de klant: items, aanvullende dekkingen en ingangsdatum.
+// De beheerder gebruikt functioneel dezelfde mutatieonderdelen en berekening als de klant.
 let adminMutationItems=[];
-function adminEuroNumber(value){return Number(String(value||'0').replace(/[^0-9,-]/g,'').replace('.','').replace(',','.'))||0;}
-function adminFormatEuro(value){return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:2}).format(value);}
+let mutationInitialRentalIn=false;
+let mutationInitialRentalOut=false;
+let mutationInitialRentalLimit='10000';
+const mutationToday='2026-08-27';
+const mutationPolicyCosts=5;
+const mutationInsuranceTax=.084;
+const equipmentMutationCategories=['Camera’s / Cinema camera','Camera’s / Professionele videocamera','Lenzen & Optiek / Zoomlens','Belichting / Gimbals & light rigs','Belichting / LED-lampen','Computers & Tablets / Laptops','Drones / Cameradrone','Geluidsapparatuur / Recorder'];
+const instrumentMutationCategories=['Snaarinstrumenten / Elektrische gitaar','Snaarinstrumenten / Akoestische gitaar','Snaarinstrumenten / Cello','Toetsinstrumenten / Vleugel','Toetsinstrumenten / Keyboard','Slagwerk / Drumstel','Studioapparatuur / Mengpaneel'];
+function adminEuroNumber(value){return Number(String(value||'0').replace(/[^0-9,-]/g,'').replaceAll('.','').replace(',','.'))||0;}
+function adminFormatEuro(value){return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(value);}
 function formatMutationDate(value){if(!value)return '—';return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short',year:'numeric'}).format(new Date(value+'T00:00:00'));}
-function refreshAdminMutationTotals(){
+function mutationRenewalIso(data){if(data.start.startsWith('25 aug'))return '2027-08-25';if(data.start.startsWith('4 mei'))return '2027-05-04';return '2026-10-12';}
+function mutationDaysBetween(start,end){return Math.max(0,Math.ceil((new Date(end+'T00:00:00')-new Date(start+'T00:00:00'))/86400000));}
+function mutationItemName(item){return [item.brand,item.model].filter(Boolean).join(' ').trim()||'Nieuw item';}
+function mutationCategories(data){return data.product==='Instrumentenverzekering'?instrumentMutationCategories:equipmentMutationCategories;}
+function mutationReceipts(data){return ['Geen aankoopbewijs',...new Set([...data.items.map(item=>item.receipt).filter(Boolean),...data.itemDocuments.filter(documentItem=>documentItem.type==='Aankoopbewijs'||documentItem.type==='Taxatierapport').map(documentItem=>documentItem.name)])];}
+function mutationSelectOptions(values,selected){return values.map(value=>`<option ${value===selected?'selected':''}>${adminEscape(value)}</option>`).join('');}
+function buildAdminMutationChanges(){
+  const changes=[];
+  adminMutationItems.forEach(item=>{
+    const name=mutationItemName(item);
+    if(item.removed){changes.push({type:'Verwijderd',className:'red',item:item.original?.name||name,fields:[{label:'Status',old:'Meeverzekerd',new:'Verwijderd'}]});return;}
+    if(item.isNew){changes.push({type:'Toegevoegd',className:'green',item:name,fields:[{label:'Categorie',old:'—',new:item.category},{label:'Serienummer',old:'—',new:item.serial||'—'},{label:'Aankoopbewijs',old:'—',new:item.receipt||'Geen aankoopbewijs'},{label:'Verzekerd bedrag',old:'—',new:adminFormatEuro(item.amountNumber)}]});return;}
+    const fields=[];const original=item.original;
+    if(name!==original.name)fields.push({label:'Item',old:original.name,new:name});
+    if(item.category!==original.category)fields.push({label:'Categorie',old:original.category,new:item.category});
+    if(item.serial!==original.serial)fields.push({label:'Serienummer',old:original.serial||'—',new:item.serial||'—'});
+    if(item.receipt!==original.receipt)fields.push({label:'Aankoopbewijs',old:original.receipt||'Geen aankoopbewijs',new:item.receipt||'Geen aankoopbewijs'});
+    if(item.amountNumber!==original.amountNumber)fields.push({label:'Verzekerd bedrag',old:adminFormatEuro(original.amountNumber),new:adminFormatEuro(item.amountNumber)});
+    if(fields.length)changes.push({type:'Gewijzigd',className:'blue',item:original.name,fields});
+  });
+  const rentalIn=document.getElementById('mutationRentalIn')?.checked;
+  const rentalOut=document.getElementById('mutationRentalOut')?.checked;
+  const rentalLimit=document.getElementById('mutationRentalLimit')?.value||'10000';
+  if(rentalIn!==mutationInitialRentalIn||rentalLimit!==mutationInitialRentalLimit){
+    const oldValue=mutationInitialRentalIn?adminFormatEuro(Number(mutationInitialRentalLimit)):'Niet meeverzekerd';
+    const newValue=rentalIn?adminFormatEuro(Number(rentalLimit)):'Niet meeverzekerd';
+    changes.push({type:rentalIn?(mutationInitialRentalIn?'Gewijzigd':'Toegevoegd'):'Verwijderd',className:rentalIn?(mutationInitialRentalIn?'blue':'green'):'red',item:'Aanvullende dekking · Inhuur',fields:[{label:'Verzekerd bedrag',old:oldValue,new:newValue}]});
+  }
+  if(rentalOut!==mutationInitialRentalOut)changes.push({type:rentalOut?'Toegevoegd':'Verwijderd',className:rentalOut?'green':'red',item:'Aanvullende dekking · Verhuur',fields:[{label:'Status',old:mutationInitialRentalOut?'Meeverzekerd':'Niet meeverzekerd',new:rentalOut?'Meeverzekerd':'Niet meeverzekerd'}]});
+  return changes;
+}
+function adminMutationCalculation(){
   const data=dossierData[activeDossierKey]||dossierData['policy-main'];
-  const total=adminMutationItems.reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
-  const rate=data.product==='Instrumentenverzekering'?.00625:.0125;
-  let premium=total*rate;
-  if(document.getElementById('mutationRentalIn')?.checked)premium+=150;
-  if(document.getElementById('mutationRentalOut')?.checked)premium+=total*rate*.25;
-  document.getElementById('mutationCurrentAmount').textContent=data.amount;
-  document.getElementById('mutationNewAmount').textContent=adminFormatEuro(total);
-  document.getElementById('mutationCurrentPremium').textContent=data.premium;
-  document.getElementById('mutationNewPremium').textContent=adminFormatEuro(premium);
+  const currentAmount=adminEuroNumber(data.amount);
+  const currentPremium=adminEuroNumber(data.premium);
+  const currentInhirePremium=mutationInitialRentalIn?Number(document.querySelector(`#mutationRentalLimit option[value="${mutationInitialRentalLimit}"]`)?.dataset.premium||0):0;
+  const currentBase=(currentPremium-currentInhirePremium)/(mutationInitialRentalOut?1.25:1);
+  const effectiveRate=currentAmount?currentBase/currentAmount:0;
+  const total=adminMutationItems.filter(item=>!item.removed).reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
+  const newBase=total*effectiveRate;
+  const rentalIn=document.getElementById('mutationRentalIn')?.checked;
+  const rentalOut=document.getElementById('mutationRentalOut')?.checked;
+  const inhirePremium=rentalIn?Number(document.getElementById('mutationRentalLimit')?.selectedOptions?.[0]?.dataset.premium||0):0;
+  const newPremium=newBase+inhirePremium+(rentalOut?newBase*.25:0);
+  const annualDifference=newPremium-currentPremium;
+  const effective=document.getElementById('mutationEffectiveDate')?.value;
+  const renewal=mutationRenewalIso(data);
+  const validDate=effective>=mutationToday&&effective<renewal;
+  const remaining=validDate?mutationDaysBetween(effective,renewal):0;
+  const hasChanges=buildAdminMutationChanges().length>0;
+  const prorated=validDate&&hasChanges?annualDifference/365*remaining:0;
+  const costs=validDate&&hasChanges?mutationPolicyCosts:0;
+  const tax=(prorated+costs)*mutationInsuranceTax;
+  return {currentAmount,total,currentPremium,newPremium,annualDifference,remaining,prorated,costs,tax,mutationTotal:prorated+costs+tax,validDate,renewal,hasChanges};
+}
+function refreshAdminMutationTotals(){
+  const calculation=adminMutationCalculation();
+  document.getElementById('mutationCurrentAmount').textContent=adminFormatEuro(calculation.currentAmount);
+  document.getElementById('mutationNewAmount').textContent=adminFormatEuro(calculation.total);
+  document.getElementById('mutationCurrentPremium').textContent=adminFormatEuro(calculation.currentPremium);
+  document.getElementById('mutationNewPremium').textContent=adminFormatEuro(calculation.newPremium);
+  document.getElementById('mutationAnnualDifference').textContent=calculation.validDate?adminFormatEuro(calculation.annualDifference):'—';
+  document.getElementById('mutationRemainingDays').textContent=calculation.validDate?`${calculation.remaining} dagen`:'—';
+  document.getElementById('mutationProratedPremium').textContent=calculation.validDate?adminFormatEuro(calculation.prorated):'—';
+  document.getElementById('mutationPolicyCosts').textContent=calculation.validDate?adminFormatEuro(calculation.costs):'—';
+  document.getElementById('mutationInsuranceTax').textContent=calculation.validDate?adminFormatEuro(calculation.tax):'—';
+  document.getElementById('mutationTotalLabel').textContent=calculation.mutationTotal<0?'Terug te ontvangen':'Nu te betalen';
+  document.getElementById('mutationTotal').textContent=calculation.validDate?adminFormatEuro(Math.abs(calculation.mutationTotal)):'—';
+  document.getElementById('mutationFormula').textContent=calculation.validDate?`(${adminFormatEuro(calculation.newPremium)} − ${adminFormatEuro(calculation.currentPremium)}) ÷ 365 × ${calculation.remaining} dagen = ${adminFormatEuro(calculation.prorated)} premieverschil.`:'Kies een geldige ingangsdatum vóór de prolongatiedatum.';
+  const submit=document.getElementById('mutationSubmit');if(submit){submit.disabled=!calculation.validDate||!calculation.hasChanges;submit.textContent='Wijziging inplannen';}
+  document.getElementById('mutationRentalLimit').disabled=!document.getElementById('mutationRentalIn').checked;
 }
 function renderAdminMutation(){
+  const data=dossierData[activeDossierKey]||dossierData['policy-main'];
+  const categories=mutationCategories(data),receipts=mutationReceipts(data);
   const body=document.getElementById('mutationItemsBody');if(!body)return;
-  body.innerHTML=adminMutationItems.map((item,index)=>`<tr><td><input class="admin-input admin-mutation-item-name" data-mutation-name="${index}" value="${adminEscape(item.name)}" aria-label="Itemnaam"></td><td>${adminEscape(item.category)}</td><td><input class="admin-input admin-mutation-serial" data-mutation-serial="${index}" value="${adminEscape(item.serial)}" aria-label="Serienummer"></td><td><div class="admin-mutation-amount"><span>€</span><input class="admin-input" data-mutation-amount="${index}" type="number" min="0" step="50" value="${item.amountNumber}"></div></td><td><button class="admin-btn text" data-mutation-remove="${index}" type="button">Verwijderen</button></td></tr>`).join('');
+  body.innerHTML=adminMutationItems.map((item,index)=>`<tr class="${item.removed?'admin-mutation-row-removed':item.isNew?'admin-mutation-row-added':''}"><td><input class="admin-input admin-mutation-brand" data-mutation-brand="${index}" value="${adminEscape(item.brand)}" aria-label="Merk" ${item.removed?'disabled':''}></td><td><input class="admin-input admin-mutation-model" data-mutation-model="${index}" value="${adminEscape(item.model)}" aria-label="Type of model" ${item.removed?'disabled':''}></td><td><select class="admin-input admin-mutation-category" data-mutation-category="${index}" aria-label="Categorie" ${item.removed?'disabled':''}>${mutationSelectOptions(categories,item.category)}</select></td><td><input class="admin-input admin-mutation-serial" data-mutation-serial="${index}" value="${adminEscape(item.serial)}" aria-label="Serienummer" ${item.removed?'disabled':''}></td><td><select class="admin-input admin-mutation-receipt" data-mutation-receipt="${index}" aria-label="Aankoopbewijs" ${item.removed?'disabled':''}>${mutationSelectOptions(receipts,item.receipt||'Geen aankoopbewijs')}</select></td><td><div class="admin-mutation-amount"><span>€</span><input class="admin-input" data-mutation-amount="${index}" type="number" min="0" step="50" value="${item.amountNumber}" ${item.removed?'disabled':''}></div></td><td><div class="admin-mutation-row-status"><span class="admin-chip ${item.removed?'red':item.isNew?'green':'gray'}">${item.removed?'Verwijderd':item.isNew?'Toegevoegd':'Actief'}</span><button class="admin-btn text" data-mutation-remove="${index}" type="button">${item.removed?'Herstellen':'Verwijderen'}</button></div></td></tr>`).join('');
   refreshAdminMutationTotals();
-  body.querySelectorAll('[data-mutation-name]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationName)].name=input.value;}));
-  body.querySelectorAll('[data-mutation-serial]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationSerial)].serial=input.value;}));
+  body.querySelectorAll('[data-mutation-brand]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationBrand)].brand=input.value;refreshAdminMutationTotals();}));
+  body.querySelectorAll('[data-mutation-model]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationModel)].model=input.value;refreshAdminMutationTotals();}));
+  body.querySelectorAll('[data-mutation-category]').forEach(select=>select.addEventListener('change',()=>{adminMutationItems[Number(select.dataset.mutationCategory)].category=select.value;refreshAdminMutationTotals();}));
+  body.querySelectorAll('[data-mutation-serial]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationSerial)].serial=input.value;refreshAdminMutationTotals();}));
+  body.querySelectorAll('[data-mutation-receipt]').forEach(select=>select.addEventListener('change',()=>{adminMutationItems[Number(select.dataset.mutationReceipt)].receipt=select.value;refreshAdminMutationTotals();}));
   body.querySelectorAll('[data-mutation-amount]').forEach(input=>input.addEventListener('input',()=>{adminMutationItems[Number(input.dataset.mutationAmount)].amountNumber=Number(input.value||0);refreshAdminMutationTotals();}));
-  body.querySelectorAll('[data-mutation-remove]').forEach(button=>button.addEventListener('click',()=>{adminMutationItems.splice(Number(button.dataset.mutationRemove),1);renderAdminMutation();}));
+  body.querySelectorAll('[data-mutation-remove]').forEach(button=>button.addEventListener('click',()=>{const item=adminMutationItems[Number(button.dataset.mutationRemove)];item.removed=!item.removed;renderAdminMutation();}));
 }
 function openAdminMutation(){
   const data=dossierData[activeDossierKey]||dossierData['policy-main'];if(data.phase!=='Polis')return;
-  adminMutationItems=data.items.map(item=>({...item,amountNumber:adminEuroNumber(item.amount)}));
+  adminMutationItems=data.items.map((item,index)=>{const parts=item.name.split(' ');const brand=parts.shift()||'';const model=parts.join(' ');const amountNumber=adminEuroNumber(item.amount);return {...item,id:`existing-${index}`,brand,model,amountNumber,isNew:false,removed:false,original:{...item,name:item.name,brand,model,amountNumber}};});
+  mutationInitialRentalIn=!data.addons[0][1].startsWith('Niet');
+  mutationInitialRentalOut=!data.addons[1][1].startsWith('Niet');
+  mutationInitialRentalLimit='10000';
   document.getElementById('mutationPageTitle').textContent=`Polis wijzigen · ${data.policy}`;
   document.getElementById('mutationPageMeta').textContent=`${data.holder.name} · ${data.product}`;
-  document.getElementById('mutationRentalIn').checked=!data.addons[0][1].startsWith('Niet');
-  document.getElementById('mutationRentalOut').checked=!data.addons[1][1].startsWith('Niet');
+  document.getElementById('mutationRentalIn').checked=mutationInitialRentalIn;
+  document.getElementById('mutationRentalOut').checked=mutationInitialRentalOut;
+  document.getElementById('mutationRentalLimit').value=mutationInitialRentalLimit;
+  document.getElementById('mutationEffectiveDate').value='2026-09-01';
   document.getElementById('adminMutationSuccess').hidden=true;
   renderAdminMutation();setAdminPage('policy-mutation');
 }
 document.getElementById('dossierStartMutation')?.addEventListener('click',openAdminMutation);
 document.getElementById('mutationBackButton')?.addEventListener('click',()=>{renderDossier(activeDossierKey);setAdminPage('dossier');});
-document.getElementById('mutationAddItem')?.addEventListener('click',()=>{adminMutationItems.push({name:'Nieuw item',category:'Nog te selecteren',serial:'',amountNumber:0});renderAdminMutation();});
-document.getElementById('mutationRentalIn')?.addEventListener('change',renderAdminMutation);
-document.getElementById('mutationRentalOut')?.addEventListener('change',renderAdminMutation);
+document.getElementById('mutationAddItem')?.addEventListener('click',()=>{const data=dossierData[activeDossierKey];adminMutationItems.push({id:`new-${Date.now()}`,brand:'',model:'',category:mutationCategories(data)[0],serial:'',receipt:'Geen aankoopbewijs',amountNumber:0,isNew:true,removed:false});renderAdminMutation();});
+document.getElementById('mutationRentalIn')?.addEventListener('change',refreshAdminMutationTotals);
+document.getElementById('mutationRentalOut')?.addEventListener('change',refreshAdminMutationTotals);
+document.getElementById('mutationRentalLimit')?.addEventListener('change',refreshAdminMutationTotals);
+document.getElementById('mutationEffectiveDate')?.addEventListener('change',refreshAdminMutationTotals);
 document.getElementById('mutationSubmit')?.addEventListener('click',()=>{
-  const data=dossierData[activeDossierKey];const effective=document.getElementById('mutationEffectiveDate')?.value;if(!data||!effective)return;
-  const total=adminMutationItems.reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
-  data.pendingMutation={reference:'MUT-2026-00129',effective:formatMutationDate(effective),created:'27 aug 2026 · 10:15',initiator:'Medewerker',summary:`${adminMutationItems.length} items · verzekerd bedrag na ingang ${adminFormatEuro(total)}`,status:'Gepland'};
-  data.activities.unshift({date:'27 aug 2026 · 10:15',actor:'Medewerker',source:'GoSafe Admin',title:'Polismutatie ingepland',change:`Wijziging klaargezet voor ${data.pendingMutation.effective}.`,detail:`Referentie: ${data.pendingMutation.reference} · Actor: Medewerker · Status: Gepland`});
-  const success=document.getElementById('adminMutationSuccess');if(success){success.hidden=false;success.innerHTML=`<div><span class="admin-future-mutation-label">Wijziging opgeslagen</span><strong>${adminEscape(data.pendingMutation.summary)}</strong><small>${adminEscape(data.pendingMutation.reference)} · alle gewijzigde waarden zijn gelogd</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">Gepland</span></div>`;}
-  const row=document.querySelector(`[data-dossier-key="${activeDossierKey}"]`);if(row?.cells?.[8])row.cells[8].innerHTML=`<span class="admin-chip amber">Per ${adminEscape(data.pendingMutation.effective)}</span><div class="admin-secondary">${adminEscape(data.pendingMutation.reference)}</div>`;
-  document.getElementById('mutationSubmit').textContent='Wijziging ingepland';
+  const data=dossierData[activeDossierKey];const effective=document.getElementById('mutationEffectiveDate')?.value;const changes=buildAdminMutationChanges();const calculation=adminMutationCalculation();if(!data||!effective||!calculation.validDate||!changes.length)return;
+  data.pendingMutation={reference:'MUT-2026-00129',effective:formatMutationDate(effective),created:'27 aug 2026 · 10:15',initiator:'Medewerker',status:'Gepland',changes};
+  data.activities.unshift({date:'27 aug 2026 · 10:15',actor:'Medewerker',source:'GoSafe Admin',title:'Polismutatie ingepland',change:`${changes.length} wijzigingsregels klaargezet voor ${data.pendingMutation.effective}.`,detail:`Referentie: ${data.pendingMutation.reference} · Actor: Medewerker · Totaal verrekening: ${adminFormatEuro(calculation.mutationTotal)}`});
+  const success=document.getElementById('adminMutationSuccess');if(success){success.hidden=false;success.innerHTML=`<div class="admin-future-mutation-head"><div><span class="admin-future-mutation-label">Wijziging opgeslagen</span><strong>${adminEscape(data.pendingMutation.reference)}</strong><small>${changes.length} technische wijzigingsregels · totaal verrekening ${adminEscape(adminFormatEuro(calculation.mutationTotal))}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">Gepland</span></div></div><div class="admin-mutation-change-list">${changes.map(renderPendingChange).join('')}</div>`;}
+  const row=document.querySelector(`[data-dossier-key="${activeDossierKey}"]`);if(row?.cells?.[8])row.cells[8].innerHTML=`<span class="admin-chip amber">Per ${adminEscape(data.pendingMutation.effective)}</span><div class="admin-secondary">${adminEscape(data.pendingMutation.reference)} · ${changes.length} regels</div>`;
+  document.getElementById('mutationSubmit').disabled=true;document.getElementById('mutationSubmit').textContent='Wijziging ingepland';
   success?.scrollIntoView?.({behavior:'smooth',block:'nearest'});
 });
 const adminEntryParams=new URLSearchParams(window.location.search);
