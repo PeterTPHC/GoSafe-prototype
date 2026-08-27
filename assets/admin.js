@@ -90,7 +90,16 @@ function renderDetailSection(title,rows){return `<section class="admin-detail-se
 function renderPendingChange(change){
   return `<div class="admin-mutation-change"><div><span class="admin-chip ${adminEscape(change.className)}">${adminEscape(change.type)}</span><strong>${adminEscape(change.item)}</strong></div><div>${change.fields.map(field=>`<span><b>${adminEscape(field.label)}</b><code>${adminEscape(field.old)}</code><i>→</i><code>${adminEscape(field.new)}</code></span>`).join('')}</div></div>`;
 }
+function renderPendingChangeTable(changes){
+  return `<div class="admin-table-wrap"><table class="admin-table admin-pending-change-table"><thead><tr><th>Soort</th><th>Onderdeel</th><th>Veld</th><th>Huidig</th><th>Nieuw</th></tr></thead><tbody>${changes.flatMap(change=>change.fields.map((field,index)=>`<tr><td>${index===0?`<span class="admin-version-type ${adminEscape(change.className)}">${adminEscape(change.type)}</span>`:''}</td><td>${index===0?`<strong>${adminEscape(change.item)}</strong>`:''}</td><td>${adminEscape(field.label)}</td><td>${adminEscape(field.old)}</td><td>${adminEscape(field.new)}</td></tr>`)).join('')}</tbody></table></div>`;
+}
 function pendingChangeForItem(data,itemName){return data.pendingMutation?.changes?.find(change=>change.item===itemName);}
+function pendingField(change,label,fallback){return change?.fields?.find(field=>field.label===label)?.new??fallback;}
+function futureCategory(change,current){
+  const direct=pendingField(change,'Categorie','');if(direct)return direct;
+  const currentParts=String(current||'').split(' / ');
+  return [pendingField(change,'Hoofdcategorie',currentParts[0]||''),pendingField(change,'Subcategorie',currentParts.slice(1).join(' / '))].filter(Boolean).join(' / ');
+}
 function setDossierTab(name){
   document.querySelectorAll('[data-dossier-tab]').forEach(button=>button.classList.toggle('active',button.dataset.dossierTab===name));
   document.querySelectorAll('[data-dossier-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.dossierPanel===name));
@@ -102,15 +111,17 @@ function renderDossier(key){
   const set=(id,html)=>{const element=document.getElementById(id);if(element)element.innerHTML=html;};
   const name=document.getElementById('dossierHolderName');if(name)name.textContent=data.holder.name;
   const meta=document.getElementById('dossierHolderMeta');if(meta)meta.textContent=[data.holder.type,data.holder.kvk!=='—'?'KvK '+data.holder.kvk:null,data.holder.email,data.holder.phone].filter(Boolean).join(' · ');
-  set('dossierHeaderChips',`<span class="admin-chip blue">${adminEscape(data.phase)}</span><span class="admin-chip ${adminEscape(data.statusClass)}">${adminEscape(data.status)}</span><span class="admin-chip outline">${adminEscape(data.product)}</span>${data.pendingMutation?'<span class="admin-chip amber">Komende wijziging</span>':''}`);
+  set('dossierHeaderChips',`<span class="admin-chip blue">${adminEscape(data.phase)}</span><span class="admin-chip ${adminEscape(data.statusClass)}">${adminEscape(data.status)}</span><span class="admin-chip outline">${adminEscape(data.product)}</span>`);
   set('dossierHeaderIdentifiers',`<div class="admin-dossier-identifier"><span>Dossiernummer</span><strong>${adminEscape(data.dossier)}</strong></div><div class="admin-dossier-identifier"><span>Polisnummer</span><strong class="${data.policy==='—'?'admin-value-muted':''}">${adminEscape(data.policy)}</strong></div><div class="admin-dossier-identifier"><span>${data.phase==='Polis'?'Ingangsdatum':'Ontvangen'}</span><strong>${adminEscape(data.phase==='Polis'?data.start:data.received.split(' · ')[0])}</strong></div>${data.phase==='Polis'?`<div class="admin-dossier-identifier"><span>Prolongatiedatum</span><strong>${adminEscape(data.renewalDate)}</strong></div>`:''}`);
   set('dossierOverviewDetails',renderDetailRows([['Fase',data.phase],['Status',data.status],['Product',data.product],['Aanvraag ontvangen',data.received],['Gewenste / actuele ingang',data.start],...(data.phase==='Polis'?[['Prolongatiedatum',data.renewalDate]]:[]),['Verzekerd bedrag',data.amount],['Jaarpremie',data.premium],['Voorwaarden',data.terms],['IPID',data.ipid]]));
   const pending=document.getElementById('dossierPendingMutation');
-  if(pending){pending.hidden=!data.pendingMutation;pending.innerHTML=data.pendingMutation?`<div class="admin-future-mutation-head"><div><span class="admin-future-mutation-label">Komende wijziging</span><strong>${adminEscape(data.pendingMutation.reference)}</strong><small>Gestart door ${adminEscape(data.pendingMutation.initiator)} op ${adminEscape(data.pendingMutation.created)}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">${adminEscape(data.pendingMutation.status)}</span></div></div><div class="admin-mutation-change-list">${(data.pendingMutation.changes||[]).map(renderPendingChange).join('')}</div>`:'';}
+  if(pending){pending.hidden=!data.pendingMutation;pending.innerHTML=data.pendingMutation?`<details class="admin-pending-details"><summary><span>Komende wijziging</span><strong>Gaat in op ${adminEscape(data.pendingMutation.effective)}</strong><small>Details bekijken</small></summary><div class="admin-pending-detail-meta">${adminEscape(data.pendingMutation.reference)} · ${adminEscape(data.pendingMutation.initiator)} · aangemaakt ${adminEscape(data.pendingMutation.created)}</div>${renderPendingChangeTable(data.pendingMutation.changes||[])}</details>`:'';}
   const mutate=document.getElementById('dossierStartMutation');
   if(mutate)mutate.hidden=data.phase!=='Polis';
   const editHolder=document.getElementById('dossierEditHolder');
-  if(editHolder)editHolder.hidden=data.phase!=='Polis';
+  if(editHolder)editHolder.hidden=false;
+  const editRelation=document.getElementById('dossierStartRelationMutation');
+  if(editRelation)editRelation.hidden=false;
   set('dossierAddonDetails',renderDetailRows(data.addons));
   set('dossierAcceptanceSummary',`<div class="admin-acceptance-result"><div><strong>${adminEscape(data.acceptance.label)}</strong><p>${adminEscape(data.acceptance.text)}</p></div><span class="admin-chip ${adminEscape(data.acceptance.className)}">${adminEscape(data.acceptance.label)}</span></div>`);
   set('dossierApplicationMeta',`<div><span>Ingediend op</span><strong>${adminEscape(data.application.submitted)}</strong></div><div><span>Bron</span><strong>${adminEscape(data.application.source)}</strong></div><div><span>Taal</span><strong>${adminEscape(data.application.language)}</strong></div><div><span>Vastgelegd onder</span><strong>${adminEscape(data.dossier)}</strong></div>`);
@@ -119,8 +130,8 @@ function renderDossier(key){
     renderDetailSection('Akkoorden',[['Slotbepalingen',data.application.slot],['Privacyverklaring',data.application.privacy],['Automatische incasso',data.application.collection],['Type verzekeringnemer',data.application.customerType]])
   ].join(''));
   const itemSummary=document.getElementById('dossierItemSummary');if(itemSummary)itemSummary.textContent=data.items.length+' items · totaal '+data.amount;
-  const activeItemRows=data.items.map(item=>{const change=pendingChangeForItem(data,item.name);return `<tr class="${change?.type==='Verwijderd'?'admin-item-pending-remove':''}"><td><div class="admin-primary">${adminEscape(item.name)}</div></td><td>${adminEscape(item.category)}</td><td>${adminEscape(item.serial)}</td><td>${adminEscape(item.receipt)}</td><td class="admin-money">${adminEscape(item.amount)}</td><td class="admin-money">${adminEscape(item.premium)}</td><td>${change?renderPendingChange(change):'<span class="admin-value-muted">Geen</span>'}</td></tr>`;}).join('');
-  const addedItemRows=(data.pendingMutation?.changes||[]).filter(change=>change.type==='Toegevoegd').map(change=>{const category=change.fields.find(field=>field.label==='Categorie')?.new||[change.fields.find(field=>field.label==='Hoofdcategorie')?.new,change.fields.find(field=>field.label==='Subcategorie')?.new].filter(Boolean).join(' / ')||'—';return `<tr class="admin-item-pending-add"><td><div class="admin-primary">${adminEscape(change.item)}</div><div class="admin-secondary">Nog niet actief</div></td><td>${adminEscape(category)}</td><td>${adminEscape(change.fields.find(field=>field.label==='Serienummer')?.new||'—')}</td><td>${adminEscape(change.fields.find(field=>field.label==='Aankoopbewijs')?.new||'—')}</td><td class="admin-money">${adminEscape(change.fields.find(field=>field.label==='Verzekerd bedrag')?.new||'—')}</td><td>—</td><td>${renderPendingChange(change)}</td></tr>`;}).join('');
+  const activeItemRows=data.items.map(item=>{const change=pendingChangeForItem(data,item.name);const active=`<tr><td><div class="admin-primary">${adminEscape(item.name)}</div></td><td>${adminEscape(item.category)}</td><td>${adminEscape(item.serial)}</td><td>${adminEscape(item.receipt)}</td><td class="admin-money">${adminEscape(item.amount)}</td><td class="admin-money">${adminEscape(item.premium)}</td><td><span class="admin-version-label active">Actieve versie</span><small class="admin-version-date">Sinds ${adminEscape(data.start)}</small></td></tr>`;if(!change)return active;const removed=change.type==='Verwijderd';const futureName=pendingField(change,'Item',item.name);const futureAmount=removed?'—':pendingField(change,'Verzekerd bedrag',item.amount);const future=`<tr class="admin-item-future-version ${removed?'removed':''}"><td><div class="admin-primary">${adminEscape(futureName)}</div></td><td>${adminEscape(removed?'—':futureCategory(change,item.category))}</td><td>${adminEscape(removed?'—':pendingField(change,'Serienummer',item.serial))}</td><td>${adminEscape(removed?'—':pendingField(change,'Aankoopbewijs',item.receipt))}</td><td class="admin-money">${adminEscape(futureAmount)}</td><td class="admin-money">${removed?'—':'Wordt herberekend'}</td><td><span class="admin-version-label ${removed?'removed':'future'}">${removed?'Verwijderd':'Nieuwe versie'}</span><small class="admin-version-date">Per ${adminEscape(data.pendingMutation.effective)}</small></td></tr>`;return active+future;}).join('');
+  const addedItemRows=(data.pendingMutation?.changes||[]).filter(change=>change.type==='Toegevoegd').map(change=>`<tr class="admin-item-future-version added"><td><div class="admin-primary">${adminEscape(change.item)}</div></td><td>${adminEscape(futureCategory(change,''))}</td><td>${adminEscape(pendingField(change,'Serienummer','—'))}</td><td>${adminEscape(pendingField(change,'Aankoopbewijs','—'))}</td><td class="admin-money">${adminEscape(pendingField(change,'Verzekerd bedrag','—'))}</td><td class="admin-money">Wordt herberekend</td><td><span class="admin-version-label future">Nieuwe versie</span><small class="admin-version-date">Per ${adminEscape(data.pendingMutation.effective)}</small></td></tr>`).join('');
   set('dossierItemsBody',activeItemRows+addedItemRows);
   set('dossierHolderDetails',[
     renderDetailSection('Verzekeringnemer',[['Naam',data.holder.name],['Type',data.holder.type],['KvK-nummer',data.holder.kvk],['Adres',data.holder.address],['BTW',data.holder.tax]]),
@@ -150,8 +161,6 @@ let adminMutationItems=[];
 let mutationInitialRentalIn=false;
 let mutationInitialRentalOut=false;
 let mutationInitialRentalLimit='10000';
-let mutationInitialHolder={};
-let mutationHolderDraft={};
 let editingMutationItemIndex=-1;
 const mutationToday='2026-08-27';
 const mutationPolicyCosts=5;
@@ -192,9 +201,6 @@ function buildAdminMutationChanges(){
     changes.push({type:rentalIn?(mutationInitialRentalIn?'Gewijzigd':'Toegevoegd'):'Verwijderd',className:rentalIn?(mutationInitialRentalIn?'blue':'green'):'red',item:'Aanvullende dekking · Inhuur',fields:[{label:'Verzekerd bedrag',old:oldValue,new:newValue}]});
   }
   if(rentalOut!==mutationInitialRentalOut)changes.push({type:rentalOut?'Toegevoegd':'Verwijderd',className:rentalOut?'green':'red',item:'Aanvullende dekking · Verhuur',fields:[{label:'Status',old:mutationInitialRentalOut?'Meeverzekerd':'Niet meeverzekerd',new:rentalOut?'Meeverzekerd':'Niet meeverzekerd'}]});
-  const holderFields=[];
-  [['name','Naam / bedrijfsnaam'],['email','E-mailadres'],['phone','Telefoonnummer'],['address','Adres'],['country','Land'],['iban','IBAN']].forEach(([key,label])=>{if((mutationHolderDraft[key]||'')!==(mutationInitialHolder[key]||''))holderFields.push({label,old:mutationInitialHolder[key]||'—',new:mutationHolderDraft[key]||'—'});});
-  if(holderFields.length)changes.push({type:'Gewijzigd',className:'blue',item:'Verzekeringnemer',fields:holderFields});
   return changes;
 }
 function adminMutationCalculation(){
@@ -222,20 +228,20 @@ function adminMutationCalculation(){
   return {currentAmount,total,currentPremium,newPremium,annualDifference,remaining,prorated,costs,tax,mutationTotal:prorated+costs+tax,validDate,renewal,hasChanges};
 }
 function adminMutationValidation(){
+  const data=dossierData[activeDossierKey]||dossierData['policy-main'];
   const activeItems=adminMutationItems.filter(item=>!item.removed);
   const total=activeItems.reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
   const computerTotal=activeItems.filter(item=>item.mainCategory==='Computers & Tablets').reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
   const otherTotal=total-computerTotal;
   const completeItems=activeItems.every(item=>item.brand?.trim()&&item.model?.trim()&&item.mainCategory&&item.subCategory&&item.serial?.trim()&&Number(item.amountNumber)>0);
-  const completeHolder=['name','email','phone','address','country','iban'].every(key=>String(mutationHolderDraft[key]||'').trim());
+  const holderCountry=data.holder.country||'Nederland';
   const checks=[
     {label:'Items compleet',ok:completeItems,detail:completeItems?'Alle verplichte itemgegevens zijn ingevuld.':'Vul alle verplichte itemgegevens in.'},
     {label:'Maximaal € 25.000 per item',ok:activeItems.every(item=>Number(item.amountNumber||0)<=25000),detail:'Harde productgrens'},
     {label:'Maximaal € 100.000 totaal',ok:total<=100000,detail:`Nieuw totaal ${adminFormatEuro(total)}`},
     {label:'Maximaal 100 items',ok:activeItems.length<=100,detail:`${activeItems.length} items`},
-    {label:'Vestigingsland Nederland',ok:mutationHolderDraft.country==='Nederland',detail:mutationHolderDraft.country||'Niet ingevuld'},
-    {label:'Computerapparatuur ≤ overige items',ok:computerTotal===0||computerTotal<=otherTotal,detail:`${adminFormatEuro(computerTotal)} tegenover ${adminFormatEuro(otherTotal)}`},
-    {label:'Verzekeringnemer compleet',ok:completeHolder,detail:completeHolder?'Alle verplichte gegevens zijn ingevuld.':'Vul alle verplichte gegevens in.'}
+    {label:'Vestigingsland Nederland',ok:holderCountry==='Nederland',detail:holderCountry},
+    {label:'Computerapparatuur ≤ overige items',ok:computerTotal===0||computerTotal<=otherTotal,detail:`${adminFormatEuro(computerTotal)} tegenover ${adminFormatEuro(otherTotal)}`}
   ];
   return {checks,blocked:checks.some(check=>!check.ok)};
 }
@@ -271,6 +277,7 @@ function populateMutationSubcategories(mainCategory,selected){
 }
 function closeMutationItemEditor(){
   editingMutationItemIndex=-1;
+  document.querySelectorAll('.admin-mutation-item-row.editing').forEach(row=>row.classList.remove('editing'));
   const editor=document.getElementById('mutationItemEditor');if(editor)editor.hidden=true;
   const error=document.getElementById('mutationItemEditorError');if(error)error.hidden=true;
 }
@@ -283,8 +290,10 @@ function openMutationItemEditor(index){
   const item=adminMutationItems[index];if(!item||item.removed)return;
   const data=dossierData[activeDossierKey]||dossierData['policy-main'];
   editingMutationItemIndex=index;
+  document.querySelectorAll('.admin-mutation-item-row').forEach((row,rowIndex)=>row.classList.toggle('editing',rowIndex===index));
   const mainCategories=Object.keys(mutationCategoryMap(data));
-  document.getElementById('mutationItemEditorTitle').textContent=item.isNew?'Item toevoegen':'Item wijzigen';
+  document.getElementById('mutationItemEditorTitle').textContent=item.isNew?'Nieuw item toevoegen':`Item wijzigen · ${mutationItemName(item)}`;
+  document.getElementById('mutationItemEditorContext').textContent=item.isNew?`Nieuwe regel · wordt regel ${index+1}`:`Je bewerkt regel ${index+1} van ${adminMutationItems.length}: ${mutationItemName(item)}`;
   document.getElementById('mutationItemBrand').value=item.brand||'';
   document.getElementById('mutationItemModel').value=item.model||'';
   document.getElementById('mutationItemMainCategory').innerHTML=mutationSelectOptions(mainCategories,item.mainCategory||mainCategories[0]);
@@ -307,7 +316,7 @@ function saveMutationItemEditor(){
 function renderAdminMutation(){
   const body=document.getElementById('mutationItemsBody');if(!body)return;
   const changedNames=new Set(buildAdminMutationChanges().filter(change=>change.type==='Gewijzigd').map(change=>change.item));
-  body.innerHTML=adminMutationItems.map((item,index)=>{const status=item.removed?'Verwijderd':item.isNew?'Toegevoegd':changedNames.has(item.original?.name)?'Gewijzigd':'Actief';const statusClass=item.removed?'red':item.isNew?'green':status==='Gewijzigd'?'blue':'gray';return `<div class="admin-mutation-item-row ${item.removed?'removed':item.isNew?'added':status==='Gewijzigd'?'changed':''}"><div class="admin-mutation-item-main"><strong>${adminEscape(mutationItemName(item))}</strong><span>${adminEscape(mutationItemCategory(item))}</span></div><div><span>Serienummer</span><strong>${adminEscape(item.serial||'—')}</strong></div><div><span>Aankoopbewijs</span><strong>${adminEscape(item.receipt||'Geen aankoopbewijs')}</strong></div><div class="admin-money"><span>Verzekerd bedrag</span><strong>${adminEscape(adminFormatEuro(item.amountNumber))}</strong></div><div class="admin-mutation-item-actions"><span class="admin-chip ${statusClass}">${status}</span><button class="admin-btn text" data-mutation-edit="${index}" type="button" ${item.removed?'disabled':''}>Bewerken</button><button class="admin-btn text" data-mutation-remove="${index}" type="button">${item.removed?'Herstellen':'Verwijderen'}</button></div></div>`;}).join('');
+  body.innerHTML=adminMutationItems.map((item,index)=>{const status=item.removed?'Verwijderd':item.isNew?'Toegevoegd':changedNames.has(item.original?.name)?'Gewijzigd':'Actief';const statusClass=item.removed?'red':item.isNew?'green':status==='Gewijzigd'?'blue':'gray';return `<div class="admin-mutation-item-row ${item.removed?'removed':item.isNew?'added':status==='Gewijzigd'?'changed':''} ${editingMutationItemIndex===index?'editing':''}" data-mutation-index="${index}"><div class="admin-mutation-item-main"><strong>${adminEscape(mutationItemName(item))}</strong><span>${adminEscape(mutationItemCategory(item))}</span></div><div><span>Serienummer</span><strong>${adminEscape(item.serial||'—')}</strong></div><div><span>Aankoopbewijs</span><strong>${adminEscape(item.receipt||'Geen aankoopbewijs')}</strong></div><div class="admin-money"><span>Verzekerd bedrag</span><strong>${adminEscape(adminFormatEuro(item.amountNumber))}</strong></div><div class="admin-mutation-item-actions"><span class="admin-chip ${statusClass}">${status}</span><button class="admin-btn text" data-mutation-edit="${index}" type="button" ${item.removed?'disabled':''}>Bewerken</button><button class="admin-btn text" data-mutation-remove="${index}" type="button">${item.removed?'Herstellen':'Verwijderen'}</button></div></div>`;}).join('');
   refreshAdminMutationTotals();
   body.querySelectorAll('[data-mutation-edit]').forEach(button=>button.addEventListener('click',()=>openMutationItemEditor(Number(button.dataset.mutationEdit))));
   body.querySelectorAll('[data-mutation-remove]').forEach(button=>button.addEventListener('click',()=>{const item=adminMutationItems[Number(button.dataset.mutationRemove)];item.removed=!item.removed;if(editingMutationItemIndex===Number(button.dataset.mutationRemove))closeMutationItemEditor();renderAdminMutation();}));
@@ -315,8 +324,6 @@ function renderAdminMutation(){
 function openAdminMutation(){
   const data=dossierData[activeDossierKey]||dossierData['policy-main'];if(data.phase!=='Polis')return;
   adminMutationItems=data.items.map((item,index)=>{const parts=item.name.split(' ');const brand=parts.shift()||'';const model=parts.join(' ');const [mainCategory='',...subcategoryParts]=String(item.category||'').split(' / ');const subCategory=subcategoryParts.join(' / ');const amountNumber=adminEuroNumber(item.amount);return {...item,id:`existing-${index}`,brand,model,mainCategory,subCategory,amountNumber,isNew:false,removed:false,original:{...item,name:item.name,brand,model,mainCategory,subCategory,amountNumber}};});
-  mutationInitialHolder={...data.holder,country:data.holder.country||'Nederland'};
-  mutationHolderDraft={...mutationInitialHolder};
   mutationInitialRentalIn=!data.addons[0][1].startsWith('Niet');
   mutationInitialRentalOut=!data.addons[1][1].startsWith('Niet');
   mutationInitialRentalLimit='10000';
@@ -326,19 +333,16 @@ function openAdminMutation(){
   document.getElementById('mutationRentalOut').checked=mutationInitialRentalOut;
   document.getElementById('mutationRentalLimit').value=mutationInitialRentalLimit;
   document.getElementById('mutationEffectiveDate').value='2026-09-01';
-  [['mutationHolderName','name'],['mutationHolderKvk','kvk'],['mutationHolderEmail','email'],['mutationHolderPhone','phone'],['mutationHolderAddress','address'],['mutationHolderCountry','country'],['mutationHolderIban','iban']].forEach(([id,key])=>{const field=document.getElementById(id);if(field)field.value=mutationHolderDraft[key]||'';});
   document.getElementById('adminMutationSuccess').hidden=true;
   closeMutationItemEditor();renderAdminMutation();setAdminPage('policy-mutation');
 }
 document.getElementById('dossierStartMutation')?.addEventListener('click',openAdminMutation);
-document.getElementById('dossierEditHolder')?.addEventListener('click',()=>{openAdminMutation();setTimeout(()=>document.getElementById('mutationHolderName')?.focus(),0);});
 document.getElementById('mutationBackButton')?.addEventListener('click',()=>{renderDossier(activeDossierKey);setAdminPage('dossier');});
 document.getElementById('mutationAddItem')?.addEventListener('click',()=>{const data=dossierData[activeDossierKey];const map=mutationCategoryMap(data);const mainCategory=Object.keys(map)[0];adminMutationItems.push({id:`new-${Date.now()}`,brand:'',model:'',mainCategory,subCategory:map[mainCategory][0],serial:'',receipt:'Geen aankoopbewijs',amountNumber:0,isNew:true,isDraft:true,removed:false});renderAdminMutation();openMutationItemEditor(adminMutationItems.length-1);});
 document.getElementById('mutationItemMainCategory')?.addEventListener('change',event=>populateMutationSubcategories(event.target.value,''));
 document.getElementById('mutationItemEditorSave')?.addEventListener('click',saveMutationItemEditor);
 document.getElementById('mutationItemEditorCancel')?.addEventListener('click',cancelMutationItemEditor);
 document.getElementById('mutationItemEditorClose')?.addEventListener('click',cancelMutationItemEditor);
-[['mutationHolderName','name'],['mutationHolderEmail','email'],['mutationHolderPhone','phone'],['mutationHolderAddress','address'],['mutationHolderCountry','country'],['mutationHolderIban','iban']].forEach(([id,key])=>document.getElementById(id)?.addEventListener('input',event=>{mutationHolderDraft[key]=event.target.value;refreshAdminMutationTotals();}));
 document.getElementById('mutationRentalIn')?.addEventListener('change',refreshAdminMutationTotals);
 document.getElementById('mutationRentalOut')?.addEventListener('change',refreshAdminMutationTotals);
 document.getElementById('mutationRentalLimit')?.addEventListener('change',refreshAdminMutationTotals);
@@ -351,6 +355,50 @@ document.getElementById('mutationSubmit')?.addEventListener('click',()=>{
   const row=document.querySelector(`[data-dossier-key="${activeDossierKey}"]`);if(row?.cells?.[8])row.cells[8].innerHTML=`<span class="admin-chip amber">Per ${adminEscape(data.pendingMutation.effective)}</span><div class="admin-secondary">${adminEscape(data.pendingMutation.reference)} · ${changes.length} regels</div>`;
   document.getElementById('mutationSubmit').disabled=true;document.getElementById('mutationSubmit').textContent='Wijziging ingepland';
   success?.scrollIntoView?.({behavior:'smooth',block:'nearest'});
+});
+
+// Relatiegegevens worden los van de polis gewijzigd. IBAN-wijzigingen blijven een klantactie.
+let relationInitialHolder={};
+let relationHolderDraft={};
+const relationEditableFields=[['relationHolderName','name','Naam / bedrijfsnaam'],['relationHolderEmail','email','E-mailadres'],['relationHolderPhone','phone','Telefoonnummer'],['relationHolderAddress','address','Adres'],['relationHolderCountry','country','Land']];
+function relationMutationChanges(){
+  return relationEditableFields.map(([,key,label])=>({key,label,old:relationInitialHolder[key]||'—',new:relationHolderDraft[key]||'—'})).filter(change=>change.old!==change.new);
+}
+function renderRelationMutationValidation(){
+  const required=['name','email','phone','address','country'];
+  const complete=required.every(key=>String(relationHolderDraft[key]||'').trim());
+  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(relationHolderDraft.email||'');
+  const countryOk=relationHolderDraft.country==='Nederland';
+  const changes=relationMutationChanges();
+  const blocked=!complete||!emailOk||!countryOk;
+  const target=document.getElementById('relationMutationValidation');
+  if(target)target.innerHTML=`<div class="admin-mutation-validation-head"><strong>Relatiecontrole</strong><span class="admin-chip ${blocked?'red':'green'}">${blocked?'Geblokkeerd':'Akkoord'}</span></div><div class="admin-mutation-validation-list"><div class="${complete?'ok':'blocked'}"><b>${complete?'✓':'!'}</b><span><strong>Verplichte gegevens</strong><small>${complete?'Compleet':'Vul alle verplichte velden in'}</small></span></div><div class="${emailOk?'ok':'blocked'}"><b>${emailOk?'✓':'!'}</b><span><strong>E-mailadres</strong><small>${emailOk?'Geldig':'Controleer het e-mailadres'}</small></span></div><div class="${countryOk?'ok':'blocked'}"><b>${countryOk?'✓':'!'}</b><span><strong>Volmachtregel Nederland</strong><small>${adminEscape(relationHolderDraft.country||'Niet ingevuld')}</small></span></div></div>`;
+  const submit=document.getElementById('relationMutationSubmit');if(submit){submit.disabled=blocked||!changes.length;submit.textContent=blocked?'Geblokkeerd door relatiecontrole':'Relatiewijziging opslaan';}
+  return {blocked,changes};
+}
+function openRelationMutation(){
+  const data=dossierData[activeDossierKey]||dossierData['policy-main'];
+  relationInitialHolder={...data.holder,country:data.holder.country||'Nederland'};
+  relationHolderDraft={...relationInitialHolder};
+  document.getElementById('relationMutationTitle').textContent=`Relatie wijzigen · ${data.holder.name}`;
+  document.getElementById('relationMutationMeta').textContent=`${data.dossier} · ${data.policy!=='—'?data.policy:data.phase}`;
+  relationEditableFields.forEach(([id,key])=>{const field=document.getElementById(id);if(field)field.value=relationHolderDraft[key]||'';});
+  document.getElementById('relationHolderKvk').value=data.holder.kvk||'—';
+  document.getElementById('relationHolderIban').textContent=data.holder.iban||'—';
+  document.getElementById('relationMutationSuccess').hidden=true;
+  renderRelationMutationValidation();setAdminPage('relation-mutation');
+}
+document.getElementById('dossierStartRelationMutation')?.addEventListener('click',openRelationMutation);
+document.getElementById('dossierEditHolder')?.addEventListener('click',openRelationMutation);
+document.getElementById('relationMutationBackButton')?.addEventListener('click',()=>{renderDossier(activeDossierKey);setAdminPage('dossier');setDossierTab('holder');});
+relationEditableFields.forEach(([id,key])=>document.getElementById(id)?.addEventListener('input',event=>{relationHolderDraft[key]=event.target.value;renderRelationMutationValidation();}));
+document.getElementById('relationMutationSubmit')?.addEventListener('click',()=>{
+  const data=dossierData[activeDossierKey];const result=renderRelationMutationValidation();if(!data||result.blocked||!result.changes.length)return;
+  result.changes.forEach(change=>{data.holder[change.key]=change.new;});
+  data.activities.unshift({date:'27 aug 2026 · 10:28',actor:'Medewerker',source:'GoSafe Admin',title:'Relatiegegevens gewijzigd',change:`${result.changes.length} relatievelden bijgewerkt.`,detail:result.changes.map(change=>`${change.label}: ${change.old} → ${change.new}`).join(' · ')});
+  relationInitialHolder={...data.holder,country:data.holder.country||'Nederland'};relationHolderDraft={...relationInitialHolder};
+  const success=document.getElementById('relationMutationSuccess');if(success){success.hidden=false;success.innerHTML=`<div class="admin-relation-success-row"><div><strong>Relatiegegevens opgeslagen</strong><small>${result.changes.length} velden vastgelegd in het activiteitenlog.</small></div><span class="admin-chip green">Opgeslagen</span></div>`;}
+  renderRelationMutationValidation();
 });
 const adminEntryParams=new URLSearchParams(window.location.search);
 if(adminEntryParams.get('dossier')&&dossierData[adminEntryParams.get('dossier')]){
