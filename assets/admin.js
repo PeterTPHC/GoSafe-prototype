@@ -451,11 +451,11 @@ document.getElementById('productAddonSave')?.addEventListener('click',()=>{
 });
 
 const acceptanceTypeDefinitions={
-  max_item_amount:{name:'Maximaal verzekerd bedrag per item',code:'ACC-MAX-ITEM',unit:'EUR',outcome:'Handmatige beoordeling',defaultValue:'25000',description:'Ieder item wordt afzonderlijk vergeleken met het ingestelde maximumbedrag.'},
-  max_item_count:{name:'Maximaal aantal objecten',code:'ACC-MAX-COUNT',unit:'objecten',outcome:'Handmatige beoordeling',defaultValue:'100',description:'Het systeem telt alle objecten in de aanvraag.'},
-  max_total_amount:{name:'Maximaal totaal verzekerd bedrag',code:'ACC-MAX-TOTAL',unit:'EUR',outcome:'Handmatige beoordeling',defaultValue:'100000',description:'Het systeem telt de verzekerde bedragen van alle items bij elkaar op.'},
+  max_item_amount:{name:'Maximaal verzekerd bedrag per item',code:'ACC-MAX-ITEM',unit:'EUR',outcome:'Uitval',defaultValue:'25000',description:'Ieder item wordt afzonderlijk vergeleken met het ingestelde maximumbedrag.'},
+  max_item_count:{name:'Maximaal aantal objecten',code:'ACC-MAX-COUNT',unit:'objecten',outcome:'Uitval',defaultValue:'100',description:'Het systeem telt alle objecten in de aanvraag.'},
+  max_total_amount:{name:'Maximaal totaal verzekerd bedrag',code:'ACC-MAX-TOTAL',unit:'EUR',outcome:'Uitval',defaultValue:'100000',description:'Het systeem telt de verzekerde bedragen van alle items bij elkaar op.'},
   allowed_country:{name:'Woon-/vestigingsland',code:'ACC-COUNTRY-NL',unit:'land',outcome:'Uitval',defaultValue:'Nederland',description:'De verzekeringnemer moet wonen of gevestigd zijn in het ingestelde land.'},
-  computer_ratio:{name:'Maximum aandeel computerapparatuur',code:'ACC-COMPUTER-RATIO',unit:'procent',outcome:'Handmatige beoordeling',defaultValue:'100',description:'De som van geselecteerde computercategorieën mag niet hoger zijn dan het ingestelde percentage van de overige verzekerde items.'}
+  computer_ratio:{name:'Maximum aandeel computerapparatuur',code:'ACC-COMPUTER-RATIO',unit:'procent',outcome:'Uitval',defaultValue:'100',description:'De som van geselecteerde computercategorieën mag niet hoger zijn dan het ingestelde percentage van de overige verzekerde items.'}
 };
 const acceptanceCategoriesByProduct={
   'Apparatuurverzekering':['Laptops','Tablets (iPads, etc.)','Computers voor bewerking'],
@@ -475,7 +475,7 @@ function acceptanceSettingHtml(row){
 function renderAcceptanceRow(row){
   const status=row.dataset.acceptanceStatus||'Concept';
   const statusClass=status==='Actief'?'green':status==='Inactief'?'amber':'gray';
-  const outcome=row.dataset.acceptanceOutcome||'Handmatige beoordeling';
+  const outcome=row.dataset.acceptanceOutcome||'Uitval';
   const outcomeClass=outcome==='Uitval'?'red':'amber';
   row.innerHTML='<td><div class="admin-primary">'+productEscape(row.dataset.acceptanceName)+'</div><div class="admin-secondary">'+productEscape(row.dataset.acceptanceCode)+'</div></td><td class="product-acceptance-setting">'+acceptanceSettingHtml(row)+'</td><td><span class="admin-chip '+outcomeClass+'">'+(outcome==='Uitval'?'Uitval':'Handmatig')+'</span></td><td><span class="admin-chip '+statusClass+'">'+productEscape(status)+'</span></td><td class="product-next-version"></td><td><button class="admin-btn text product-edit-acceptance" type="button">Bewerken</button></td>';
 }
@@ -499,7 +499,7 @@ function syncAcceptanceEditorType(){
   const categories=document.getElementById('productAcceptanceCategoryConfig');if(categories)categories.hidden=type!=='computer_ratio';
   const label=document.getElementById('productAcceptanceValueLabel');if(label)label.textContent=type==='computer_ratio'?'Maximale verhouding (%)':type==='max_item_count'?'Maximum aantal':'Maximum bedrag';
   const value=document.getElementById('productAcceptanceValue');if(value&&!editingAcceptanceRow)value.value=definition.defaultValue;
-  const outcome=document.getElementById('productAcceptanceOutcomeLabel');if(outcome)outcome.textContent=definition.outcome==='Uitval'?'Bij afwijking: directe uitval':'Bij overschrijding: handmatige beoordeling';
+  const outcome=document.getElementById('productAcceptanceOutcomeLabel');if(outcome)outcome.textContent='Bij afwijking: uitval';
 }
 function openAcceptanceEditor(row){
   if(!row)return;
