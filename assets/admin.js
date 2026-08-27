@@ -54,6 +54,31 @@ dossierData['application-camera']={...dossierData['application-fallout'],dossier
 dossierData['policy-jdevries']={...dossierData['policy-main'],dossier:'DOS-2026-00481',policy:'POL-2026-00312',holder:{...dossierData['application-fallout'].holder},product:'Instrumentenverzekering',received:'4 mei 2026 · 10:41',start:'4 mei 2026',amount:'€ 26.240',premium:'€ 164,00',items:instrumentItems};
 dossierData['policy-studio']={...dossierData['policy-main'],dossier:'DOS-2025-01228',policy:'POL-2025-00917',holder:{...dossierData['application-main'].holder,name:'Studio Noord B.V.',kvk:'87654321',email:'finance@studionoord.nl',phone:'050 22 18 880',address:'Helperpark 274, 9723 ZA Groningen'},received:'12 okt 2025 · 09:12',start:'12 okt 2025',amount:'€ 38.600',premium:'€ 482,50'};
 
+// Dossierbreed: productdocumenten horen bij de algemene gegevens; bewijsstukken en afgegeven stukken blijven apart.
+Object.values(dossierData).forEach(data=>{
+  const equipment=data.product==='Apparatuurverzekering';
+  data.terms=equipment?'Algemene voorwaarden GoSafe 2026-01 · Voorwaarden Apparatuur 2026-01':'Algemene voorwaarden GoSafe 2026-01 · Voorwaarden Instrumenten 2026-01';
+  data.ipid=equipment?'IPID Apparatuurverzekering 2026-01':'IPID Instrumentenverzekering 2026-01';
+  data.renewalDate=data.phase==='Polis'?(data.start.startsWith('25 aug')?'25 aug 2027':data.start.startsWith('4 mei')?'4 mei 2027':'12 okt 2026'):'—';
+  data.pendingMutation=null;
+  data.itemDocuments=equipment?[
+    {name:'Factuur MediaMarkt Pro.pdf',type:'Aankoopbewijs',item:'Sony FX6',date:'12 aug 2026',status:'Gekoppeld',className:'green'},
+    {name:'Garantiebewijs Sony FX6.pdf',type:'Garantiebewijs',item:'Sony FX6',date:'12 aug 2026',status:'Gekoppeld',className:'green'},
+    {name:'Foto serienummer MacBook.jpg',type:'Serienummerfoto',item:'MacBook Pro 16',date:'18 mei 2026',status:'Gekoppeld',className:'green'},
+    {name:'Taxatierapport lichtset.pdf',type:'Taxatierapport',item:'Aputure lichtset',date:'9 jul 2026',status:'Gekoppeld',className:'green'}
+  ]:[
+    {name:'Factuur Bax Music.pdf',type:'Aankoopbewijs',item:'Fender American Professional II',date:'12 mrt 2026',status:'Gekoppeld',className:'green'},
+    {name:'Taxatierapport vintage gitaar.pdf',type:'Taxatierapport',item:'Fender 1965 Stratocaster',date:'6 jan 2024',status:'Gekoppeld',className:'green'},
+    {name:'Certificaat van echtheid.pdf',type:'Certificaat',item:'Fender 1965 Stratocaster',date:'6 jan 2024',status:'Gekoppeld',className:'green'}
+  ];
+  data.policyDocuments=data.phase==='Polis'?[
+    {name:`Polis ${data.policy} · versie 1`,type:'Polis',issued:data.start,valid:data.start,status:'Actueel',className:'green'},
+    {name:`Nota ${data.policy.replace('POL','N')}-01`,type:'Nota',issued:data.start,valid:data.start,status:'Afgegeven',className:'blue'}
+  ]:[];
+});
+dossierData['policy-main'].pendingMutation={reference:'MUT-2026-00128',effective:'1 sep 2026',created:'27 aug 2026 · 09:42',initiator:'Klant',summary:'Sony FX6 vervangen en verzekerd bedrag gewijzigd naar € 41.250',status:'Gepland'};
+dossierData['policy-main'].activities.unshift({date:'27 aug 2026 · 09:42',actor:'Klant',source:'Mijn GoSafe',title:'Polismutatie ingepland',change:'Een wijziging is klaargezet en gaat op 1 september 2026 in.',detail:'Referentie: MUT-2026-00128 · Status: Gepland'});
+
 function adminEscape(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));}
 function renderDetailRows(rows){return rows.map(([label,value])=>`<div class="admin-detail-row"><span>${adminEscape(label)}</span><strong>${adminEscape(value)}</strong></div>`).join('');}
 function renderDetailSection(title,rows){return `<section class="admin-detail-section"><h3>${adminEscape(title)}</h3><div class="admin-detail-list">${renderDetailRows(rows)}</div></section>`;}
@@ -67,9 +92,13 @@ function renderDossier(key){
   const set=(id,html)=>{const element=document.getElementById(id);if(element)element.innerHTML=html;};
   const name=document.getElementById('dossierHolderName');if(name)name.textContent=data.holder.name;
   const meta=document.getElementById('dossierHolderMeta');if(meta)meta.textContent=[data.holder.type,data.holder.kvk!=='—'?'KvK '+data.holder.kvk:null,data.holder.email,data.holder.phone].filter(Boolean).join(' · ');
-  set('dossierHeaderChips',`<span class="admin-chip blue">${adminEscape(data.phase)}</span><span class="admin-chip ${adminEscape(data.statusClass)}">${adminEscape(data.status)}</span><span class="admin-chip outline">${adminEscape(data.product)}</span>`);
-  set('dossierHeaderIdentifiers',`<div class="admin-dossier-identifier"><span>Dossiernummer</span><strong>${adminEscape(data.dossier)}</strong></div><div class="admin-dossier-identifier"><span>Polisnummer</span><strong class="${data.policy==='—'?'admin-value-muted':''}">${adminEscape(data.policy)}</strong></div><div class="admin-dossier-identifier"><span>${data.phase==='Polis'?'Ingangsdatum':'Ontvangen'}</span><strong>${adminEscape(data.phase==='Polis'?data.start:data.received.split(' · ')[0])}</strong></div>`);
-  set('dossierOverviewDetails',renderDetailRows([['Fase',data.phase],['Status',data.status],['Product',data.product],['Aanvraag ontvangen',data.received],['Gewenste / actuele ingang',data.start],['Verzekerd bedrag',data.amount],['Jaarpremie',data.premium]]));
+  set('dossierHeaderChips',`<span class="admin-chip blue">${adminEscape(data.phase)}</span><span class="admin-chip ${adminEscape(data.statusClass)}">${adminEscape(data.status)}</span><span class="admin-chip outline">${adminEscape(data.product)}</span>${data.pendingMutation?'<span class="admin-chip amber">Komende wijziging</span>':''}`);
+  set('dossierHeaderIdentifiers',`<div class="admin-dossier-identifier"><span>Dossiernummer</span><strong>${adminEscape(data.dossier)}</strong></div><div class="admin-dossier-identifier"><span>Polisnummer</span><strong class="${data.policy==='—'?'admin-value-muted':''}">${adminEscape(data.policy)}</strong></div><div class="admin-dossier-identifier"><span>${data.phase==='Polis'?'Ingangsdatum':'Ontvangen'}</span><strong>${adminEscape(data.phase==='Polis'?data.start:data.received.split(' · ')[0])}</strong></div>${data.phase==='Polis'?`<div class="admin-dossier-identifier"><span>Prolongatiedatum</span><strong>${adminEscape(data.renewalDate)}</strong></div>`:''}`);
+  set('dossierOverviewDetails',renderDetailRows([['Fase',data.phase],['Status',data.status],['Product',data.product],['Aanvraag ontvangen',data.received],['Gewenste / actuele ingang',data.start],...(data.phase==='Polis'?[['Prolongatiedatum',data.renewalDate]]:[]),['Verzekerd bedrag',data.amount],['Jaarpremie',data.premium],['Voorwaarden',data.terms],['IPID',data.ipid]]));
+  const pending=document.getElementById('dossierPendingMutation');
+  if(pending){pending.hidden=!data.pendingMutation;pending.innerHTML=data.pendingMutation?`<div><span class="admin-future-mutation-label">Komende wijziging</span><strong>${adminEscape(data.pendingMutation.summary)}</strong><small>${adminEscape(data.pendingMutation.reference)} · gestart door ${adminEscape(data.pendingMutation.initiator)} op ${adminEscape(data.pendingMutation.created)}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">${adminEscape(data.pendingMutation.status)}</span></div>`:'';}
+  const mutate=document.getElementById('dossierStartMutation');
+  if(mutate){mutate.hidden=data.phase!=='Polis';mutate.href=`index.html?context=admin&dossier=${encodeURIComponent(key)}&policy=${encodeURIComponent(data.policy)}&holder=${encodeURIComponent(data.holder.name)}`;}
   set('dossierAddonDetails',renderDetailRows(data.addons));
   set('dossierAcceptanceSummary',`<div class="admin-acceptance-result"><div><strong>${adminEscape(data.acceptance.label)}</strong><p>${adminEscape(data.acceptance.text)}</p></div><span class="admin-chip ${adminEscape(data.acceptance.className)}">${adminEscape(data.acceptance.label)}</span></div>`);
   set('dossierApplicationMeta',`<div><span>Ingediend op</span><strong>${adminEscape(data.application.submitted)}</strong></div><div><span>Bron</span><strong>${adminEscape(data.application.source)}</strong></div><div><span>Taal</span><strong>${adminEscape(data.application.language)}</strong></div><div><span>Vastgelegd onder</span><strong>${adminEscape(data.dossier)}</strong></div>`);
@@ -83,7 +112,8 @@ function renderDossier(key){
     renderDetailSection('Verzekeringnemer',[['Naam',data.holder.name],['Type',data.holder.type],['KvK-nummer',data.holder.kvk],['Adres',data.holder.address],['BTW',data.holder.tax]]),
     renderDetailSection('Contact en betaling',[['E-mailadres',data.holder.email],['Telefoonnummer',data.holder.phone],['IBAN',data.holder.iban],['Incassomachtiging',data.application.collection]])
   ].join(''));
-  set('dossierDocumentsBody',data.documents.map(documentItem=>`<tr><td><div class="admin-document-name">${adminEscape(documentItem.name)}</div></td><td>${adminEscape(documentItem.type)}</td><td>${adminEscape(documentItem.date)}</td><td>${adminEscape(documentItem.source)}</td><td><span class="admin-chip ${adminEscape(documentItem.className)}">${adminEscape(documentItem.status)}</span></td></tr>`).join(''));
+  set('dossierItemDocumentsBody',data.itemDocuments.map(documentItem=>`<tr><td><div class="admin-document-name">${adminEscape(documentItem.name)}</div></td><td>${adminEscape(documentItem.type)}</td><td>${adminEscape(documentItem.item)}</td><td>${adminEscape(documentItem.date)}</td><td><span class="admin-chip ${adminEscape(documentItem.className)}">${adminEscape(documentItem.status)}</span></td></tr>`).join(''));
+  set('dossierPolicyDocumentsBody',data.policyDocuments.length?data.policyDocuments.map(documentItem=>`<tr><td><div class="admin-document-name">${adminEscape(documentItem.name)}</div></td><td>${adminEscape(documentItem.type)}</td><td>${adminEscape(documentItem.issued)}</td><td>${adminEscape(documentItem.valid)}</td><td><span class="admin-chip ${adminEscape(documentItem.className)}">${adminEscape(documentItem.status)}</span></td></tr>`).join(''):'<tr><td colspan="5"><div class="admin-empty-inline">Nog geen polisdocumenten afgegeven.</div></td></tr>');
   set('dossierRecentActivities',data.activities.slice(0,5).map(activity=>`<div class="admin-event"><div class="admin-event-time">${adminEscape(activity.date.replace(' 2026','').replace(' 2025',''))}</div><div class="admin-event-mark"></div><div><div class="admin-event-title">${adminEscape(activity.title)}</div><div class="admin-event-copy">${adminEscape(activity.actor)} · ${adminEscape(activity.change)}</div></div></div>`).join(''));
   set('dossierActivitiesBody',data.activities.map(activity=>`<tr><td>${adminEscape(activity.date)}</td><td><div class="admin-primary">${adminEscape(activity.actor)}</div></td><td>${adminEscape(activity.source)}</td><td><div class="admin-primary">${adminEscape(activity.title)}</div></td><td class="admin-activity-change"><strong>${adminEscape(activity.change)}</strong><code>${adminEscape(activity.detail)}</code></td></tr>`).join(''));
   setDossierTab('overview');
@@ -100,6 +130,13 @@ document.querySelectorAll('.admin-dossier-row').forEach(row=>row.addEventListene
 document.getElementById('dossierBackButton')?.addEventListener('click',()=>setAdminPage(dossierReturnPage));
 document.querySelectorAll('[data-dossier-tab]').forEach(button=>button.addEventListener('click',()=>setDossierTab(button.dataset.dossierTab)));
 document.querySelector('[data-show-dossier-activities]')?.addEventListener('click',()=>setDossierTab('activities'));
+const adminEntryParams=new URLSearchParams(window.location.search);
+if(adminEntryParams.get('dossier')&&dossierData[adminEntryParams.get('dossier')]){
+  dossierReturnPage='policies';
+  renderDossier(adminEntryParams.get('dossier'));
+  const back=document.getElementById('dossierBackButton');if(back)back.textContent='← Terug naar polissen';
+  setAdminPage('dossier');
+}
 
 function setupDossierList({bodyId,searchId,statusId,productId,dateId,countId,singular,plural}){
   const body=document.getElementById(bodyId);if(!body)return;
