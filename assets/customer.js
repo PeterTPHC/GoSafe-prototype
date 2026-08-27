@@ -681,6 +681,7 @@ refreshPortalMutationState();
 
 function applicationCustomerType(){ return document.querySelector('input[name="customerType"]:checked')?.value || 'business'; }
 function valOr(id,fallback){ const el=document.getElementById(id); return (el && String(el.value||'').trim()) || fallback; }
+function countryLabel(value){return ({NL:'Nederland',BE:'België',DE:'Duitsland',FR:'Frankrijk',OTHER:'Ander land'})[value]||value||'Nederland';}
 function profileDate(value,fallback){ if(!value) return fallback; try{return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'long',year:'numeric'}).format(new Date(value+'T00:00:00'))}catch(e){return fallback} }
 function syncPortalProfile(){
   const type=applicationCustomerType(); const isBusiness=type==='business';
@@ -693,7 +694,7 @@ function syncPortalProfile(){
   if(isBusiness){
     const company=valOr('companyName','Voorbeeld Media B.V.'); const first=valOr('businessFirstName','Sanne'); const last=valOr('businessLastName','de Vries');
     document.getElementById('profileCompanyName').textContent=company; document.getElementById('profileKvk').textContent=valOr('kvkNumber','12345678'); document.getElementById('profileLegalForm').textContent=valOr('legalForm','Besloten vennootschap (BV)'); document.getElementById('profileBusinessContact').textContent=`${first} ${last}`; document.getElementById('profileEmail').textContent=email; document.getElementById('profilePhone').textContent=phone;
-    document.getElementById('profileEditCompany').value=company; document.getElementById('profileEditKvk').value=valOr('kvkNumber','12345678'); document.getElementById('profileEditFirst').value=first; document.getElementById('profileEditLast').value=last;
+    document.getElementById('profileEditCompany').value=company; document.getElementById('profileEditKvk').value=valOr('kvkNumber','12345678'); document.getElementById('profileEditLegalForm').value=valOr('legalForm','Besloten vennootschap (BV)'); document.getElementById('profileEditFirst').value=first; document.getElementById('profileEditLast').value=last;
   }else{
     const first=valOr('privateFirstName','Sanne'); const last=valOr('privateLastName','de Vries');
     document.getElementById('profilePrivateName').textContent=`${first} ${last}`; document.getElementById('profileBirthDate').textContent=profileDate(valOr('dateOfBirth','1990-03-12'),'12 maart 1990'); document.getElementById('profilePrivateEmail').textContent=email; document.getElementById('profilePrivatePhone').textContent=phone;
@@ -702,7 +703,8 @@ function syncPortalProfile(){
   document.getElementById('profileEditEmail').value=email; document.getElementById('profileEditPhone').value=phone;
   const pc=valOr('postcode','1234 AB'), hn=valOr('houseNumber','12'), add=valOr('houseAddition','A'), st=valOr('street','Voorbeeldstraat'), cityv=valOr('city','Amsterdam');
   document.getElementById('profileAddress').textContent=`${st} ${hn}${add?' '+add:''}, ${pc} ${cityv}`;
-  document.getElementById('profileEditPostcode').value=pc; document.getElementById('profileEditHouse').value=hn; document.getElementById('profileEditAddition').value=add; document.getElementById('profileEditStreet').value=st; document.getElementById('profileEditCity').value=cityv;
+  const country=countryLabel(valOr('country','NL'));
+  document.getElementById('profileCountry').textContent=country; document.getElementById('profileEditPostcode').value=pc; document.getElementById('profileEditHouse').value=hn; document.getElementById('profileEditAddition').value=add; document.getElementById('profileEditCountry').value=country; document.getElementById('profileEditStreet').value=st; document.getElementById('profileEditCity').value=cityv;
   const ibanv=valOr('iban','NL91 ABNA 0417 1643 00'), holder=valOr('accountHolder',isBusiness?valOr('companyName','Voorbeeld Media B.V.'):`${valOr('privateFirstName','Sanne')} ${valOr('privateLastName','de Vries')}`);
   document.getElementById('profileIban').textContent=ibanv; document.getElementById('profileAccountHolder').textContent=holder; document.getElementById('profileEditIban').value=ibanv; document.getElementById('profileEditHolder').value=holder;
 }
@@ -711,9 +713,9 @@ document.getElementById('portalEditProfile')?.addEventListener('click',()=>{sync
 document.getElementById('portalCancelProfileEdit')?.addEventListener('click',()=>{profileView?.classList.remove('hidden');profileEdit?.classList.remove('visible');document.getElementById('portalEditProfile').style.display='inline-flex'});
 document.getElementById('portalSaveProfileEdit')?.addEventListener('click',()=>{
   const isBusiness=applicationCustomerType()==='business';
-  if(isBusiness){document.getElementById('profileCompanyName').textContent=valOr('profileEditCompany','Voorbeeld Media B.V.');document.getElementById('profileBusinessContact').textContent=`${valOr('profileEditFirst','Sanne')} ${valOr('profileEditLast','de Vries')}`;document.getElementById('profileEmail').textContent=valOr('profileEditEmail','');document.getElementById('profilePhone').textContent=valOr('profileEditPhone','');}
+  if(isBusiness){document.getElementById('profileCompanyName').textContent=valOr('profileEditCompany','Voorbeeld Media B.V.');document.getElementById('profileLegalForm').textContent=valOr('profileEditLegalForm','Besloten vennootschap (BV)');document.getElementById('profileBusinessContact').textContent=`${valOr('profileEditFirst','Sanne')} ${valOr('profileEditLast','de Vries')}`;document.getElementById('profileEmail').textContent=valOr('profileEditEmail','');document.getElementById('profilePhone').textContent=valOr('profileEditPhone','');}
   else{document.getElementById('profilePrivateName').textContent=`${valOr('profileEditPrivateFirst','Sanne')} ${valOr('profileEditPrivateLast','de Vries')}`;document.getElementById('profileBirthDate').textContent=profileDate(valOr('profileEditDob','1990-03-12'),'12 maart 1990');document.getElementById('profilePrivateEmail').textContent=valOr('profileEditEmail','');document.getElementById('profilePrivatePhone').textContent=valOr('profileEditPhone','');}
-  document.getElementById('profileAddress').textContent=`${valOr('profileEditStreet','')} ${valOr('profileEditHouse','')}${valOr('profileEditAddition','')?' '+valOr('profileEditAddition',''):''}, ${valOr('profileEditPostcode','')} ${valOr('profileEditCity','')}`;
+  document.getElementById('profileAddress').textContent=`${valOr('profileEditStreet','')} ${valOr('profileEditHouse','')}${valOr('profileEditAddition','')?' '+valOr('profileEditAddition',''):''}, ${valOr('profileEditPostcode','')} ${valOr('profileEditCity','')}`;document.getElementById('profileCountry').textContent=valOr('profileEditCountry','Nederland');
   document.getElementById('profileIban').textContent=valOr('profileEditIban','');document.getElementById('profileAccountHolder').textContent=valOr('profileEditHolder','');
   profileView?.classList.remove('hidden');profileEdit?.classList.remove('visible');document.getElementById('portalEditProfile').style.display='inline-flex';
 });

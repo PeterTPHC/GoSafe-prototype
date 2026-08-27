@@ -476,6 +476,21 @@ setupDossierList({bodyId:'policyListBody',searchId:'policyListSearch',statusId:'
 const productAdminPage=document.querySelector('.product-admin-page');
 let selectedAdminProduct='';
 let pendingProductPage='categories';
+// Het klikprototype gebruikt dezelfde functionele contracten als productie, maar met een
+// lokale adapter. In productie wordt alleen deze adapter vervangen door de echte Product API;
+// de admin leest of schrijft nooit rechtstreeks in de productconfiguratiedatabase.
+const productApiAdapter={
+  mode:'mock',
+  calls:[],
+  request(apiId,payload={}){
+    const call={apiId,payload,requestedAt:new Date().toISOString()};
+    this.calls.push(call);
+    document.dispatchEvent(new CustomEvent('gosafe:product-api',{detail:call}));
+    return {ok:true,apiId,data:payload,auditReference:'PROTO-'+String(this.calls.length).padStart(4,'0')};
+  }
+};
+window.GoSafeProductApiPrototype=productApiAdapter;
+function callProductApi(apiId,payload){return productApiAdapter.request(apiId,{productId:document.getElementById('productAdminProduct')?.value||null,changeSetId:'CHANGESET-TARIEVEN-2027',...payload});}
 function showProductChooser(){
   selectedAdminProduct='';
   productAdminPage?.classList.add('choosing-product');
@@ -488,6 +503,19 @@ function selectAdminProduct(name){
   const current=document.getElementById('productCurrentName');if(current)current.textContent=name;
   const apiProduct=document.getElementById('productApiProduct');if(apiProduct)apiProduct.value=name;
   productAdminPage?.classList.remove('choosing-product');
+  [
+    'API-PRODUCT-CATEGORY-SETTINGS-GET',
+    'API-P07-CATEGORY-RULE-TYPE-LIST',
+    'API-P07-CATEGORY-RULE-LIST',
+    'API-PRODUCT-SETTINGS-GET',
+    'API-PRODUCT-CONDITIONS-GET',
+    'API-PRODUCT-CONDITIONS-LIBRARY-LIST',
+    'API-PRODUCT-IPID-GET',
+    'API-PRODUCT-IPID-LIBRARY-LIST',
+    'API-PRODUCT-ADDONS-GET',
+    'API-PRODUCT-ACCEPTANCE-GET',
+    'API-PRODUCT-CHANGESET-GET'
+  ].forEach(apiId=>callProductApi(apiId,{operation:'read'}));
   setProductPage(pendingProductPage||'categories');
   closeProductCategoryEdit();
   filterProductCategories();
@@ -557,7 +585,7 @@ function closeProductCategoryEdit(){
 document.querySelectorAll('.product-open-category').forEach(btn=>btn.addEventListener('click',e=>editProductCategory(e.currentTarget.closest('.product-category-row'))));
 ['productCloseCategoryEdit','productCancelCategoryEdit'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductCategoryEdit));
 document.getElementById('productSaveCategoryChange')?.addEventListener('click',e=>{
-  const row=document.querySelector('.product-category-row.selected');if(row){row.dataset.upcoming='Concept · Tarieven 2027';setProductNextVersion(row,'concept','Tarieven 2027');}
+  const row=document.querySelector('.product-category-row.selected');if(row){callProductApi('API-PRODUCT-CATEGORY-SETTINGS-PUT',{scopeType:row.dataset.level,scopeId:row.dataset.categoryName,rateMode:document.getElementById('productCategoryRateMode')?.value,rate:document.getElementById('productCategoryRate')?.value,deductibleMode:document.getElementById('productCategoryDeductibleMode')?.value,deductible:document.getElementById('productCategoryDeductible')?.value});row.dataset.upcoming='Concept · Tarieven 2027';setProductNextVersion(row,'concept','Tarieven 2027');}
   e.currentTarget.textContent='Opgeslagen';
   window.setTimeout(()=>e.currentTarget.textContent='Opslaan',1200);
 });
@@ -587,7 +615,8 @@ function toggleProductChangeEditor(show=true){if(productChangeEditor) productCha
 ['productNewChangeSet','productNewChangeSetInline'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',()=>{setProductPage('changes');toggleProductChangeEditor(true);});});
 document.querySelectorAll('.product-edit-draft').forEach(el=>el.addEventListener('click',()=>{setProductPage('changes');toggleProductChangeEditor(true);}));
 const productCloseChangeSet=document.getElementById('productCloseChangeSet');if(productCloseChangeSet)productCloseChangeSet.addEventListener('click',()=>toggleProductChangeEditor(false));
-document.getElementById('productSaveChangeSet')?.addEventListener('click',()=>showAdminToast('Wijzigingsset en interne notitie opgeslagen'));
+document.getElementById('productSaveChangeSet')?.addEventListener('click',()=>{callProductApi('API-PRODUCT-CHANGESET-PUT',{internalNote:document.getElementById('productChangeInternalNote')?.value||''});showAdminToast('Wijzigingsset en interne notitie opgeslagen via de Product API.');});
+document.querySelector('.product-change-actions .primary')?.addEventListener('click',()=>{callProductApi('API-P07-PRODUCT-CHANGESET-PUBLISH',{operation:'publish'});showAdminToast('Wijzigingsset gecontroleerd en gepubliceerd via de Product API.');});
 
 function syncProductVersionContext(){
   const select=document.getElementById('productConfigView'),box=document.getElementById('productVersionContext');if(!select||!box)return;
@@ -663,7 +692,7 @@ document.getElementById('productCategoryAddRule')?.addEventListener('click',()=>
     input.checked=false;
   });
   const selectedRow=document.querySelector('.product-category-row.selected');
-  if(selectedRow){selectedRow.dataset.rule=[...existing].join('|');selectedRow.dataset.ruleSource=selectedRow.dataset.categoryName||'';const cell=selectedRow.children[3];if(cell)cell.innerHTML=[...existing].map(rule=>'<span class="product-rule-chip">'+productEscape(rule)+'</span>').join('');}
+  if(selectedRow){callProductApi('API-P07-CATEGORY-RULE-LINK-BATCH',{scopeType:selectedRow.dataset.level,scopeId:selectedRow.dataset.categoryName,ruleNames:[...existing]});selectedRow.dataset.rule=[...existing].join('|');selectedRow.dataset.ruleSource=selectedRow.dataset.categoryName||'';const cell=selectedRow.children[3];if(cell)cell.innerHTML=[...existing].map(rule=>'<span class="product-rule-chip">'+productEscape(rule)+'</span>').join('');}
   updateCategoryRuleSelection();
 });
 document.getElementById('productCategoryOwnRules')?.addEventListener('click',e=>{
@@ -729,6 +758,7 @@ document.getElementById('productRuleSave')?.addEventListener('click',()=>{
   if(type==='Clausule toevoegen'&&!clause){if(editorError){editorError.textContent='Selecteer de clausule die deze regel moet toevoegen.';editorError.classList.add('visible');}return;}
   const duplicate=[...document.querySelectorAll('.product-rule-row')].find(row=>row!==editingProductRuleRow&&(row.dataset.ruleCode||'').toUpperCase()===code);
   if(duplicate){if(editorError){editorError.textContent='Deze regelcode bestaat al binnen dit product.';editorError.classList.add('visible');}return;}
+  callProductApi('API-P07-CATEGORY-RULE-UPSERT',{ruleId:editingProductRuleRow?.dataset.ruleId||null,code,name,typeKey:type==='Serienummer verplicht'?'serial_number_required':'attach_clause',typeVersion:1,config:type==='Clausule toevoegen'?{clauseId:clause}:{},description,status});
   let row=editingProductRuleRow;
   if(!row){row=document.createElement('tr');row.className='product-rule-row';document.querySelector('.product-category-rules-table tbody')?.prepend(row);}
   row.dataset.product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';row.dataset.ruleName=name;row.dataset.ruleCode=code;row.dataset.ruleType=type;row.dataset.ruleDescription=description;row.dataset.ruleStatus=status;row.dataset.ruleClause=type==='Clausule toevoegen'?clause:'';
@@ -800,6 +830,7 @@ document.getElementById('productSettingSave')?.addEventListener('click',()=>{
   const value=Number(document.getElementById('productSettingValue')?.value);
   const effective=document.getElementById('productSettingEffective')?.value||'';
   if(!Number.isFinite(value)||value<0||!effective){document.getElementById('productSettingEditorError')?.classList.add('visible');return;}
+  callProductApi('API-PRODUCT-SETTINGS-PUT',{settingKey:editingProductSettingRow.dataset.settingKey,value,effectiveDate:effective});
   editingProductSettingRow.dataset.settingValue=String(value);editingProductSettingRow.dataset.settingEffective=effective;
   const valueCell=editingProductSettingRow.querySelector('.product-setting-value');if(valueCell)valueCell.textContent=formatProductEuro(value);
   if(editingProductSettingRow.children[3])editingProductSettingRow.children[3].textContent=formatProductDate(effective);
@@ -840,6 +871,7 @@ document.getElementById('productConditionsSave')?.addEventListener('click',()=>{
   if(!editingProductConditionsRow)return;
   const ids=[...document.querySelectorAll('#productConditionOptions label:not([hidden]) input:checked')].map(input=>input.value);
   if(!ids.length){document.getElementById('productConditionsEditorError')?.classList.add('visible');return;}
+  callProductApi('API-PRODUCT-CONDITIONS-PUT',{conditionVersionIds:ids});
   editingProductConditionsRow.dataset.conditionIds=ids.join('|');renderProductConditionsRow(editingProductConditionsRow);setProductNextVersion(editingProductConditionsRow,'concept','Productdocumenten 2027');
   showAdminToast('Voorwaarden opgeslagen in de wijzigingsset');closeProductConditionsEditor();
 });
@@ -860,7 +892,7 @@ function openProductIpidEditor(row){
 function closeProductIpidEditor(){editingProductIpidRow=null;document.getElementById('productIpidEditor')?.classList.remove('visible');document.getElementById('productIpidEditorError')?.classList.remove('visible');}
 document.querySelector('.product-ipid-table tbody')?.addEventListener('click',e=>{const button=e.target.closest('.product-edit-ipid');if(button)openProductIpidEditor(button.closest('.product-ipid-row'));});
 ['productIpidEditorClose','productIpidEditorCancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductIpidEditor));
-document.getElementById('productIpidSave')?.addEventListener('click',()=>{if(!editingProductIpidRow)return;const selected=document.querySelector('#productIpidOptions label:not([hidden]) input:checked');if(!selected){document.getElementById('productIpidEditorError')?.classList.add('visible');return;}editingProductIpidRow.dataset.ipidId=selected.value;renderProductIpidRow(editingProductIpidRow);setProductNextVersion(editingProductIpidRow,'concept','Productdocumenten 2027');showAdminToast('IPID opgeslagen in de wijzigingsset');closeProductIpidEditor();});
+document.getElementById('productIpidSave')?.addEventListener('click',()=>{if(!editingProductIpidRow)return;const selected=document.querySelector('#productIpidOptions label:not([hidden]) input:checked');if(!selected){document.getElementById('productIpidEditorError')?.classList.add('visible');return;}callProductApi('API-PRODUCT-IPID-PUT',{ipidDocumentVersionId:selected.value});editingProductIpidRow.dataset.ipidId=selected.value;renderProductIpidRow(editingProductIpidRow);setProductNextVersion(editingProductIpidRow,'concept','Productdocumenten 2027');showAdminToast('IPID opgeslagen in de wijzigingsset');closeProductIpidEditor();});
 
 let editingProductAddonRow=null;
 function parseAddonTiers(value){return String(value||'').split('|').filter(Boolean).map(pair=>{const [amount,premium]=pair.split(':').map(Number);return {amount,premium};}).filter(tier=>Number.isFinite(tier.amount)&&Number.isFinite(tier.premium));}
@@ -908,6 +940,7 @@ document.getElementById('productAddonSave')?.addEventListener('click',()=>{
     editingProductAddonRow.dataset.addonPercentage=String(percentage);
     const cell=editingProductAddonRow.querySelector('.product-addon-value');if(cell)cell.textContent=String(percentage).replace('.',',')+'%';
   }
+  callProductApi('API-PRODUCT-ADDONS-PUT',editingProductAddonRow.dataset.addonType==='inhire'?{inhireTiers:parseAddonTiers(editingProductAddonRow.dataset.addonTiers)}:{rentalSurchargePercentage:Number(editingProductAddonRow.dataset.addonPercentage)});
   setProductNextVersion(editingProductAddonRow,'concept','Tarieven 2027');showAdminToast('Aanvullende dekking opgeslagen in de wijzigingsset');closeProductAddonEditor();
 });
 
@@ -991,6 +1024,7 @@ document.getElementById('productAcceptanceSave')?.addEventListener('click',()=>{
   if(invalid){const error=document.getElementById('productAcceptanceEditorError');if(error){error.textContent=type==='computer_ratio'?'Vul een geldige verhouding, minimaal één categorie en een ingangsdatum in.':'Vul een geldige waarde en ingangsdatum in.';error.classList.add('visible');}return;}
   const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
   const row=editingAcceptanceRow;
+  callProductApi('API-PRODUCT-ACCEPTANCE-PUT',{criterionId:row.dataset.acceptanceCode,typeKey:type,config:{value,categories},status,effectiveDate:effective,outcome:'fallout'});
   row.dataset.product=product;row.dataset.acceptanceType=type;row.dataset.acceptanceCode=definition.code+(product==='Instrumentenverzekering'?'-INS':'');row.dataset.acceptanceName=definition.name;row.dataset.acceptanceValue=value;row.dataset.acceptanceUnit=definition.unit;row.dataset.acceptanceOutcome=definition.outcome;row.dataset.acceptanceStatus=status;row.dataset.acceptanceEffective=effective;row.dataset.acceptanceCategories=type==='computer_ratio'?categories.join('|'):'';
   renderAcceptanceRow(row);setProductNextVersion(row,'concept','Tarieven 2027');filterProductAcceptance();showAdminToast('Acceptatiecriterium opgeslagen in de wijzigingsset');closeAcceptanceEditor();
 });
