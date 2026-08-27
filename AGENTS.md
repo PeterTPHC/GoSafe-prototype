@@ -13,7 +13,8 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 
 - Klantflow: `index.html`
 - Admin/polisdeel: `admin.html`
-- Zelfstandige procesmonitor: `process-monitor.html`
+- Realtime procesmonitor in admin: `admin.html#processes`
+- Vaste doorverwijzing: `process-monitor.html`
 - Gedeelde assets: `assets/`
 
 ## Werkwijze per wijziging
@@ -25,6 +26,9 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 5. Controleer de werkende GitHub Pages-URL in een browser voordat de wijziging als klaar wordt gemeld.
 6. Werk relevante documentatie in de bestaande Drive-documenten bij; maak geen lokale documentkopieën.
 
-## Huidige afbakening
+## Procesmonitoring
 
-De procesmonitor is voorlopig een zelfstandige mockup. Integreer deze nog niet in het polis- of dossierdeel totdat de gebruiker dat expliciet vraagt.
+- De globale procesmonitor gebruikt exact dezelfde admin-shell, navigatie en componenten als `admin.html`.
+- In ieder aanvraag- en polisdossier staat een tab `Processen` met de voortgang op dossierniveau.
+- Processtatussen worden realtime bijgewerkt; voeg geen handmatige refreshknop toe.
+- Functioneel uitgangspunt: initiële API-snapshot, daarna status-events via SSE of WebSocket, inclusief automatische reconnect en zichtbaar signaal als de verbinding niet actueel is.

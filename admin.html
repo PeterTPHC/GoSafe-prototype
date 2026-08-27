@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GoSafe – adminprototype</title>
-<link rel="stylesheet" href="assets/prototype.css?v=20260827-mutation-v5">
+<link rel="stylesheet" href="assets/prototype.css?v=20260827-processes-v2">
 </head>
 <body><div class="prototype-toolbar admin-prototype-toolbar"><strong>GoSafe prototype</strong><div class="toolbar-group"><span class="toolbar-context">Adminomgeving</span><a class="toolbar-btn" href="index.html">← Naar klantflow</a></div></div><section class="screen active" id="screen-admin">
 <div class="admin-shell">
@@ -19,6 +19,7 @@
     <button class="admin-nav active" data-admin-target="overview" type="button">Overzicht</button>
     <button class="admin-nav" data-admin-target="workqueue" type="button">Werkvoorraad <span class="admin-nav-badge">12</span></button>
     <button class="admin-nav" data-admin-target="activities" type="button">Activiteiten</button>
+    <button class="admin-nav" data-admin-target="processes" type="button">Processen <span class="admin-nav-badge">4</span></button>
   </div>
   <div class="admin-nav-group"><div class="admin-nav-label">Verzekering</div>
     <button class="admin-nav" data-admin-target="applications" type="button">Aanvragen <span class="admin-nav-badge">4</span></button>
@@ -101,6 +102,21 @@
     <tr><td>26 aug · 06:55</td><td>—</td><td>Batch PROL-20260826</td><td>Systeem</td><td>Prolongatieberekening</td><td><span class="admin-chip amber">1 uitzondering</span></td></tr>
     <tr><td>25 aug · 16:42</td><td>Studio Noord B.V.</td><td>POL-2025-00917</td><td>Finance</td><td>Incasso opnieuw aangeboden</td><td><span class="admin-chip blue">Verwerkt</span></td></tr>
   </tbody></table></div></div>
+</div>
+
+<div class="admin-page" data-admin-page="processes">
+  <div class="admin-page-head"><div><h1>Processen</h1><p>Realtime inzicht in alle achtergrondprocessen, wachtrijen en uitzonderingen.</p></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="adminProcessLiveAge">Laatste update zojuist</span></div></div></div>
+  <div class="admin-kpis admin-process-kpis">
+    <div class="admin-kpi"><div class="admin-kpi-label">Actief</div><div class="admin-kpi-value">14</div><div class="admin-kpi-sub">8 polisafgifte · 4 mutaties · 2 overige</div></div>
+    <div class="admin-kpi"><div class="admin-kpi-label">Wacht op extern</div><div class="admin-kpi-value">3</div><div class="admin-kpi-sub">Allemaal binnen verwachte responstijd</div></div>
+    <div class="admin-kpi"><div class="admin-kpi-label">Retry gepland</div><div class="admin-kpi-value">2</div><div class="admin-kpi-sub">Eerstvolgende automatische poging binnen 2 minuten</div></div>
+    <div class="admin-kpi"><div class="admin-kpi-label">Handmatige actie</div><div class="admin-kpi-value">4</div><div class="admin-kpi-sub">2 buiten SLA · oudste 1 uur en 25 minuten</div></div>
+  </div>
+  <div class="admin-card admin-process-flow-card"><div class="admin-card-head"><div><h2>Polisafgifte vandaag</h2><p>186 afgerond · mediane doorlooptijd 4,9 seconden</p></div><span class="admin-chip green">99,2% zonder handwerk</span></div><div class="admin-card-body"><div class="admin-process-flow"><div><strong>204</strong><span>Gestart</span><i><b style="width:100%"></b></i></div><div><strong>201</strong><span>Documenten</span><i><b style="width:98.5%"></b></i></div><div><strong>194</strong><span>ANVA akkoord</span><i><b style="width:95.1%"></b></i></div><div><strong>190</strong><span>Kindprocessen</span><i><b style="width:93.1%"></b></i></div><div><strong>186</strong><span>Afgerond</span><i><b style="width:91.2%"></b></i></div></div></div></div>
+  <div class="admin-process-layout">
+    <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="adminProcessSearch" type="search" placeholder="Zoek proces, dossier, polis of relatie"><select id="adminProcessTypeFilter"><option value="">Alle processen</option><option>Aanvraagverwerking</option><option>Polisafgifte</option><option>Mutatie</option><option>Prolongatie</option><option>Royement</option><option>Incasso</option></select><select id="adminProcessStatusFilter"><option value="">Alle statussen</option><option value="running">Actief</option><option value="external">Wacht extern</option><option value="retry">Retry gepland</option><option value="manual">Actie nodig</option><option value="completed">Afgerond</option></select><span class="admin-result-count" id="adminProcessResultCount">8 processen</span></div><div class="admin-table-wrap"><table class="admin-table admin-process-table"><thead><tr><th>Proces</th><th>Dossier / polis</th><th>Status</th><th>Huidige stap</th><th>Leeftijd</th><th>SLA</th></tr></thead><tbody id="adminProcessListBody"></tbody></table></div></div>
+    <aside class="admin-card admin-process-detail" id="adminProcessDetail"></aside>
+  </div>
 </div>
 
 <div class="admin-page" data-admin-page="applications">
@@ -337,6 +353,7 @@
     <button data-dossier-tab="holder" type="button">Verzekeringnemer</button>
     <button data-dossier-tab="item-documents" type="button">Itemdocumenten</button>
     <button data-dossier-tab="policy-documents" type="button">Polisdocumenten</button>
+    <button data-dossier-tab="processes" type="button">Processen <span class="admin-dossier-tab-count" id="dossierProcessTabCount">0</span></button>
     <button data-dossier-tab="activities" type="button">Activiteiten</button>
     <button class="admin-dossier-context-tab" id="dossierContextTab" data-dossier-tab="context" type="button" hidden>Wijzigen</button>
   </div>
@@ -361,6 +378,10 @@
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="policy-documents">
     <div class="admin-card"><div class="admin-card-head"><div><h2>Polisdocumenten</h2><p>Alle polissen, nota's en creditnota's die voor dit dossier zijn afgegeven.</p></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Soort</th><th>Afgegeven</th><th>Geldig vanaf</th><th>Status</th></tr></thead><tbody id="dossierPolicyDocumentsBody"></tbody></table></div></div>
+  </div>
+  <div class="admin-dossier-panel" data-dossier-panel="processes">
+    <div class="admin-process-panel-head"><div><h2>Processen voor dit dossier</h2><p>De status en stappen worden realtime bijgewerkt; handmatig verversen is niet nodig.</p></div><div class="admin-process-live compact"><i></i><div><strong>Realtime verbonden</strong><span id="dossierProcessLiveAge">Laatste update zojuist</span></div></div></div>
+    <div class="admin-dossier-process-layout"><div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-process-table"><thead><tr><th>Proces</th><th>Status</th><th>Huidige stap</th><th>Gestart</th><th>Doorlooptijd</th></tr></thead><tbody id="dossierProcessListBody"></tbody></table></div></div><aside class="admin-card admin-process-detail" id="dossierProcessDetail"></aside></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="activities">
     <div class="admin-card"><div class="admin-card-head"><div><h2>Activiteitenlog</h2><p>Alle dossiermutaties, inclusief actor, bron en gewijzigde waarden.</p></div></div><div class="admin-table-wrap"><table class="admin-table admin-activity-table"><thead><tr><th>Datum / tijd</th><th>Actor</th><th>Bron</th><th>Activiteit</th><th>Wijziging</th></tr></thead><tbody id="dossierActivitiesBody"></tbody></table></div></div>
@@ -392,6 +413,6 @@
 </main>
 </div>
 </div>
-</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260827-audit-v2"></script>
+</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260827-processes-v2"></script>
 </body>
 </html>
