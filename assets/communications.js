@@ -45,6 +45,21 @@ document.addEventListener('click',event=>{const tab=event.target.closest('[data-
 document.addEventListener('keydown',event=>{const row=event.target.closest('[data-communication-queue-id],[data-communication-message-id],[data-communication-template-id]');if(!row||(event.key!=='Enter'&&event.key!==' '))return;event.preventDefault();if(row.dataset.communicationQueueId){selectedCommunicationQueue=row.dataset.communicationQueueId;renderCommunicationQueue();}if(row.dataset.communicationMessageId){selectedCommunicationMessage=row.dataset.communicationMessageId;renderCommunicationMessages();}if(row.dataset.communicationTemplateId){selectedCommunicationTemplate=row.dataset.communicationTemplateId;renderCommunicationTemplates();}});
 
 document.querySelector('.admin-nav[data-admin-target="communications"]')?.addEventListener('click',()=>history.replaceState(null,'','#communications'));
+
+// UX-review 2026-08-28: extra voorbeeldregels en contextuele dossiernavigatie.
+dossierData['policy-event']={...dossierData['policy-main'],dossier:'DOS-2026-00614',policy:'POL-2026-00276',holder:{...dossierData['application-main'].holder,name:'Voorbeeldbedrijf D'},received:'18 jun 2026 · 11:24',start:'18 jun 2026',amount:'€ 64.500',premium:'€ 806,25'};
+dossierData['policy-music']={...dossierData['policy-jdevries'],dossier:'DOS-2026-00231',policy:'POL-2026-00109',holder:{...dossierData['application-fallout'].holder,name:'Voorbeeldklant E'},received:'9 feb 2026 · 13:08',start:'9 feb 2026',amount:'€ 18.750',premium:'€ 117,19'};
+dossierData['policy-rental']={...dossierData['policy-main'],dossier:'DOS-2025-01490',policy:'POL-2025-01142',holder:{...dossierData['application-main'].holder,name:'Voorbeeldbedrijf F'},received:'3 dec 2025 · 09:36',start:'3 dec 2025',amount:'€ 92.300',premium:'€ 1.153,75'};
+dossierData['policy-photo']={...dossierData['policy-main'],dossier:'DOS-2026-00722',policy:'POL-2026-00348',holder:{...dossierData['application-main'].holder,name:'Voorbeeldbedrijf G'},received:'7 jul 2026 · 16:12',start:'7 jul 2026',amount:'€ 31.900',premium:'€ 398,75'};
+setAdminPage=function(name){
+  document.querySelectorAll('[data-admin-page]').forEach(element=>element.classList.toggle('active',element.dataset.adminPage===name));
+  const dossier=dossierData[activeDossierKey];
+  const navName=name==='dossier'?(dossier?.phase==='Polis'?'policies':'applications'):name;
+  document.querySelectorAll('.admin-nav[data-admin-target]').forEach(element=>element.classList.toggle('active',element.dataset.adminTarget===navName));
+  if(['processes','renewals','policies'].includes(name))history.replaceState(null,'',`#${name}`);
+  document.querySelector('.admin-main')?.scrollTo?.({top:0,behavior:'smooth'});
+};
+
 let communicationRealtimeAge=0;
 setInterval(()=>{communicationRealtimeAge=(communicationRealtimeAge+1)%6;const element=document.getElementById('communicationLiveAge');if(element)element.textContent=communicationRealtimeAge===0?'Laatste update zojuist':'Laatste update '+communicationRealtimeAge+' sec geleden';},1000);
 renderAdminProcesses();

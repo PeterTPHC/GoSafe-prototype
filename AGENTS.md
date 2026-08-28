@@ -60,6 +60,10 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Behoud de vaste menugroepen: `Dagelijks werk`, `Bewaking`, `Administratie`, `Inzicht` en `Beheer`.
 - Houd processtatussen realtime en zichtbaar zonder refreshknop.
 - Communicatie gebruikt dezelfde realtime werkwijze. De admin toont operationeel `Wachtrij`, `Berichten` en `Templates`, zonder refreshknop.
+- Overzichtslijsten tonen alleen gegevens die nodig zijn om een record te herkennen of een actie te starten. Laat interne dossiercodes, e-mailadressen en laatste-activiteitkolommen weg als die geen directe keuze ondersteunen.
+- Werkvoorraadtaken hebben alleen de statussen `Open` en `Afgerond`; gebruik geen status `Bezig`. Toon daar geen prioriteit, eigenaar of uiterste datum.
+- Bedragen in aanvraag- en polisoverzichten staan rechts uitgelijnd.
+- Bij het openen van een dossier springt de actieve hoofdnavigatie mee naar `Aanvragen` of `Polissen`, ongeacht vanuit welk overzicht het dossier is geopend.
 
 ## Prolongatie en mutatie
 
