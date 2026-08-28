@@ -34,6 +34,15 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Processtatussen worden realtime bijgewerkt; voeg geen handmatige refreshknop toe.
 - Functioneel uitgangspunt: initiële API-snapshot, daarna status-events via SSE of WebSocket, inclusief automatische reconnect en zichtbaar signaal als de verbinding niet actueel is.
 
+## Admin UX
+
+- Ontwerp de admin als operationele werkomgeving: toon eerst dossiers, uitzonderingen en benodigde acties.
+- Gebruik overal dezelfde admin-shell, navigatie, paginakoppen, kaarten, tabellen, statussen en acties.
+- Voeg alleen uitleg toe als die nodig is om een keuze veilig te kunnen maken; vermijd introductietekst die de paginatitel of tabel herhaalt.
+- Toon tellingen alleen als ze een actie prioriteren, een filterresultaat verduidelijken of een actuele processtatus aangeven.
+- Behoud de vaste menugroepen: `Dagelijks werk`, `Bewaking`, `Administratie`, `Inzicht` en `Beheer`.
+- Houd processtatussen realtime en zichtbaar zonder refreshknop.
+
 ## Prolongatie en mutatie
 
 - Vooraankondiging is een los, automatisch communicatieproces en maakt geen polisversie of financiële boeking.

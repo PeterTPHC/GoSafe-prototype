@@ -234,6 +234,16 @@ function filterRenewals(){
   const count=document.getElementById('renewalResultCount');if(count)count.textContent=`${visible} ${visible===1?'polis':'polissen'}`;
 }
 ['renewalSearch','renewalStatusFilter','renewalPeriodFilter'].forEach(id=>document.getElementById(id)?.addEventListener(id==='renewalSearch'?'input':'change',filterRenewals));
+document.querySelectorAll('[data-renewal-status]').forEach(button=>button.addEventListener('click',()=>{
+  const filter=document.getElementById('renewalStatusFilter');
+  const next=filter?.value===button.dataset.renewalStatus?'':button.dataset.renewalStatus;
+  if(filter)filter.value=next;
+  document.querySelectorAll('[data-renewal-status]').forEach(item=>item.classList.toggle('active',item.dataset.renewalStatus===next));
+  filterRenewals();
+}));
+document.getElementById('renewalStatusFilter')?.addEventListener('change',event=>{
+  document.querySelectorAll('[data-renewal-status]').forEach(item=>item.classList.toggle('active',item.dataset.renewalStatus===event.currentTarget.value));
+});
 document.addEventListener('click',event=>{const row=event.target.closest('.admin-process-row');if(row)selectAdminProcess(row.dataset.processId,row.closest('[data-dossier-panel="processes"]')?'dossier':'admin');const retry=event.target.closest('[data-process-retry]');if(retry){const process=adminProcessData.find(item=>item.id===retry.dataset.processRetry);if(process){process.status='running';process.step='Opnieuw ingepland';process.error='';process.steps=process.steps.map(step=>step[1]==='failed'?[step[0],'running','Nieuwe poging zojuist gestart']:step);renderAdminProcesses();renderDossierProcesses(dossierData[activeDossierKey]||dossierData['policy-main']);}}});
 document.addEventListener('keydown',event=>{const row=event.target.closest('.admin-process-row');if(row&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectAdminProcess(row.dataset.processId,row.closest('[data-dossier-panel="processes"]')?'dossier':'admin');}});
 let adminRealtimeAge=0;

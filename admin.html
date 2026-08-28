@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GoSafe – adminprototype</title>
-<link rel="stylesheet" href="assets/prototype.css?v=20260828-renewal-mutation-v1">
+<link rel="stylesheet" href="assets/prototype.css?v=20260828-admin-ux-v1">
 </head>
 <body><div class="prototype-toolbar admin-prototype-toolbar"><strong>GoSafe prototype</strong><div class="toolbar-group"><span class="toolbar-context">Adminomgeving</span><a class="toolbar-btn" href="index.html">← Naar klantflow</a></div></div><section class="screen active" id="screen-admin">
 <div class="admin-shell">
@@ -15,19 +15,21 @@
 </header>
 <div class="admin-body">
 <aside class="admin-sidebar">
-  <div class="admin-nav-group"><div class="admin-nav-label">Werk</div>
+  <div class="admin-nav-group"><div class="admin-nav-label">Dagelijks werk</div>
     <button class="admin-nav active" data-admin-target="overview" type="button">Overzicht</button>
     <button class="admin-nav" data-admin-target="workqueue" type="button">Werkvoorraad <span class="admin-nav-badge">12</span></button>
-    <button class="admin-nav" data-admin-target="activities" type="button">Activiteiten</button>
-    <button class="admin-nav" data-admin-target="processes" type="button">Processen <span class="admin-nav-badge">4</span></button>
-  </div>
-  <div class="admin-nav-group"><div class="admin-nav-label">Verzekering</div>
     <button class="admin-nav" data-admin-target="applications" type="button">Aanvragen <span class="admin-nav-badge">4</span></button>
     <button class="admin-nav" data-admin-target="policies" type="button">Polissen</button>
-    <button class="admin-nav" data-admin-target="renewals" type="button">Prolongaties <span class="admin-nav-badge">34</span></button>
+    <button class="admin-nav" data-admin-target="renewals" type="button">Prolongaties <span class="admin-nav-badge">2</span></button>
+  </div>
+  <div class="admin-nav-group"><div class="admin-nav-label">Bewaking</div>
+    <button class="admin-nav" data-admin-target="processes" type="button">Processen <span class="admin-nav-badge">4</span></button>
+    <button class="admin-nav" data-admin-target="activities" type="button">Activiteiten</button>
+  </div>
+  <div class="admin-nav-group"><div class="admin-nav-label">Administratie</div>
+    <button class="admin-nav" data-admin-target="relations" type="button">Relaties</button>
     <button class="admin-nav" data-admin-target="finance" type="button">Financieel</button>
   </div>
-  <div class="admin-nav-group"><div class="admin-nav-label">Klanten</div><button class="admin-nav" data-admin-target="relations" type="button">Relaties</button></div>
   <div class="admin-nav-group"><div class="admin-nav-label">Inzicht</div><button class="admin-nav" data-admin-target="reports" type="button">Rapportages</button></div>
   <div class="admin-nav-group"><div class="admin-nav-label">Beheer</div>
     <button class="admin-nav" data-admin-target="products" type="button">Productbeheer</button>
@@ -42,39 +44,27 @@
     </div>
     <button class="admin-nav" data-admin-target="users" type="button">Gebruikers &amp; rechten</button>
   </div>
-  <div class="admin-sidebar-bottom">Interne GoSafe-omgeving.<br/>Rechten bepalen straks welke onderdelen en acties zichtbaar zijn.</div>
 </aside>
 <main class="admin-main">
 
 <div class="admin-page active" data-admin-page="overview">
-  <div class="admin-page-head"><div><h1>Overzicht</h1><p>Operationeel startpunt voor wat aandacht nodig heeft en wat het systeem de komende dagen gaat uitvoeren.</p></div><div class="admin-actions"><button class="admin-btn" data-admin-target="activities" type="button">Alle activiteiten</button><button class="admin-btn primary" data-admin-target="workqueue" type="button">Naar werkvoorraad</button></div></div>
-  <div class="admin-kpis">
-    <div class="admin-kpi"><div class="admin-kpi-label">Open aanvragen</div><div class="admin-kpi-value">8</div><div class="admin-kpi-sub">3 vandaag ontvangen</div></div>
-    <div class="admin-kpi"><div class="admin-kpi-label">Handmatige acceptatie</div><div class="admin-kpi-value">4</div><div class="admin-kpi-sub">2 langer dan 1 werkdag</div></div>
-    <div class="admin-kpi"><div class="admin-kpi-label">Open taken</div><div class="admin-kpi-value">12</div><div class="admin-kpi-sub">5 aan jou toegewezen</div></div>
-    <div class="admin-kpi"><div class="admin-kpi-label">Prolongaties 30 dagen</div><div class="admin-kpi-value">34</div><div class="admin-kpi-sub">Eerstvolgende batch 28 aug</div></div>
-  </div>
+  <div class="admin-page-head"><div><h1>Overzicht</h1></div><div class="admin-actions"><button class="admin-btn primary" data-admin-target="workqueue" type="button">Naar werkvoorraad</button></div></div>
   <div class="admin-grid-2">
     <div>
-      <div class="admin-card"><div class="admin-card-head"><div><h2>Werkvoorraad vandaag</h2><p>Uitzonderingen en handmatige acties.</p></div><span class="admin-card-link" data-admin-target="workqueue">Alles bekijken</span></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Prioriteit</th><th>Relatie</th><th>Type</th><th>Taak</th><th>Uiterlijk</th><th></th></tr></thead><tbody>
+      <div class="admin-card"><div class="admin-card-head"><div><h2>Werkvoorraad vandaag</h2></div><span class="admin-card-link" data-admin-target="workqueue">Alles bekijken</span></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Prioriteit</th><th>Relatie</th><th>Type</th><th>Taak</th><th>Uiterlijk</th><th></th></tr></thead><tbody>
       <tr><td><span class="admin-chip red">Hoog</span></td><td><div class="admin-primary">Voorbeeld Media B.V.</div><div class="admin-secondary">POL-2026-00184</div></td><td>Acceptatie</td><td>Slotbepalingen beoordelen</td><td>Vandaag</td><td><span class="admin-link admin-open-dossier">Open</span></td></tr>
       <tr><td><span class="admin-chip amber">Normaal</span></td><td><div class="admin-primary">J. de Vries</div><div class="admin-secondary">AAN-2026-00821</div></td><td>Aanvraag</td><td>Controle bedrijfsgegevens</td><td>27 aug</td><td><span class="admin-link">Open</span></td></tr>
       <tr><td><span class="admin-chip amber">Normaal</span></td><td><div class="admin-primary">Studio Noord B.V.</div><div class="admin-secondary">POL-2025-00917</div></td><td>Betaling</td><td>Mislukte incasso beoordelen</td><td>28 aug</td><td><span class="admin-link">Open</span></td></tr>
       </tbody></table></div></div>
-      <div class="admin-card"><div class="admin-card-head"><div><h2>Recente systeemactiviteit</h2><p>Auditspoor over klanten, polissen en processen.</p></div><span class="admin-card-link" data-admin-target="activities">Volledige logging</span></div><div class="admin-card-body"><div class="admin-timeline">
-        <div class="admin-event"><div class="admin-event-time">07:18</div><div class="admin-event-mark"></div><div><div class="admin-event-title">Nota aangemaakt</div><div class="admin-event-copy">Systeem · POL-2026-00184 · Nota N-2026-010812 klaargezet.</div></div></div>
-        <div class="admin-event"><div class="admin-event-time">07:11</div><div class="admin-event-mark"></div><div><div class="admin-event-title">Polismutatie verwerkt</div><div class="admin-event-copy">Systeem · Voorbeeld Media B.V. · Nieuwe polisversie gegenereerd.</div></div></div>
-        <div class="admin-event"><div class="admin-event-time">06:55</div><div class="admin-event-mark"></div><div><div class="admin-event-title">Prolongatieberekening gereed</div><div class="admin-event-copy">Batch · 18 polissen berekend, 1 uitzondering naar werkvoorraad.</div></div></div>
-      </div></div></div>
     </div>
     <div>
-      <div class="admin-card"><div class="admin-card-head"><div><h2>Planning systeem</h2><p>Wat staat wanneer klaar voor verwerking.</p></div></div><div class="admin-card-body"><div class="admin-schedule">
+      <div class="admin-card"><div class="admin-card-head"><div><h2>Planning</h2></div></div><div class="admin-card-body"><div class="admin-schedule">
         <div class="admin-schedule-row"><div class="admin-schedule-date">DAGELIJKS</div><div><div class="admin-schedule-title">Prolongatievoorraad herberekenen</div><div class="admin-schedule-sub">toekomstige regels en mutaties meenemen</div></div><span class="admin-chip green">Automatisch</span></div>
         <div class="admin-schedule-row"><div class="admin-schedule-date">28 AUG</div><div><div class="admin-schedule-title">Definitieve prolongaties uitvoeren</div><div class="admin-schedule-sub">op de laatste dag van de huidige termijn</div></div><span class="admin-chip blue">Automatisch</span></div>
         <div class="admin-schedule-row"><div class="admin-schedule-date">28 AUG</div><div><div class="admin-schedule-title">Registratie naar ANVA</div><div class="admin-schedule-sub">ANVA verzorgt boeking en incasso</div></div><span class="admin-chip gray">Na akkoord</span></div>
         <div class="admin-schedule-row"><div class="admin-schedule-date">29 AUG</div><div><div class="admin-schedule-title">Nieuwe termijn actief</div><div class="admin-schedule-sub">sluit direct aan op vorige termijn</div></div><span class="admin-chip gray">Wacht</span></div>
       </div></div></div>
-      <div class="admin-card"><div class="admin-card-head"><div><h2>Procescontrole</h2><p>Uitzonderingen die automatisch zijn gesignaleerd.</p></div></div><div class="admin-card-body"><div class="admin-schedule">
+      <div class="admin-card"><div class="admin-card-head"><div><h2>Aandacht nodig</h2></div><span class="admin-card-link" data-admin-target="processes">Naar processen</span></div><div class="admin-card-body"><div class="admin-schedule">
         <div class="admin-schedule-row"><div class="admin-schedule-date">1</div><div><div class="admin-schedule-title">Prolongatie geblokkeerd</div><div class="admin-schedule-sub">onvolledige productconfiguratie</div></div><span class="admin-chip red">Actie</span></div>
         <div class="admin-schedule-row"><div class="admin-schedule-date">2</div><div><div class="admin-schedule-title">Nota niet verzonden</div><div class="admin-schedule-sub">e-mailadres ongeldig</div></div><span class="admin-chip amber">Controle</span></div>
       </div></div></div>
@@ -83,7 +73,7 @@
 </div>
 
 <div class="admin-page" data-admin-page="workqueue">
-  <div class="admin-page-head"><div><h1>Werkvoorraad</h1><p>Alle taken en uitzonderingen waarvoor een collega een beslissing of handmatige actie moet uitvoeren.</p></div><div class="admin-actions"><button class="admin-btn primary" type="button">Nieuwe interne taak</button></div></div>
+  <div class="admin-page-head"><div><h1>Werkvoorraad</h1></div><div class="admin-actions"><button class="admin-btn primary" type="button">Nieuwe interne taak</button></div></div>
   <div class="admin-filterbar"><input class="grow" placeholder="Zoek op relatie, polis, aanvraag of taak"/><select><option>Alle typen</option><option>Acceptatie</option><option>Mutatie</option><option>Betaling</option><option>Relatie</option></select><select><option>Alle eigenaren</option><option>Mijn taken</option><option>Niet toegewezen</option></select><select><option>Open</option><option>Afgerond</option></select><span class="admin-result-count">12 open taken</span></div>
   <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Prioriteit</th><th>Type</th><th>Relatie</th><th>Polis / aanvraag</th><th>Taak</th><th>Eigenaar</th><th>Uiterlijk</th><th>Status</th></tr></thead><tbody>
     <tr><td><span class="admin-chip red">Hoog</span></td><td>Acceptatie</td><td><span class="admin-link admin-open-dossier">Voorbeeld Media B.V.</span></td><td>POL-2026-00184</td><td>Slotbepalingen beoordelen</td><td>Niet toegewezen</td><td>Vandaag</td><td><span class="admin-chip amber">Open</span></td></tr>
@@ -94,7 +84,7 @@
 </div>
 
 <div class="admin-page" data-admin-page="activities">
-  <div class="admin-page-head"><div><h1>Activiteiten</h1><p>Systeem-brede logging: wie of welk proces heeft wanneer iets gedaan, op welke relatie/polis en met welk resultaat.</p></div></div>
+  <div class="admin-page-head"><div><h1>Activiteiten</h1></div></div>
   <div class="admin-filterbar"><input class="grow" placeholder="Zoek gebeurtenis, relatie, polis of actor"/><select><option>Alle actors</option><option>Systeem</option><option>Medewerker</option><option>Klant</option></select><select><option>Alle resultaten</option><option>Gelukt</option><option>Waarschuwing</option><option>Mislukt</option></select><span class="admin-result-count">Laatste 30 dagen</span></div>
   <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Datum / tijd</th><th>Relatie</th><th>Polis / aanvraag</th><th>Actor</th><th>Activiteit</th><th>Resultaat</th></tr></thead><tbody>
     <tr><td>26 aug · 07:18</td><td>Voorbeeld Media B.V.</td><td>POL-2026-00184</td><td>Systeem</td><td>Nota aangemaakt</td><td><span class="admin-chip green">Gelukt</span></td></tr>
@@ -105,14 +95,7 @@
 </div>
 
 <div class="admin-page" data-admin-page="processes">
-  <div class="admin-page-head"><div><h1>Processen</h1><p>Realtime inzicht in alle achtergrondprocessen, wachtrijen en uitzonderingen.</p></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="adminProcessLiveAge">Laatste update zojuist</span></div></div></div>
-  <div class="admin-kpis admin-process-kpis">
-    <div class="admin-kpi"><div class="admin-kpi-label">Actief</div><div class="admin-kpi-value">14</div><div class="admin-kpi-sub">8 polisafgifte · 4 mutaties · 2 overige</div></div>
-    <div class="admin-kpi"><div class="admin-kpi-label">Wacht op extern</div><div class="admin-kpi-value">3</div><div class="admin-kpi-sub">Allemaal binnen verwachte responstijd</div></div>
-    <div class="admin-kpi"><div class="admin-kpi-label">Retry gepland</div><div class="admin-kpi-value">2</div><div class="admin-kpi-sub">Eerstvolgende automatische poging binnen 2 minuten</div></div>
-    <div class="admin-kpi"><div class="admin-kpi-label">Handmatige actie</div><div class="admin-kpi-value">4</div><div class="admin-kpi-sub">2 buiten SLA · oudste 1 uur en 25 minuten</div></div>
-  </div>
-  <div class="admin-card admin-process-flow-card"><div class="admin-card-head"><div><h2>Polisafgifte vandaag</h2><p>186 afgerond · mediane doorlooptijd 4,9 seconden</p></div><span class="admin-chip green">99,2% zonder handwerk</span></div><div class="admin-card-body"><div class="admin-process-flow"><div><strong>204</strong><span>Gestart</span><i><b style="width:100%"></b></i></div><div><strong>201</strong><span>Documenten</span><i><b style="width:98.5%"></b></i></div><div><strong>194</strong><span>ANVA akkoord</span><i><b style="width:95.1%"></b></i></div><div><strong>190</strong><span>Kindprocessen</span><i><b style="width:93.1%"></b></i></div><div><strong>186</strong><span>Afgerond</span><i><b style="width:91.2%"></b></i></div></div></div></div>
+  <div class="admin-page-head"><div><h1>Processen</h1></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="adminProcessLiveAge">Laatste update zojuist</span></div></div></div>
   <div class="admin-process-layout">
     <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="adminProcessSearch" type="search" placeholder="Zoek proces, dossier, polis of relatie"><select id="adminProcessTypeFilter"><option value="">Alle processen</option><option>Aanvraagverwerking</option><option>Polisafgifte</option><option>Mutatie</option><option>Vooraankondiging</option><option>Prolongatievoorcontrole</option><option>Prolongatie</option><option>Royement</option></select><select id="adminProcessStatusFilter"><option value="">Alle statussen</option><option value="running">Actief</option><option value="external">Wacht extern</option><option value="retry">Retry gepland</option><option value="manual">Actie nodig</option><option value="completed">Afgerond</option></select><span class="admin-result-count" id="adminProcessResultCount">12 processen</span></div><div class="admin-table-wrap"><table class="admin-table admin-process-table"><thead><tr><th>Proces</th><th>Dossier / polis</th><th>Status</th><th>Huidige stap</th><th>Leeftijd</th><th>SLA</th></tr></thead><tbody id="adminProcessListBody"></tbody></table></div></div>
     <aside class="admin-card admin-process-detail" id="adminProcessDetail"></aside>
@@ -120,7 +103,7 @@
 </div>
 
 <div class="admin-page" data-admin-page="applications">
-  <div class="admin-page-head"><div><h1>Aanvragen</h1><p>Alle dossiers die zich in de fase Aanvraag bevinden.</p></div></div>
+  <div class="admin-page-head"><div><h1>Aanvragen</h1></div></div>
   <div class="admin-filterbar"><input class="grow" id="applicationListSearch" type="search" placeholder="Zoek dossier, naam of e-mailadres"/><select id="applicationStatusFilter"><option value="">Alle statussen</option><option value="ter akkoord">Ter akkoord</option><option value="uitval">Uitval</option></select><select id="applicationProductFilter"><option value="">Alle producten</option><option value="apparatuurverzekering">Apparatuurverzekering</option><option value="instrumentenverzekering">Instrumentenverzekering</option></select><select id="applicationDateFilter"><option value="">Alle ontvangstdatums</option><option value="vandaag">Vandaag</option><option value="deze week">Deze week</option></select><span class="admin-result-count" id="applicationResultCount">4 aanvragen</span></div>
   <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-dossier-list"><thead><tr><th>Dossier</th><th>Verzekeringnemer</th><th>Product</th><th>Ontvangen</th><th>Verzekerd bedrag</th><th>Jaarpremie</th><th>Status</th><th>Laatste activiteit</th></tr></thead><tbody id="applicationListBody">
     <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="application-main" data-search="dos-2026-00831 voorbeeld media b.v. sanne@voorbeeld.nl" data-status="ter akkoord" data-product="apparatuurverzekering" data-date="vandaag deze week"><td><span class="admin-link">DOS-2026-00831</span></td><td><div class="admin-primary">Voorbeeld Media B.V.</div><div class="admin-secondary">sanne@voorbeeld.nl</div></td><td>Apparatuurverzekering</td><td>26 aug · 07:04</td><td class="admin-money">€ 39.850</td><td class="admin-money">€ 498,13</td><td><span class="admin-chip amber">Ter akkoord</span></td><td>26 aug · 07:04</td></tr>
@@ -131,7 +114,7 @@
 </div>
 
 <div class="admin-page" data-admin-page="policies">
-  <div class="admin-page-head"><div><h1>Polissen</h1><p>Alle dossiers die zich in de fase Polis bevinden.</p></div></div>
+  <div class="admin-page-head"><div><h1>Polissen</h1></div></div>
   <div class="admin-filterbar"><input class="grow" id="policyListSearch" type="search" placeholder="Zoek polis, dossier, naam of e-mailadres"/><select id="policyStatusFilter"><option value="">Alle statussen</option><option value="actief">Actief</option></select><select id="policyProductFilter"><option value="">Alle producten</option><option value="apparatuurverzekering">Apparatuurverzekering</option><option value="instrumentenverzekering">Instrumentenverzekering</option></select><select id="policyDateFilter"><option value="">Alle ingangsdatums</option><option value="deze maand">Deze maand</option><option value="dit jaar">Dit jaar</option></select><span class="admin-result-count" id="policyResultCount">3 polissen</span></div>
   <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-dossier-list"><thead><tr><th>Polis</th><th>Verzekeringnemer</th><th>Product</th><th>Ingangsdatum</th><th>Prolongatiedatum</th><th>Verzekerd bedrag</th><th>Jaarpremie</th><th>Status</th><th>Komende wijziging</th><th>Laatste activiteit</th></tr></thead><tbody id="policyListBody">
     <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="policy-main" data-search="pol-2026-00184 dos-2026-00812 voorbeeld media b.v. sanne@voorbeeld.nl mut-2026-00128" data-status="actief" data-product="apparatuurverzekering" data-date="deze maand dit jaar"><td><div class="admin-primary admin-link">POL-2026-00184</div><div class="admin-secondary">DOS-2026-00812</div></td><td><div class="admin-primary">Voorbeeld Media B.V.</div><div class="admin-secondary">sanne@voorbeeld.nl</div></td><td>Apparatuurverzekering</td><td>25 aug 2026</td><td><strong>25 aug 2027</strong></td><td class="admin-money">€ 39.850</td><td class="admin-money">€ 498,13</td><td><span class="admin-chip green">Actief</span></td><td><span class="admin-chip amber">Per 1 sep 2026</span><div class="admin-secondary">MUT-2026-00128 · 3 itemregels</div></td><td>27 aug · 09:42</td></tr>
@@ -141,11 +124,12 @@
 </div>
 
 <div class="admin-page" data-admin-page="renewals">
-  <div class="admin-page-head"><div><h1>Prolongatievoorraad</h1><p>Vooraf zien welke polissen automatisch kunnen verlengen en welke uitzondering vóór de prolongatiedag aandacht vraagt.</p></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="renewalLiveAge">Laatste update zojuist</span></div></div></div>
-  <div class="admin-stage-grid admin-renewal-kpis">
-    <div class="admin-stage"><span>Prolongeerbaar</span><strong>27</strong><small>geen blokkade verwacht</small></div><div class="admin-stage"><span>Premie / voorwaarden gewijzigd</span><strong>4</strong><small>klantcommunicatie nodig</small></div><div class="admin-stage"><span>Openstaande mutatie</span><strong>3</strong><small>waarvan 1 na prolongatie</small></div><div class="admin-stage"><span>Uitval verwacht</span><strong>2</strong><small>door toekomstige regels</small></div><div class="admin-stage"><span>Actie nodig</span><strong>2</strong><small>vóór laatste polisdag</small></div>
+  <div class="admin-page-head"><div><h1>Prolongaties</h1></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="renewalLiveAge">Laatste update zojuist</span></div></div></div>
+  <div class="admin-status-strip" aria-label="Prolongatie aandachtspunten">
+    <button type="button" data-renewal-status="actie"><strong>2</strong><span>Actie nodig</span></button>
+    <button type="button" data-renewal-status="uitval"><strong>2</strong><span>Uitval verwacht</span></button>
+    <button type="button" data-renewal-status="mutatie"><strong>3</strong><span>Openstaande mutaties</span></button>
   </div>
-  <div class="admin-card admin-renewal-explainer"><div class="admin-card-head"><div><h2>Twee gescheiden processen</h2><p>De voorraad kijkt vooruit; de definitieve prolongatie blijft zo kort mogelijk.</p></div><span class="admin-chip green">Volledig automatisch</span></div><div class="admin-card-body"><div class="admin-renewal-flow"><div><strong>Vooraankondiging</strong><span>Los communicatieproces dat uitnodigt tot muteren.</span></div><div><strong>Dagelijkse voorcontrole</strong><span>Nieuwe regels, data en mutaties worden opnieuw getoetst.</span></div><div><strong>Laatste polisdag</strong><span>GoSafe berekent en stuurt de registratie naar ANVA.</span></div><div><strong>Volgende dag</strong><span>De nieuwe termijn sluit zonder gat of overlap aan.</span></div></div></div></div>
   <div class="admin-filterbar"><input class="grow" id="renewalSearch" type="search" placeholder="Zoek polis, relatie of mutatie"/><select id="renewalPeriodFilter"><option value="">Komende 60 dagen</option><option value="7">Komende 7 dagen</option><option value="30">Komende 30 dagen</option><option value="90">Komende 90 dagen</option></select><select id="renewalStatusFilter"><option value="">Alle voorcontrolestatussen</option><option value="prolongeerbaar">Prolongeerbaar</option><option value="gewijzigd">Premie / voorwaarden gewijzigd</option><option value="mutatie">Openstaande mutatie</option><option value="uitval">Uitval verwacht</option><option value="actie">Actie nodig</option></select><span class="admin-result-count" id="renewalResultCount">5 polissen</span></div>
   <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-renewal-table"><thead><tr><th>Einde huidige termijn</th><th>Nieuwe termijn</th><th>Polis / relatie</th><th>Premie nu → nieuw</th><th>Voorcontrole</th><th>Geplande mutatie</th><th>Vooraankondiging</th><th>Actie</th></tr></thead><tbody id="renewalListBody">
     <tr class="admin-dossier-row" tabindex="0" data-open-dossier data-dossier-key="policy-studio" data-renewal-row data-search="pol-2025-00917 studio noord mut-2026-00131" data-status="mutatie actie" data-days="45"><td><strong>12 okt 2026</strong><div class="admin-secondary">laatste dag inclusief</div></td><td><strong>13 okt 2026 – 12 okt 2027</strong><div class="admin-secondary">sluit direct aan</div></td><td><div class="admin-primary admin-link">POL-2025-00917</div><div class="admin-secondary">Studio Noord B.V.</div></td><td class="admin-money">€ 482,50 → € 508,20</td><td><span class="admin-chip amber">Openstaande mutatie</span><div class="admin-secondary">prognose opnieuw berekend</div></td><td><span class="admin-chip blue">20 okt 2026</span><div class="admin-secondary">stukken na prolongatie</div></td><td><span class="admin-chip green">Verzonden</span></td><td><span class="admin-link">Open dossier</span></td></tr>
@@ -157,8 +141,7 @@
 </div>
 
 <div class="admin-page" data-admin-page="finance">
-  <div class="admin-page-head"><div><h1>Financieel</h1><p>Operationele inzage in nota's, creditnota's en betaalstatussen uit ANVA. ANVA verzorgt de financiële boeking en incasso.</p></div></div>
-  <div class="admin-kpis"><div class="admin-kpi"><div class="admin-kpi-label">Nota's te versturen</div><div class="admin-kpi-value">14</div><div class="admin-kpi-sub">€ 6.840,22</div></div><div class="admin-kpi"><div class="admin-kpi-label">Incasso gepland</div><div class="admin-kpi-value">31</div><div class="admin-kpi-sub">volgende batch 1 sep</div></div><div class="admin-kpi"><div class="admin-kpi-label">Mislukte incasso</div><div class="admin-kpi-value">3</div><div class="admin-kpi-sub">actie vereist</div></div><div class="admin-kpi"><div class="admin-kpi-label">Creditnota's open</div><div class="admin-kpi-value">2</div><div class="admin-kpi-sub">€ 184,30</div></div></div>
+  <div class="admin-page-head"><div><h1>Financieel</h1></div></div>
   <div class="admin-filterbar"><input class="grow" placeholder="Zoek nota, polis of relatie"/><select><option>Alle financiële statussen</option><option>Te versturen</option><option>Verstuurd</option><option>Voldaan</option><option>Mislukt</option></select></div>
   <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Nota</th><th>Relatie</th><th>Polis</th><th>Type</th><th>Bedrag</th><th>Datum</th><th>Status</th><th>Volgende actie</th></tr></thead><tbody>
     <tr><td>N-2026-010812</td><td>Voorbeeld Media B.V.</td><td>POL-2026-00184</td><td>Mutatienota</td><td class="admin-money">€ 497,23</td><td>26 aug 2026</td><td><span class="admin-chip blue">Te versturen</span></td><td>Versturen</td></tr>
@@ -168,7 +151,7 @@
 </div>
 
 <div class="admin-page" data-admin-page="relations">
-  <div class="admin-page-head"><div><h1>Relaties</h1><p>Centrale klantadministratie voor particuliere en zakelijke relaties, met toegang tot polissen, aanvragen, taken en volledige klantactiviteit.</p></div><div class="admin-actions"><button class="admin-btn primary" type="button">Nieuwe relatie</button></div></div>
+  <div class="admin-page-head"><div><h1>Relaties</h1></div><div class="admin-actions"><button class="admin-btn primary" type="button">Nieuwe relatie</button></div></div>
   <div class="admin-filterbar"><input class="grow" placeholder="Zoek naam, e-mail, KvK of relatienummer"/><select><option>Alle relatietypen</option><option>Particulier</option><option>Zakelijk</option></select><span class="admin-result-count">1.087 relaties</span></div>
   <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Relatie</th><th>Type</th><th>E-mail</th><th>Polissen</th><th>Open taken</th><th>Laatste activiteit</th><th></th></tr></thead><tbody>
     <tr><td><div class="admin-primary">Voorbeeld Media B.V.</div><div class="admin-secondary">REL-000184 · KvK 12345678</div></td><td>Zakelijk</td><td>sanne@voorbeeld.nl</td><td>1 actief</td><td><span class="admin-chip amber">1</span></td><td>26 aug · 07:18</td><td><button class="admin-btn admin-open-dossier" type="button">Open dossier</button></td></tr>
@@ -178,14 +161,14 @@
 </div>
 
 <div class="admin-page" data-admin-page="reports">
-  <div class="admin-page-head"><div><h1>Rapportages</h1><p>Vaste operationele en managementrapportages. Filters, exports en exacte KPI-definities werken we per rapport later uit.</p></div></div>
+  <div class="admin-page-head"><div><h1>Rapportages</h1></div></div>
   <div class="admin-report-grid">
-    <div class="admin-report"><h3>Productie &amp; premie</h3><p>Nieuwe polissen, premievolume, productmix, mutaties en ontwikkeling per periode.</p><span class="admin-link">Open rapport</span></div>
-    <div class="admin-report"><h3>Portefeuille</h3><p>Aantal actieve polissen, verzekerd bedrag, categorieën, prolongaties en beëindigingen.</p><span class="admin-link">Open rapport</span></div>
-    <div class="admin-report"><h3>Acceptatie &amp; uitval</h3><p>Direct gesloten versus handmatig beoordeeld, redenen voor uitval en doorlooptijden.</p><span class="admin-link">Open rapport</span></div>
-    <div class="admin-report"><h3>Mutaties</h3><p>Aantallen, premie-effect, meest gewijzigde objecten/dekkingen en verwerkingstijd.</p><span class="admin-link">Open rapport</span></div>
-    <div class="admin-report"><h3>Financieel</h3><p>Nota's, ontvangen premie, openstaand, mislukte incasso's, creditnota's en betaalstatus.</p><span class="admin-link">Open rapport</span></div>
-    <div class="admin-report"><h3>Proces &amp; operatie</h3><p>Werkvoorraad, uitzonderingen, foutpercentages, batches en systeemactiviteiten.</p><span class="admin-link">Open rapport</span></div>
+    <div class="admin-report"><h3>Productie &amp; premie</h3><span class="admin-link">Open rapport</span></div>
+    <div class="admin-report"><h3>Portefeuille</h3><span class="admin-link">Open rapport</span></div>
+    <div class="admin-report"><h3>Acceptatie &amp; uitval</h3><span class="admin-link">Open rapport</span></div>
+    <div class="admin-report"><h3>Mutaties</h3><span class="admin-link">Open rapport</span></div>
+    <div class="admin-report"><h3>Financieel</h3><span class="admin-link">Open rapport</span></div>
+    <div class="admin-report"><h3>Proces &amp; operatie</h3><span class="admin-link">Open rapport</span></div>
   </div>
 </div>
 
@@ -197,10 +180,9 @@
 
   <section class="product-choice-screen" id="productAdminChooser" aria-labelledby="productChoiceTitle">
     <h2 id="productChoiceTitle">Welk product wil je beheren?</h2>
-    <p>Kies eerst een product. De actieve productcontext blijft daarna zichtbaar op iedere beheerpagina.</p>
     <div class="product-choice-grid">
-      <button class="product-choice-card" type="button" data-product-choice="Apparatuurverzekering"><span>Product</span><strong>Apparatuurverzekering</strong><small>Categorieën voor camera-, video-, licht- en geluidsapparatuur.</small><em>Open productbeheer →</em></button>
-      <button class="product-choice-card" type="button" data-product-choice="Instrumentenverzekering"><span>Product</span><strong>Instrumentenverzekering</strong><small>Categorieën voor instrumenten, versterking en bijbehorende accessoires.</small><em>Open productbeheer →</em></button>
+      <button class="product-choice-card" type="button" data-product-choice="Apparatuurverzekering"><span>Product</span><strong>Apparatuurverzekering</strong><em>Open productbeheer →</em></button>
+      <button class="product-choice-card" type="button" data-product-choice="Instrumentenverzekering"><span>Product</span><strong>Instrumentenverzekering</strong><em>Open productbeheer →</em></button>
     </div>
   </section>
 
@@ -235,13 +217,13 @@
   </div>
 
   <div class="product-subpage" data-product-page="category-rules">
-    <div class="product-subpage-head product-subpage-head-quiet"><div><h2>Categorieregels</h2><p>Beheer de herbruikbare regels die je op product-, hoofd- of subcategorieniveau koppelt.</p></div><button class="admin-btn primary" id="productNewCategoryRule" type="button">Nieuwe regel</button></div>
+    <div class="product-subpage-head product-subpage-head-quiet"><div><h2>Categorieregels</h2></div><button class="admin-btn primary" id="productNewCategoryRule" type="button">Nieuwe regel</button></div>
     <div class="admin-filterbar product-filterbar"><input id="productRuleSearch" type="search" placeholder="Zoek op naam, code, type of omschrijving..."><select id="productRuleStatusFilter"><option value="">Alle statussen</option><option value="Actief">Actief</option><option value="Concept">Concept</option><option value="Inactief">Inactief</option></select><span class="admin-result-count" id="productRuleCount">Regels</span></div>
     <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table product-category-rules-table"><thead><tr><th>Regel</th><th>Type</th><th>Toepassing</th><th>Status</th><th></th></tr></thead><tbody>
       <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="Serienummer verplicht" data-rule-code="REG-SERIAL-REQ" data-rule-type="Serienummer verplicht" data-rule-description="Het systeem controleert het vaste itemveld serienummer en blokkeert opslaan zolang dit leeg is." data-rule-status="Actief"><td><div class="admin-primary">Serienummer verplicht</div><div class="admin-secondary">REG-SERIAL-REQ</div></td><td>Serienummer verplicht</td><td>Camera’s + 6 subcategorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td></tr>
       <tr class="product-rule-row" data-product="Apparatuurverzekering" data-rule-name="Clausule CL233 toevoegen" data-rule-code="CLA-CL233" data-rule-type="Clausule toevoegen" data-rule-description="Voegt de geselecteerde clausule CL233 toe aan de polisdocumenten." data-rule-status="Actief" data-rule-clause="CL233"><td><div class="admin-primary">Clausule CL233 toevoegen</div><div class="admin-secondary">CLA-CL233</div></td><td>Clausule toevoegen</td><td>Lenzen &amp; Optiek + 6 subcategorieën</td><td><span class="admin-chip green">Actief</span></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td></tr>
     </tbody></table></div></div>
-    <div class="admin-card product-rule-editor" id="productRuleEditor" aria-live="polite"><div class="admin-card-head"><div><h2 id="productRuleEditorTitle">Nieuwe categorieregel</h2><p>Je maakt hier een regel van een bestaand, in code ontwikkeld type.</p></div><button class="admin-btn text" id="productRuleEditorClose" type="button">Sluiten</button></div><div class="admin-card-body"><div class="product-rule-editor-grid"><label><span>Code</span><input class="admin-input" id="productRuleCode" placeholder="REG-..."></label><label><span>Naam</span><input class="admin-input" id="productRuleName" placeholder="Naam van de regel"></label><label><span>Regeltype</span><select class="admin-input" id="productRuleType"><option>Serienummer verplicht</option><option>Clausule toevoegen</option></select></label><label class="wide"><span>Omschrijving</span><textarea class="admin-input" id="productRuleDescription" placeholder="Beschrijf intern wanneer deze regel wordt gebruikt."></textarea></label><label class="wide product-rule-config" id="productRuleSerialConfig"><span>Vaste systeemwerking</span><div class="product-rule-fixed-config"><strong>Controleer itemveld: Serienummer</strong><small>Leeg veld blokkeert het opslaan van het item. Dit gedrag wordt in code ontwikkeld en is niet vrij instelbaar.</small></div></label><label class="wide product-rule-config" id="productRuleClauseConfig" hidden><span>Clausule</span><select class="admin-input" id="productRuleClause"><option value="">Selecteer een clausule...</option><option value="CL233">CL233</option><option value="CL117">CL117</option></select></label><label><span>Status</span><select class="admin-input" id="productRuleStatus"><option>Concept</option><option>Actief</option><option>Inactief</option></select></label></div><div class="product-rule-editor-note">Voorlopig zijn alleen <strong>Serienummer verplicht</strong> en <strong>Clausule toevoegen</strong> beschikbaar. Nieuwe regeltypen worden door development toegevoegd.</div><div class="product-rule-editor-error" id="productRuleEditorError">Vul code, naam en omschrijving in.</div><div class="admin-actions product-detail-actions"><button class="admin-btn" id="productRuleEditorCancel" type="button">Annuleren</button><button class="admin-btn primary" id="productRuleSave" type="button">Regel opslaan</button></div></div></div>
+    <div class="admin-card product-rule-editor" id="productRuleEditor" aria-live="polite"><div class="admin-card-head"><div><h2 id="productRuleEditorTitle">Nieuwe categorieregel</h2></div><button class="admin-btn text" id="productRuleEditorClose" type="button">Sluiten</button></div><div class="admin-card-body"><div class="product-rule-editor-grid"><label><span>Code</span><input class="admin-input" id="productRuleCode" placeholder="REG-..."></label><label><span>Naam</span><input class="admin-input" id="productRuleName" placeholder="Naam van de regel"></label><label><span>Regeltype</span><select class="admin-input" id="productRuleType"><option>Serienummer verplicht</option><option>Clausule toevoegen</option></select></label><label class="wide"><span>Omschrijving</span><textarea class="admin-input" id="productRuleDescription" placeholder="Beschrijf intern wanneer deze regel wordt gebruikt."></textarea></label><label class="wide product-rule-config" id="productRuleSerialConfig"><span>Vaste systeemwerking</span><div class="product-rule-fixed-config"><strong>Controleer itemveld: Serienummer</strong><small>Leeg veld blokkeert het opslaan van het item. Dit gedrag wordt in code ontwikkeld en is niet vrij instelbaar.</small></div></label><label class="wide product-rule-config" id="productRuleClauseConfig" hidden><span>Clausule</span><select class="admin-input" id="productRuleClause"><option value="">Selecteer een clausule...</option><option value="CL233">CL233</option><option value="CL117">CL117</option></select></label><label><span>Status</span><select class="admin-input" id="productRuleStatus"><option>Concept</option><option>Actief</option><option>Inactief</option></select></label></div><div class="product-rule-editor-error" id="productRuleEditorError">Vul code, naam en omschrijving in.</div><div class="admin-actions product-detail-actions"><button class="admin-btn" id="productRuleEditorCancel" type="button">Annuleren</button><button class="admin-btn primary" id="productRuleSave" type="button">Regel opslaan</button></div></div></div>
   </div>
 
   <div class="product-subpage" data-product-page="costs">
@@ -254,7 +236,7 @@
       <tr class="product-setting-row" data-product="Instrumentenverzekering" data-setting-key="policy_costs_renewal" data-setting-name="Poliskosten per prolongatie" data-setting-value="5" data-setting-unit="EUR" data-setting-application="Iedere prolongatie" data-setting-effective="2026-01-01"><td><div class="admin-primary">Poliskosten per prolongatie</div><div class="admin-secondary">policy_costs_renewal</div></td><td class="admin-money product-setting-value">€ 5,00</td><td>Iedere prolongatie</td><td>1 jan 2026</td><td><button class="admin-btn text product-edit-setting" type="button">Wijzigen</button></td></tr>
       <tr class="product-setting-row" data-product="Instrumentenverzekering" data-setting-key="administration_costs" data-setting-name="Administratiekosten" data-setting-value="2.5" data-setting-unit="EUR" data-setting-application="Productconfiguratie" data-setting-effective="2026-01-01"><td><div class="admin-primary">Administratiekosten</div><div class="admin-secondary">administration_costs</div></td><td class="admin-money product-setting-value">€ 2,50</td><td>Productconfiguratie</td><td>1 jan 2026</td><td><button class="admin-btn text product-edit-setting" type="button">Wijzigen</button></td></tr>
     </tbody></table></div></div>
-    <div class="admin-card product-setting-editor" id="productSettingEditor" aria-live="polite"><div class="admin-card-head"><div><h2 id="productSettingEditorTitle">Productinstelling wijzigen</h2><p>De wijziging geldt alleen voor het product dat je nu beheert.</p></div><button class="admin-btn text" id="productSettingEditorClose" type="button">Sluiten</button></div><div class="admin-card-body"><div class="product-setting-editor-grid"><label><span>Instelling</span><input class="admin-input" id="productSettingName" disabled></label><label><span>Waarde</span><input class="admin-input" id="productSettingValue" type="number" min="0" step="0.01"></label><label><span>Eenheid</span><input class="admin-input" value="Euro" disabled></label><label><span>Geldig vanaf</span><input class="admin-input" id="productSettingEffective" type="date"></label></div><div class="product-rule-editor-error" id="productSettingEditorError">Vul een geldige waarde en ingangsdatum in.</div><div class="admin-actions product-detail-actions"><button class="admin-btn" id="productSettingEditorCancel" type="button">Annuleren</button><button class="admin-btn primary" id="productSettingSave" type="button">Opslaan in wijzigingsset</button></div></div></div>
+    <div class="admin-card product-setting-editor" id="productSettingEditor" aria-live="polite"><div class="admin-card-head"><div><h2 id="productSettingEditorTitle">Productinstelling wijzigen</h2></div><button class="admin-btn text" id="productSettingEditorClose" type="button">Sluiten</button></div><div class="admin-card-body"><div class="product-setting-editor-grid"><label><span>Instelling</span><input class="admin-input" id="productSettingName" disabled></label><label><span>Waarde</span><input class="admin-input" id="productSettingValue" type="number" min="0" step="0.01"></label><label><span>Eenheid</span><input class="admin-input" value="Euro" disabled></label><label><span>Geldig vanaf</span><input class="admin-input" id="productSettingEffective" type="date"></label></div><div class="product-rule-editor-error" id="productSettingEditorError">Vul een geldige waarde en ingangsdatum in.</div><div class="admin-actions product-detail-actions"><button class="admin-btn" id="productSettingEditorCancel" type="button">Annuleren</button><button class="admin-btn primary" id="productSettingSave" type="button">Opslaan in wijzigingsset</button></div></div></div>
     <div class="product-document-grid"><div class="admin-card product-conditions-card"><div class="admin-card-head"><div><h2>Voorwaarden</h2></div></div><div class="admin-table-wrap"><table class="admin-table product-conditions-table"><thead><tr><th>Geselecteerde voorwaarden</th><th>Versie</th><th></th></tr></thead><tbody>
       <tr class="product-conditions-row" data-product="Apparatuurverzekering" data-condition-ids="AV-GS-2026-01|VW-APP-2026-01"><td class="product-condition-names"><div class="admin-primary">Algemene voorwaarden GoSafe</div><div class="admin-primary">Voorwaarden Apparatuurverzekering</div></td><td>2026-01</td><td><button class="admin-btn text product-edit-conditions" type="button">Wijzigen</button></td></tr>
       <tr class="product-conditions-row" data-product="Instrumentenverzekering" data-condition-ids="AV-GS-2026-01|VW-INS-2026-01"><td class="product-condition-names"><div class="admin-primary">Algemene voorwaarden GoSafe</div><div class="admin-primary">Voorwaarden Instrumentenverzekering</div></td><td>2026-01</td><td><button class="admin-btn text product-edit-conditions" type="button">Wijzigen</button></td></tr>
@@ -304,17 +286,17 @@
   </div>
 
   <div class="product-subpage" data-product-page="changes">
-    <div class="product-subpage-head"><div><h2>Wijzigingssets</h2><p>Bundel wijzigingen met dezelfde ingangsdatum en publiceer ze in één keer.</p></div><button class="admin-btn primary" id="productNewChangeSetInline" type="button">Nieuwe wijzigingsset</button></div>
+    <div class="product-subpage-head"><div><h2>Wijzigingssets</h2></div><button class="admin-btn primary" id="productNewChangeSetInline" type="button">Nieuwe wijzigingsset</button></div>
     <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Wijzigingsset</th><th>Ingangsdatum</th><th>Wijzigingen</th><th>Status</th><th></th></tr></thead><tbody>
       <tr><td><div class="admin-primary">Productinstellingen 2026</div><div class="admin-secondary">Gepubliceerd 1 jan 2026</div></td><td>1 jan 2026</td><td>Initiële waarden</td><td><span class="admin-chip green">Gepubliceerd</span></td><td><button class="admin-btn text" type="button">Bekijk</button></td></tr>
       <tr><td><div class="admin-primary">Tarieven 2027</div><div class="admin-secondary">Voorbeeldconcept, nog niet actief</div></td><td>1 jan 2027</td><td>2 conceptwijzigingen</td><td><span class="admin-chip gray">Concept</span></td><td><button class="admin-btn text product-edit-draft" type="button">Open</button></td></tr>
     </tbody></table></div></div>
-    <div class="product-change-editor" id="productChangeEditor"><div class="admin-card-head"><div><h2>Wijzigingsset bewerken</h2><p>Actieve conceptset. Alle productwijzigingen die je nu opslaat worden hieraan toegevoegd en gaan na publicatie tegelijk in.</p></div><button class="admin-btn text" id="productCloseChangeSet" type="button">Sluiten</button></div><div class="admin-card-body"><div class="product-change-form"><label><span>Naam</span><input class="admin-input" value="Tarieven 2027"></label><label><span>Ingangsdatum</span><input class="admin-input" type="date" value="2027-01-01"></label><label class="wide"><span>Interne notitie</span><textarea class="admin-input" id="productChangeInternalNote" placeholder="Notitie voor collega's; niet zichtbaar voor klanten."></textarea></label></div><div class="product-change-lines"><div><strong>Apparatuurverzekering / Camera’s / Cinema camera · premie</strong><span>1,25% → <b>1,35%</b></span><em>Voorbeeld</em></div><div><strong>Poliskosten nieuwe verzekering</strong><span>€ 5,00 → <b>€ 7,50</b></span><em>Voorbeeld</em></div></div><div class="product-change-warning">Deze waarden zijn alleen voorbeelddata in het prototype en zijn niet als productbesluit vastgelegd.</div><div class="admin-actions product-change-actions"><button class="admin-btn" id="productSaveChangeSet" type="button">Concept opslaan</button><button class="admin-btn primary" type="button">Controleren &amp; publiceren</button></div></div></div>
+    <div class="product-change-editor" id="productChangeEditor"><div class="admin-card-head"><div><h2>Wijzigingsset bewerken</h2></div><button class="admin-btn text" id="productCloseChangeSet" type="button">Sluiten</button></div><div class="admin-card-body"><div class="product-change-form"><label><span>Naam</span><input class="admin-input" value="Tarieven 2027"></label><label><span>Ingangsdatum</span><input class="admin-input" type="date" value="2027-01-01"></label><label class="wide"><span>Interne notitie</span><textarea class="admin-input" id="productChangeInternalNote" placeholder="Notitie voor collega's; niet zichtbaar voor klanten."></textarea></label></div><div class="product-change-lines"><div><strong>Apparatuurverzekering / Camera’s / Cinema camera · premie</strong><span>1,25% → <b>1,35%</b></span><em>Voorbeeld</em></div><div><strong>Poliskosten nieuwe verzekering</strong><span>€ 5,00 → <b>€ 7,50</b></span><em>Voorbeeld</em></div></div><div class="product-change-warning">Deze waarden zijn alleen voorbeelddata in het prototype en zijn niet als productbesluit vastgelegd.</div><div class="admin-actions product-change-actions"><button class="admin-btn" id="productSaveChangeSet" type="button">Concept opslaan</button><button class="admin-btn primary" type="button">Controleren &amp; publiceren</button></div></div></div>
   </div>
 
   <div class="product-subpage" data-product-page="api">
-    <div class="product-subpage-head"><div><h2>Product API test</h2><p>Technische testhulp voor beheer. Geen prominente dagelijkse beheerfunctie.</p></div></div>
-    <div class="product-api-layout"><div class="admin-card"><div class="admin-card-body product-api-form"><label><span>Scenario</span><select class="admin-input" id="productApiScenario"><option value="application">Nieuwe aanvraag</option><option value="mutation">Mutatie</option><option value="renewal">Prolongatie</option></select></label><label><span>Peildatum</span><input class="admin-input" id="productApiDate" type="date" value="2026-08-26"></label><label><span>Product</span><select class="admin-input" id="productApiProduct"><option value="Apparatuurverzekering">Apparatuurverzekering · NL</option><option value="Instrumentenverzekering">Instrumentenverzekering · NL</option></select></label><button class="admin-btn primary" id="productApiRun" type="button">Bereken testscenario</button></div></div><div class="admin-card"><div class="admin-card-head"><div><h2>Response preview</h2><p>Functioneel voorbeeld, nog geen definitief technisch contract.</p></div><span class="admin-chip blue">200 OK</span></div><div class="admin-card-body"><pre class="product-api-preview" id="productApiPreview">{
+    <div class="product-subpage-head"><div><h2>Product API test</h2></div></div>
+    <div class="product-api-layout"><div class="admin-card"><div class="admin-card-body product-api-form"><label><span>Scenario</span><select class="admin-input" id="productApiScenario"><option value="application">Nieuwe aanvraag</option><option value="mutation">Mutatie</option><option value="renewal">Prolongatie</option></select></label><label><span>Peildatum</span><input class="admin-input" id="productApiDate" type="date" value="2026-08-26"></label><label><span>Product</span><select class="admin-input" id="productApiProduct"><option value="Apparatuurverzekering">Apparatuurverzekering · NL</option><option value="Instrumentenverzekering">Instrumentenverzekering · NL</option></select></label><button class="admin-btn primary" id="productApiRun" type="button">Bereken testscenario</button></div></div><div class="admin-card"><div class="admin-card-head"><div><h2>Response preview</h2></div><span class="admin-chip blue">200 OK</span></div><div class="admin-card-body"><pre class="product-api-preview" id="productApiPreview">{
   "product": "APP-NL",
   "scenario": "application",
   "peildatum": "2026-08-26",
@@ -332,19 +314,18 @@
 </div>
 
 <div class="admin-page" data-admin-page="users">
-  <div class="admin-page-head"><div><h1>Gebruikers &amp; rechten</h1><p>Alleen voor beheerders: medewerkers activeren/deactiveren, rollen toekennen en rechten per onderdeel bepalen.</p></div><div class="admin-actions"><button class="admin-btn primary" type="button">Gebruiker toevoegen</button></div></div>
+  <div class="admin-page-head"><div><h1>Gebruikers &amp; rechten</h1></div><div class="admin-actions"><button class="admin-btn primary" type="button">Gebruiker toevoegen</button></div></div>
   <div class="admin-grid-even">
-    <div class="admin-card"><div class="admin-card-head"><div><h2>Gebruikers</h2><p>Interne medewerkers met toegang tot GoSafe Admin.</p></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Gebruiker</th><th>Rol</th><th>Status</th><th>Laatste login</th></tr></thead><tbody>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Gebruikers</h2></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Gebruiker</th><th>Rol</th><th>Status</th><th>Laatste login</th></tr></thead><tbody>
       <tr><td>Admin gebruiker</td><td>Admin</td><td><span class="admin-chip green">Actief</span></td><td>Vandaag · 07:02</td></tr><tr><td>Behandelaar</td><td>Behandelaar</td><td><span class="admin-chip green">Actief</span></td><td>25 aug · 16:44</td></tr><tr><td>Finance gebruiker</td><td>Finance</td><td><span class="admin-chip green">Actief</span></td><td>25 aug · 15:21</td></tr>
     </tbody></table></div></div>
-    <div class="admin-card"><div class="admin-card-head"><div><h2>Rollen</h2><p>Voorlopige structuur; exacte rechtenmatrix later.</p></div></div><div class="admin-card-body"><div class="admin-schedule">
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Rollen</h2></div></div><div class="admin-card-body"><div class="admin-schedule">
       <div class="admin-schedule-row"><div class="admin-schedule-date">A</div><div><div class="admin-schedule-title">Admin</div><div class="admin-schedule-sub">volledig beheer, inclusief gebruikers en productinstellingen</div></div><span class="admin-chip green">Volledig</span></div>
       <div class="admin-schedule-row"><div class="admin-schedule-date">B</div><div><div class="admin-schedule-title">Behandelaar</div><div class="admin-schedule-sub">aanvragen, polissen, relaties, taken en acceptatie</div></div><span class="admin-chip blue">Operationeel</span></div>
       <div class="admin-schedule-row"><div class="admin-schedule-date">F</div><div><div class="admin-schedule-title">Finance</div><div class="admin-schedule-sub">nota's, betalingen en financiële rapportages</div></div><span class="admin-chip blue">Financieel</span></div>
       <div class="admin-schedule-row"><div class="admin-schedule-date">R</div><div><div class="admin-schedule-title">Read-only</div><div class="admin-schedule-sub">alleen inzien van toegestane dossiers en rapportages</div></div><span class="admin-chip gray">Lezen</span></div>
     </div></div></div>
   </div>
-  <div class="admin-right-note">De authenticatiemethode voor medewerkers (bijvoorbeeld SSO + MFA), sessiebeleid en de definitieve rechtenmatrix zijn bewust nog niet gekozen. Die werken we later als security- en autorisatieonderdeel uit.</div>
 </div>
 
 <div class="admin-page" data-admin-page="dossier">
@@ -377,17 +358,17 @@
     <div class="admin-card"><div class="admin-card-head"><div><h2>Verzekeringnemer</h2></div><button class="admin-btn" id="dossierEditHolder" type="button">Relatie wijzigen</button></div><div class="admin-card-body"><div class="admin-detail-section-grid" id="dossierHolderDetails"></div></div></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="item-documents">
-    <div class="admin-card"><div class="admin-card-head"><div><h2>Itemdocumenten</h2><p>Bewijsstukken die aan één of meer verzekerde items zijn gekoppeld.</p></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Soort</th><th>Gekoppeld item</th><th>Datum</th><th>Status</th></tr></thead><tbody id="dossierItemDocumentsBody"></tbody></table></div></div>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Itemdocumenten</h2></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Soort</th><th>Gekoppeld item</th><th>Datum</th><th>Status</th></tr></thead><tbody id="dossierItemDocumentsBody"></tbody></table></div></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="policy-documents">
-    <div class="admin-card"><div class="admin-card-head"><div><h2>Polisdocumenten</h2><p>Alle polissen, nota's en creditnota's die voor dit dossier zijn afgegeven.</p></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Soort</th><th>Afgegeven</th><th>Geldig vanaf</th><th>Status</th></tr></thead><tbody id="dossierPolicyDocumentsBody"></tbody></table></div></div>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Polisdocumenten</h2></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Soort</th><th>Afgegeven</th><th>Geldig vanaf</th><th>Status</th></tr></thead><tbody id="dossierPolicyDocumentsBody"></tbody></table></div></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="processes">
-    <div class="admin-process-panel-head"><div><h2>Processen voor dit dossier</h2><p>De status en stappen worden realtime bijgewerkt; handmatig verversen is niet nodig.</p></div><div class="admin-process-live compact"><i></i><div><strong>Realtime verbonden</strong><span id="dossierProcessLiveAge">Laatste update zojuist</span></div></div></div>
+    <div class="admin-process-panel-head"><div><h2>Processen voor dit dossier</h2></div><div class="admin-process-live compact"><i></i><div><strong>Realtime verbonden</strong><span id="dossierProcessLiveAge">Laatste update zojuist</span></div></div></div>
     <div class="admin-dossier-process-layout"><div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-process-table"><thead><tr><th>Proces</th><th>Status</th><th>Huidige stap</th><th>Gestart</th><th>Doorlooptijd</th></tr></thead><tbody id="dossierProcessListBody"></tbody></table></div></div><aside class="admin-card admin-process-detail" id="dossierProcessDetail"></aside></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="activities">
-    <div class="admin-card"><div class="admin-card-head"><div><h2>Activiteitenlog</h2><p>Alle dossiermutaties, inclusief actor, bron en gewijzigde waarden.</p></div></div><div class="admin-table-wrap"><table class="admin-table admin-activity-table"><thead><tr><th>Datum / tijd</th><th>Actor</th><th>Bron</th><th>Activiteit</th><th>Wijziging</th></tr></thead><tbody id="dossierActivitiesBody"></tbody></table></div></div>
+    <div class="admin-card"><div class="admin-card-head"><div><h2>Activiteitenlog</h2></div></div><div class="admin-table-wrap"><table class="admin-table admin-activity-table"><thead><tr><th>Datum / tijd</th><th>Actor</th><th>Bron</th><th>Activiteit</th><th>Wijziging</th></tr></thead><tbody id="dossierActivitiesBody"></tbody></table></div></div>
   </div>
 </div>
 
@@ -416,6 +397,6 @@
 </main>
 </div>
 </div>
-</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260828-renewal-mutation-v1"></script>
+</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260828-admin-ux-v1"></script>
 </body>
 </html>
