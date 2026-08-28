@@ -14,6 +14,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Klantflow: `index.html`
 - Admin/polisdeel: `admin.html`
 - Realtime procesmonitor in admin: `admin.html#processes`
+- Prolongatievoorraad in admin: `admin.html#renewals`
 - Vaste doorverwijzing: `process-monitor.html`
 - Gedeelde assets: `assets/`
 
@@ -32,3 +33,13 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - In ieder aanvraag- en polisdossier staat een tab `Processen` met de voortgang op dossierniveau.
 - Processtatussen worden realtime bijgewerkt; voeg geen handmatige refreshknop toe.
 - Functioneel uitgangspunt: initiële API-snapshot, daarna status-events via SSE of WebSocket, inclusief automatische reconnect en zichtbaar signaal als de verbinding niet actueel is.
+
+## Prolongatie en mutatie
+
+- Vooraankondiging is een los, automatisch communicatieproces en maakt geen polisversie of financiële boeking.
+- De prolongatievoorraad kijkt automatisch vooruit, toetst toekomstige productregels en geplande mutaties en maakt verwachte uitval vóór de prolongatiedag zichtbaar.
+- De definitieve prolongatie start automatisch op de laatste dag van de lopende termijn; de nieuwe termijn start de kalenderdag erna. Bijvoorbeeld: geldig tot en met 25 augustus, nieuwe termijn vanaf 26 augustus.
+- GoSafe orkestreert en berekent. ANVA verzorgt formele registratie, financiële boeking en incasso; voeg geen GoSafe-incassostap toe aan het prolongatieproces.
+- Een mutatie vóór of op het huidige termijn-einde levert na ANVA direct polis en nota op, ook als de ingangsdatum later is. Op de ingangsdatum wordt alleen de voorbereide versie actief.
+- Een mutatie ná de komende prolongatie blijft akkoord als delta, krijgt status `Akkoord – wacht op prolongatie`, wordt daarna op de vernieuwde polisversie geherbaseerd en opnieuw gevalideerd. De klant krijgt direct een bevestiging en de stukken pas na prolongatie en ANVA-verwerking.
+- Meerdere toekomstige mutaties worden chronologisch toegepast; iedere mutatie gebruikt de uitkomst van de vorige gebeurtenis.

@@ -5,6 +5,7 @@ function setAdminPage(name){
   document.querySelectorAll('[data-admin-page]').forEach(el=>el.classList.toggle('active',el.dataset.adminPage===name));
   const navName=name==='dossier'?dossierReturnPage:name;
   document.querySelectorAll('.admin-nav[data-admin-target]').forEach(el=>el.classList.toggle('active',el.dataset.adminTarget===navName));
+  if(['processes','renewals','policies'].includes(name))history.replaceState(null,'',`#${name}`);
   document.querySelector('.admin-main')?.scrollTo?.({top:0,behavior:'smooth'});
 }
 document.querySelectorAll('[data-admin-target]').forEach(btn=>btn.addEventListener('click',()=>setAdminPage(btn.dataset.adminTarget)));
@@ -62,11 +63,13 @@ const adminProcessData=[
   {id:'PRC-240827-0179',dossierKey:'application-sound',type:'Aanvraagverwerking',ref:'DOS-2026-00824',policy:'—',holder:'Sound Crew B.V.',status:'external',step:'Wacht op KvK-respons',age:'8m 55s',sla:'aandacht',started:'11:10:41',attempts:'1 / 3',steps:[['Aanvraag ontvangen','completed','11:10:41'],['Relatiegegevens controleren','completed','11:10:42'],['KvK-controle verwerken','waiting','Correlation ID kvk-7e91f3'],['Acceptatiecriteria uitvoeren','pending',''],['Aanvraagstatus bijwerken','pending','']]},
   {id:'PRC-240827-0174',dossierKey:'application-fallout',type:'Aanvraagverwerking',ref:'DOS-2026-00829',policy:'—',holder:'J. de Vries',status:'manual',step:'Acceptatie-uitval beoordelen',age:'21m 24s',sla:'aandacht',started:'10:58:08',attempts:'1 / 3',error:'MAX_INSURED_AMOUNT_EXCEEDED',steps:[['Aanvraag ontvangen','completed','10:58:08'],['Productregels controleren','completed','10:58:09'],['Acceptatie-uitval registreren','completed','€ 112.500 > € 100.000'],['Handmatige beoordeling','failed','Naar werkvoorraad gestuurd'],['Klant informeren','pending','']]},
   {id:'PRC-240827-0168',dossierKey:'application-camera',type:'Aanvraagverwerking',ref:'DOS-2026-00807',policy:'—',holder:'Camera Works B.V.',status:'manual',step:'Itemlimiet beoordelen',age:'48m 28s',sla:'overschreden',started:'10:31:04',attempts:'1 / 3',error:'ITEM_LIMIT_EXCEEDED',steps:[['Aanvraag ontvangen','completed','10:31:04'],['Productregels controleren','completed','10:31:05'],['Itemlimiet controleren','failed','Eén item boven € 25.000'],['Handmatige beoordeling','waiting','Werkvoorraad · hoge prioriteit'],['Klant informeren','pending','']]},
-  {id:'PRC-240827-0159',dossierKey:'policy-main',type:'Polisafgifte',ref:'POL-2026-00184',policy:'POL-2026-00184',holder:'Voorbeeld Media B.V.',status:'completed',step:'Afgerond',age:'4,8 s',sla:'goed',started:'15:30:12',attempts:'1 / 3',steps:[['Polisafgifte initialiseren','completed','15:30:12'],['Polisblad en nota genereren','completed','15:30:14'],['Documenten opslaan','completed','15:30:15'],['Definitieve polismail verzenden','completed','15:30:16'],['Polisregistratie naar ANVA','completed','15:30:16 · accepted'],['Incasso en compliance starten','completed','15:30:17']]},
-  {id:'PRC-240827-0148',dossierKey:'policy-main',type:'Mutatie',ref:'MUT-2026-00128',policy:'POL-2026-00184',holder:'Voorbeeld Media B.V.',status:'external',step:'Wacht op ingangsdatum',age:'18u 07m',sla:'goed',started:'27 aug · 09:42',attempts:'1 / 3',steps:[['Mutatie valideren en vastleggen','completed','27 aug · 09:42'],['Wijzigingsset opslaan','completed','3 itemregels'],['Wachten op ingangsdatum','waiting','1 sep 2026 · 00:00'],['Nieuwe polisversie activeren','pending',''],['Documenten, ANVA en klant bijwerken','pending','']]},
+  {id:'PRC-240827-0159',dossierKey:'policy-main',type:'Polisafgifte',ref:'POL-2026-00184',policy:'POL-2026-00184',holder:'Voorbeeld Media B.V.',status:'completed',step:'Afgerond',age:'4,8 s',sla:'goed',started:'15:30:12',attempts:'1 / 3',steps:[['Polisafgifte initialiseren','completed','15:30:12'],['Polisblad en nota genereren','completed','15:30:14'],['Documenten opslaan','completed','15:30:15'],['Definitieve polismail verzenden','completed','15:30:16'],['Polisregistratie naar ANVA','completed','15:30:16 · accepted'],['Compliance starten','completed','15:30:17']]},
+  {id:'PRC-240827-0148',dossierKey:'policy-main',type:'Mutatie',ref:'MUT-2026-00128',policy:'POL-2026-00184',holder:'Voorbeeld Media B.V.',status:'external',step:'Wacht op ingangsdatum',age:'18u 07m',sla:'goed',started:'27 aug · 09:42',attempts:'1 / 3',steps:[['Mutatie valideren en berekenen','completed','27 aug · 09:42'],['Mutatie registreren in ANVA','completed','accepted'],['Polis en nota maken en verzenden','completed','27 aug · 09:43'],['Wachten op ingangsdatum','waiting','1 sep 2026 · 00:00'],['Voorbereide polisversie activeren','pending','geen nieuwe stukken']]},
   {id:'PRC-240827-0139',dossierKey:'policy-jdevries',type:'Polisafgifte',ref:'POL-2026-00312',policy:'POL-2026-00312',holder:'J. de Vries',status:'completed',step:'Afgerond',age:'5,2 s',sla:'goed',started:'4 mei · 10:41',attempts:'1 / 3',steps:[['Polisafgifte initialiseren','completed','10:41:02'],['Documenten genereren en opslaan','completed','10:41:05'],['ANVA-respons verwerken','completed','accepted'],['Klant informeren','completed','10:41:07']]},
-  {id:'PRC-240827-0127',dossierKey:'policy-studio',type:'Incasso',ref:'POL-2025-00917',policy:'POL-2025-00917',holder:'Studio Noord B.V.',status:'retry',step:'Incasso opnieuw aanbieden',age:'1u 25m',sla:'overschreden',started:'09:54:11',attempts:'2 / 3',error:'PAYMENT_PROVIDER_TIMEOUT',steps:[['Incasso-opdracht aanmaken','completed','09:54:11'],['Incasso aanbieden','failed','Timeout betaalprovider'],['Automatische retry wachten','waiting','Volgende poging binnen 2 minuten'],['Resultaat verwerken','pending',''],['Dossierstatus bijwerken','pending','']]},
-  {id:'PRC-240827-0121',dossierKey:null,type:'Prolongatie',ref:'BATCH-2026-09-01-A',policy:'247 polissen',holder:'Prolongatiebatch',status:'external',step:'ANVA-batchverwerking',age:'49m 36s',sla:'goed',started:'10:30:00',attempts:'1 / 3',steps:[['Batch samenstellen','completed','247 polissen'],['Premies berekenen','completed','247 van 247'],['ANVA-batchverwerking','waiting','231 van 247 responses'],['Documenten en incasso starten','pending','']]},
+  {id:'PRC-240828-0127',dossierKey:'policy-studio',type:'Mutatie',ref:'MUT-2026-00131',policy:'POL-2025-00917',holder:'Studio Noord B.V.',status:'external',step:'Wacht op prolongatie',age:'17m',sla:'goed',started:'28 aug · 09:14',attempts:'1 / 3',steps:[['Mutatie valideren en akkoord vastleggen','completed','28 aug · 09:14'],['Klant informeren over documentmoment','completed','bevestiging verzonden'],['Wachten op prolongatie','waiting','12 okt 2026'],['Delta herbaseren en opnieuw toetsen','pending',''],['Registreren in ANVA en stukken verzenden','pending','voor 20 okt 2026']]},
+  {id:'PRC-240828-0124',dossierKey:'policy-studio',type:'Prolongatievoorcontrole',ref:'POL-2025-00917',policy:'POL-2025-00917',holder:'Studio Noord B.V.',status:'completed',step:'Openstaande mutatie meegenomen',age:'1,2 s',sla:'goed',started:'28 aug · 09:15',attempts:'1 / 3',steps:[['Toekomstige productregels ophalen','completed','versie 2026-10'],['Vernieuwde polis voorspellen','completed','13 okt 2026'],['Geplande mutaties in volgorde leggen','completed','MUT-2026-00131 na prolongatie'],['Uitval en documentmoment bepalen','completed','geen uitval · stukken na prolongatie'],['Voorraadstatus publiceren','completed','realtime bijgewerkt']]},
+  {id:'PRC-240828-0123',dossierKey:'policy-studio',type:'Vooraankondiging',ref:'POL-2025-00917',policy:'POL-2025-00917',holder:'Studio Noord B.V.',status:'completed',step:'Vooraankondiging verzonden',age:'2,1 s',sla:'goed',started:'14 aug · 08:00',attempts:'1 / 3',steps:[['Communicatiemoment bepalen','completed','60 dagen vóór prolongatie'],['Klant en kanaal selecteren','completed','e-mail'],['Uitnodiging tot muteren verzenden','completed','finance@studionoord.nl'],['Verzendstatus publiceren','completed','geen polis- of financiële wijziging']]},
+  {id:'PRC-240827-0121',dossierKey:null,type:'Prolongatie',ref:'PROL-2026-08-28-A',policy:'18 polissen',holder:'Automatische prolongatierun',status:'external',step:'Wacht op ANVA-responses',age:'49m 36s',sla:'goed',started:'28 aug · 02:00',attempts:'1 / 3',steps:[['Start op laatste polisdag','completed','18 polissen'],['Nieuwe termijnen en premies berekenen','completed','18 van 18'],['Polisversies vastleggen','completed','18 van 18'],['Registratie naar ANVA','waiting','16 van 18 responses'],['Documenten en klantcommunicatie','pending','na ANVA akkoord']]},
   {id:'PRC-240827-0118',dossierKey:null,type:'Royement',ref:'POL-251112-0442',policy:'POL-251112-0442',holder:'Stagecraft Europe',status:'manual',step:'Creditnota controleren',age:'1u 25m',sla:'overschreden',started:'09:54:03',attempts:'3 / 3',error:'CREDIT_NOTE_AMOUNT_MISMATCH',steps:[['Royement vastleggen','completed','09:54:03'],['Dekking beëindigen','completed','09:54:04'],['Creditnota genereren','failed','Bedrag wijkt € 2,50 af'],['ANVA en klant bijwerken','pending','']]}
 ];
 const adminProcessStatusMeta={running:{label:'Actief',className:'green'},external:{label:'Wacht extern',className:'blue'},retry:{label:'Retry gepland',className:'amber'},manual:{label:'Actie nodig',className:'red'},completed:{label:'Afgerond',className:'gray'}};
@@ -99,8 +102,13 @@ dossierData['policy-main'].pendingMutation={reference:'MUT-2026-00128',effective
   {type:'Gewijzigd',className:'blue',item:'Sony FX6',fields:[{label:'Categorie',old:'Camera’s / Cinema camera',new:'Camera’s / Professionele videocamera'},{label:'Verzekerd bedrag',old:'€ 8.500',new:'€ 9.000'}]},
   {type:'Verwijderd',className:'red',item:'DJI RS 4 Pro',fields:[{label:'Status',old:'Meeverzekerd',new:'Verwijderd'}]},
   {type:'Toegevoegd',className:'green',item:'Canon EOS R5 C',fields:[{label:'Categorie',old:'—',new:'Camera’s / Cinema camera'},{label:'Verzekerd bedrag',old:'—',new:'€ 2.650'}]}
-]};
+],relationToRenewal:'Vóór prolongatie',documentsStatus:'Polis en nota direct afgegeven',communicationStatus:'Stukken verzonden bij verwerking'};
 dossierData['policy-main'].activities.unshift({date:'27 aug 2026 · 09:42',actor:'Klant',source:'Mijn GoSafe',title:'Polismutatie ingepland',change:'Een wijziging is klaargezet en gaat op 1 september 2026 in.',detail:'Referentie: MUT-2026-00128 · Status: Gepland'});
+dossierData['policy-studio'].pendingMutation={reference:'MUT-2026-00131',effective:'20 okt 2026',created:'28 aug 2026 · 09:14',initiator:'Medewerker',status:'Akkoord – wacht op prolongatie',relationToRenewal:'Na prolongatie',documentsStatus:'Stukken volgen na prolongatie en ANVA',communicationStatus:'Bevestiging aan klant verzonden',changes:[
+  {type:'Gewijzigd',className:'blue',item:'Sony FX6',fields:[{label:'Verzekerd bedrag',old:'€ 8.500',new:'€ 9.750'}]},
+  {type:'Toegevoegd',className:'green',item:'Atomos Ninja Ultra',fields:[{label:'Categorie',old:'—',new:'Camera’s / Monitor-recorder'},{label:'Verzekerd bedrag',old:'—',new:'€ 1.250'}]}
+]};
+dossierData['policy-studio'].activities.unshift({date:'28 aug 2026 · 09:14',actor:'Medewerker',source:'GoSafe Admin',title:'Toekomstige mutatie akkoord',change:'Mutatie gaat na de komende prolongatie in en wacht op herbasering.',detail:'MUT-2026-00131 · Klantbevestiging verzonden · Polis en nota volgen na prolongatie'});
 
 function adminEscape(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));}
 const addressCountryNames={NL:'Nederland',BE:'België',DE:'Duitsland'};
@@ -174,7 +182,7 @@ function renderDossier(key){
   set('dossierHeaderIdentifiers',`<div class="admin-dossier-identifier"><span>Dossiernummer</span><strong>${adminEscape(data.dossier)}</strong></div><div class="admin-dossier-identifier"><span>Polisnummer</span><strong class="${data.policy==='—'?'admin-value-muted':''}">${adminEscape(data.policy)}</strong></div><div class="admin-dossier-identifier"><span>${data.phase==='Polis'?'Ingangsdatum':'Ontvangen'}</span><strong>${adminEscape(data.phase==='Polis'?data.start:data.received.split(' · ')[0])}</strong></div>${data.phase==='Polis'?`<div class="admin-dossier-identifier"><span>Prolongatiedatum</span><strong>${adminEscape(data.renewalDate)}</strong></div>`:''}`);
   set('dossierOverviewDetails',renderDetailRows([['Fase',data.phase],['Status',data.status],['Product',data.product],['Aanvraag ontvangen',data.received],['Gewenste / actuele ingang',data.start],...(data.phase==='Polis'?[['Prolongatiedatum',data.renewalDate]]:[]),['Verzekerd bedrag',data.amount],['Jaarpremie',data.premium],['Voorwaarden',data.terms],['IPID',data.ipid]]));
   const pending=document.getElementById('dossierPendingMutation');
-  if(pending){pending.hidden=!data.pendingMutation;pending.innerHTML=data.pendingMutation?`<details class="admin-pending-details"><summary><span>Komende wijziging</span><strong>Gaat in op ${adminEscape(data.pendingMutation.effective)}</strong><small>Details bekijken</small></summary><div class="admin-pending-detail-meta">${adminEscape(data.pendingMutation.reference)} · ${adminEscape(data.pendingMutation.initiator)} · aangemaakt ${adminEscape(data.pendingMutation.created)}</div>${renderPendingChangeTable(data.pendingMutation.changes||[])}</details>`:'';}
+  if(pending){pending.hidden=!data.pendingMutation;pending.innerHTML=data.pendingMutation?`<details class="admin-pending-details"><summary><span>Komende wijziging</span><strong>Gaat in op ${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip ${data.pendingMutation.status.includes('wacht')?'amber':'blue'}">${adminEscape(data.pendingMutation.status)}</span><small>Details bekijken</small></summary><div class="admin-pending-detail-meta">${adminEscape(data.pendingMutation.reference)} · ${adminEscape(data.pendingMutation.initiator)} · aangemaakt ${adminEscape(data.pendingMutation.created)}</div><div class="admin-pending-process-meta"><div><span>Ten opzichte van prolongatie</span><strong>${adminEscape(data.pendingMutation.relationToRenewal||'—')}</strong></div><div><span>Klantcommunicatie</span><strong>${adminEscape(data.pendingMutation.communicationStatus||'—')}</strong></div><div><span>Polis en nota</span><strong>${adminEscape(data.pendingMutation.documentsStatus||'—')}</strong></div></div>${renderPendingChangeTable(data.pendingMutation.changes||[])}</details>`:'';}
   const mutate=document.getElementById('dossierStartMutation');
   if(mutate)mutate.hidden=data.phase!=='Polis';
   const editHolder=document.getElementById('dossierEditHolder');
@@ -216,12 +224,23 @@ document.getElementById('dossierBackButton')?.addEventListener('click',()=>setAd
 document.querySelectorAll('[data-dossier-tab]').forEach(button=>button.addEventListener('click',()=>setDossierTab(button.dataset.dossierTab)));
 document.querySelector('[data-show-dossier-activities]')?.addEventListener('click',()=>setDossierTab('activities'));
 ['adminProcessSearch','adminProcessTypeFilter','adminProcessStatusFilter'].forEach(id=>document.getElementById(id)?.addEventListener(id==='adminProcessSearch'?'input':'change',renderAdminProcesses));
+function filterRenewals(){
+  const query=(document.getElementById('renewalSearch')?.value||'').trim().toLowerCase();
+  const status=document.getElementById('renewalStatusFilter')?.value||'';
+  const period=Number(document.getElementById('renewalPeriodFilter')?.value||60);
+  const rows=[...document.querySelectorAll('[data-renewal-row]')];
+  let visible=0;
+  rows.forEach(row=>{const show=(!query||(row.dataset.search||'').includes(query))&&(!status||(row.dataset.status||'').includes(status))&&Number(row.dataset.days||0)<=period;row.hidden=!show;if(show)visible+=1;});
+  const count=document.getElementById('renewalResultCount');if(count)count.textContent=`${visible} ${visible===1?'polis':'polissen'}`;
+}
+['renewalSearch','renewalStatusFilter','renewalPeriodFilter'].forEach(id=>document.getElementById(id)?.addEventListener(id==='renewalSearch'?'input':'change',filterRenewals));
 document.addEventListener('click',event=>{const row=event.target.closest('.admin-process-row');if(row)selectAdminProcess(row.dataset.processId,row.closest('[data-dossier-panel="processes"]')?'dossier':'admin');const retry=event.target.closest('[data-process-retry]');if(retry){const process=adminProcessData.find(item=>item.id===retry.dataset.processRetry);if(process){process.status='running';process.step='Opnieuw ingepland';process.error='';process.steps=process.steps.map(step=>step[1]==='failed'?[step[0],'running','Nieuwe poging zojuist gestart']:step);renderAdminProcesses();renderDossierProcesses(dossierData[activeDossierKey]||dossierData['policy-main']);}}});
 document.addEventListener('keydown',event=>{const row=event.target.closest('.admin-process-row');if(row&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectAdminProcess(row.dataset.processId,row.closest('[data-dossier-panel="processes"]')?'dossier':'admin');}});
 let adminRealtimeAge=0;
-setInterval(()=>{adminRealtimeAge=(adminRealtimeAge+1)%6;const label=adminRealtimeAge===0?'Laatste update zojuist':`Laatste update ${adminRealtimeAge} sec geleden`;['adminProcessLiveAge','dossierProcessLiveAge'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent=label;});},1000);
+setInterval(()=>{adminRealtimeAge=(adminRealtimeAge+1)%6;const label=adminRealtimeAge===0?'Laatste update zojuist':`Laatste update ${adminRealtimeAge} sec geleden`;['adminProcessLiveAge','dossierProcessLiveAge','renewalLiveAge'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent=label;});},1000);
 renderAdminProcesses();
-if(location.hash==='#processes')setAdminPage('processes');
+filterRenewals();
+const initialAdminRoute=location.hash.slice(1);if(['processes','renewals','policies'].includes(initialAdminRoute))setAdminPage(initialAdminRoute);
 
 // De beheerder gebruikt functioneel dezelfde mutatieonderdelen en berekening als de klant.
 let adminMutationItems=[];
@@ -239,6 +258,7 @@ function adminFormatEuro(value){return new Intl.NumberFormat('nl-NL',{style:'cur
 function formatMutationDate(value){if(!value)return '—';return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short',year:'numeric'}).format(new Date(value+'T00:00:00'));}
 function mutationRenewalIso(data){if(data.start.startsWith('25 aug'))return '2027-08-25';if(data.start.startsWith('4 mei'))return '2027-05-04';return '2026-10-12';}
 function mutationDaysBetween(start,end){return Math.max(0,Math.ceil((new Date(end+'T00:00:00')-new Date(start+'T00:00:00'))/86400000));}
+function mutationShiftDate(value,{days=0,years=0}={}){const date=new Date(value+'T00:00:00');date.setFullYear(date.getFullYear()+years);date.setDate(date.getDate()+days);return date.toISOString().slice(0,10);}
 function mutationItemName(item){return [item.brand,item.model].filter(Boolean).join(' ').trim()||'Nieuw item';}
 function mutationCategoryMap(data){return data.product==='Instrumentenverzekering'?instrumentMutationCategories:equipmentMutationCategories;}
 function mutationItemCategory(item){return [item.mainCategory,item.subCategory].filter(Boolean).join(' / ');}
@@ -286,13 +306,15 @@ function adminMutationCalculation(){
   const annualDifference=newPremium-currentPremium;
   const effective=document.getElementById('mutationEffectiveDate')?.value;
   const renewal=mutationRenewalIso(data);
-  const validDate=effective>=mutationToday&&effective<renewal;
-  const remaining=validDate?mutationDaysBetween(effective,renewal):0;
+  const afterRenewal=Boolean(effective&&effective>renewal);
+  const targetTermEnd=afterRenewal?mutationShiftDate(renewal,{years:1}):renewal;
+  const validDate=Boolean(effective&&effective>=mutationToday&&effective<=targetTermEnd);
+  const remaining=validDate?mutationDaysBetween(effective,mutationShiftDate(targetTermEnd,{days:1})):0;
   const hasChanges=buildAdminMutationChanges().length>0;
   const prorated=validDate&&hasChanges?annualDifference/365*remaining:0;
   const costs=validDate&&hasChanges?mutationPolicyCosts:0;
   const tax=(prorated+costs)*mutationInsuranceTax;
-  return {currentAmount,total,currentPremium,newPremium,annualDifference,remaining,prorated,costs,tax,mutationTotal:prorated+costs+tax,validDate,renewal,hasChanges};
+  return {currentAmount,total,currentPremium,newPremium,annualDifference,remaining,prorated,costs,tax,mutationTotal:prorated+costs+tax,validDate,renewal,targetTermEnd,afterRenewal,hasChanges};
 }
 function adminMutationValidation(){
   const data=dossierData[activeDossierKey]||dossierData['policy-main'];
@@ -332,8 +354,14 @@ function refreshAdminMutationTotals(){
   document.getElementById('mutationInsuranceTax').textContent=calculation.validDate?adminFormatEuro(calculation.tax):'—';
   document.getElementById('mutationTotalLabel').textContent=calculation.mutationTotal<0?'Terug te ontvangen':'Nu te betalen';
   document.getElementById('mutationTotal').textContent=calculation.validDate?adminFormatEuro(Math.abs(calculation.mutationTotal)):'—';
-  document.getElementById('mutationFormula').textContent=calculation.validDate?`(${adminFormatEuro(calculation.newPremium)} − ${adminFormatEuro(calculation.currentPremium)}) ÷ 365 × ${calculation.remaining} dagen = ${adminFormatEuro(calculation.prorated)} premieverschil.`:'Kies een geldige ingangsdatum vóór de prolongatiedatum.';
-  const submit=document.getElementById('mutationSubmit');if(submit){submit.disabled=!calculation.validDate||!calculation.hasChanges||validation.blocked;submit.textContent=validation.blocked?'Geblokkeerd door volmachtregels':'Wijziging inplannen';}
+  document.getElementById('mutationFormula').textContent=calculation.validDate?`(${adminFormatEuro(calculation.newPremium)} − ${adminFormatEuro(calculation.currentPremium)}) ÷ 365 × ${calculation.remaining} dagen = ${adminFormatEuro(calculation.prorated)} premieverschil in de doeltermijn.`:'Kies een geldige ingangsdatum vanaf vandaag.';
+  const planning=document.getElementById('mutationPlanningCard');if(planning)planning.classList.toggle('after-renewal',calculation.afterRenewal);
+  const planningTitle=document.getElementById('mutationPlanningTitle');if(planningTitle)planningTitle.textContent=calculation.afterRenewal?'Stukken volgen na prolongatie':'Stukken direct na verwerking';
+  const planningStatus=document.getElementById('mutationPlanningStatus');if(planningStatus){planningStatus.className=`admin-chip ${calculation.afterRenewal?'amber':'green'}`;planningStatus.textContent=calculation.afterRenewal?'Na prolongatie':'Vóór prolongatie';}
+  const planningText=document.getElementById('mutationPlanningText');if(planningText)planningText.textContent=calculation.afterRenewal?`De klant krijgt nu een bevestiging. Na de prolongatie op ${formatMutationDate(calculation.renewal)} wordt de mutatie herberekend; polis en nota volgen daarna.`:`Polis en nota worden direct na verwerking in ANVA gemaakt en verstuurd, ook als de wijziging later ingaat.`;
+  const note=document.getElementById('mutationDocumentNote');if(note)note.textContent=calculation.afterRenewal?'De mutatie blijft akkoord als delta bewaard, wordt op de vernieuwde polisversie geherbaseerd en vóór de ingangsdatum opnieuw gevalideerd.':'Op de ingangsdatum wordt alleen de voorbereide versie actief; er worden dan geen nieuwe stukken gemaakt.';
+  const proratedLabel=document.getElementById('mutationProratedLabel');if(proratedLabel)proratedLabel.textContent=calculation.afterRenewal?'Premieverschil vernieuwde termijn':'Premieverschil huidige termijn';
+  const submit=document.getElementById('mutationSubmit');if(submit){submit.disabled=!calculation.validDate||!calculation.hasChanges||validation.blocked;submit.textContent=validation.blocked?'Geblokkeerd door volmachtregels':calculation.afterRenewal?'Akkoord & wachten op prolongatie':'Wijziging verwerken';}
   document.getElementById('mutationRentalLimit').disabled=!document.getElementById('mutationRentalIn').checked;
 }
 function populateMutationSubcategories(mainCategory,selected){
@@ -399,7 +427,7 @@ function openAdminMutation(){
   document.getElementById('mutationRentalIn').checked=mutationInitialRentalIn;
   document.getElementById('mutationRentalOut').checked=mutationInitialRentalOut;
   document.getElementById('mutationRentalLimit').value=mutationInitialRentalLimit;
-  document.getElementById('mutationEffectiveDate').value='2026-09-01';
+  document.getElementById('mutationEffectiveDate').value=activeDossierKey==='policy-studio'?'2026-10-20':'2026-09-01';
   document.getElementById('adminMutationSuccess').hidden=true;
   closeMutationItemEditor();renderAdminMutation();openDossierMutationPanel('policy-mutation','Polis wijzigen');
 }
@@ -416,11 +444,11 @@ document.getElementById('mutationRentalLimit')?.addEventListener('change',refres
 document.getElementById('mutationEffectiveDate')?.addEventListener('change',refreshAdminMutationTotals);
 document.getElementById('mutationSubmit')?.addEventListener('click',()=>{
   const data=dossierData[activeDossierKey];const effective=document.getElementById('mutationEffectiveDate')?.value;const changes=buildAdminMutationChanges();const calculation=adminMutationCalculation();if(!data||!effective||!calculation.validDate||!changes.length||adminMutationValidation().blocked)return;
-  data.pendingMutation={reference:'MUT-2026-00129',effective:formatMutationDate(effective),created:'27 aug 2026 · 10:15',initiator:'Medewerker',status:'Gepland',changes};
-  data.activities.unshift({date:'27 aug 2026 · 10:15',actor:'Medewerker',source:'GoSafe Admin',title:'Polismutatie ingepland',change:`${changes.length} wijzigingsregels klaargezet voor ${data.pendingMutation.effective}.`,detail:`Referentie: ${data.pendingMutation.reference} · Actor: Medewerker · Totaal verrekening: ${adminFormatEuro(calculation.mutationTotal)}`});
-  const success=document.getElementById('adminMutationSuccess');if(success){success.hidden=false;success.innerHTML=`<div class="admin-future-mutation-head"><div><span class="admin-future-mutation-label">Wijziging opgeslagen</span><strong>${adminEscape(data.pendingMutation.reference)}</strong><small>${changes.length} technische wijzigingsregels · totaal verrekening ${adminEscape(adminFormatEuro(calculation.mutationTotal))}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip amber">Gepland</span></div></div><div class="admin-mutation-change-list">${changes.map(renderPendingChange).join('')}</div>`;}
+  data.pendingMutation={reference:'MUT-2026-00129',effective:formatMutationDate(effective),created:'28 aug 2026 · 10:15',initiator:'Medewerker',status:calculation.afterRenewal?'Akkoord – wacht op prolongatie':'Gepland',relationToRenewal:calculation.afterRenewal?'Na prolongatie':'Vóór prolongatie',documentsStatus:calculation.afterRenewal?'Stukken volgen na prolongatie en ANVA':'Polis en nota direct afgegeven',communicationStatus:calculation.afterRenewal?'Bevestiging aan klant verzonden':'Stukken direct aan klant verzonden',changes};
+  data.activities.unshift({date:'28 aug 2026 · 10:15',actor:'Medewerker',source:'GoSafe Admin',title:calculation.afterRenewal?'Polismutatie akkoord – wacht op prolongatie':'Polismutatie verwerkt',change:`${changes.length} wijzigingsregels klaargezet voor ${data.pendingMutation.effective}.`,detail:`Referentie: ${data.pendingMutation.reference} · ${data.pendingMutation.communicationStatus} · ${data.pendingMutation.documentsStatus}`});
+  const success=document.getElementById('adminMutationSuccess');if(success){success.hidden=false;success.innerHTML=`<div class="admin-future-mutation-head"><div><span class="admin-future-mutation-label">Wijziging opgeslagen</span><strong>${adminEscape(data.pendingMutation.reference)}</strong><small>${adminEscape(data.pendingMutation.communicationStatus)} · ${adminEscape(data.pendingMutation.documentsStatus)}</small></div><div><span>Gaat in op</span><strong>${adminEscape(data.pendingMutation.effective)}</strong><span class="admin-chip ${calculation.afterRenewal?'amber':'blue'}">${adminEscape(data.pendingMutation.status)}</span></div></div><div class="admin-mutation-change-list">${changes.map(renderPendingChange).join('')}</div>`;}
   const row=document.querySelector(`[data-dossier-key="${activeDossierKey}"]`);if(row?.cells?.[8])row.cells[8].innerHTML=`<span class="admin-chip amber">Per ${adminEscape(data.pendingMutation.effective)}</span><div class="admin-secondary">${adminEscape(data.pendingMutation.reference)} · ${changes.length} regels</div>`;
-  document.getElementById('mutationSubmit').disabled=true;document.getElementById('mutationSubmit').textContent='Wijziging ingepland';
+  document.getElementById('mutationSubmit').disabled=true;document.getElementById('mutationSubmit').textContent=calculation.afterRenewal?'Wacht op prolongatie':'Wijziging verwerkt';
   success?.scrollIntoView?.({behavior:'smooth',block:'nearest'});
 });
 
