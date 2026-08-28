@@ -3,7 +3,7 @@ let dossierReturnPage='applications';
 let activeDossierKey='policy-main';
 function setAdminPage(name){
   document.querySelectorAll('[data-admin-page]').forEach(el=>el.classList.toggle('active',el.dataset.adminPage===name));
-  const navName=name==='dossier'?dossierReturnPage:name;
+  const navName=name==='dossier'?(dossierData[activeDossierKey]?.phase==='Polis'?'policies':'applications'):name;
   document.querySelectorAll('.admin-nav[data-admin-target]').forEach(el=>el.classList.toggle('active',el.dataset.adminTarget===navName));
   if(['processes','renewals','policies'].includes(name))history.replaceState(null,'',`#${name}`);
   document.querySelector('.admin-main')?.scrollTo?.({top:0,behavior:'smooth'});
