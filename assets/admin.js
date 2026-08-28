@@ -226,9 +226,9 @@ function renderDossier(key){
 }
 function openDossier(trigger){
   dossierReturnPage=trigger.closest('[data-admin-page]')?.dataset.adminPage||'applications';
-  if(!['applications','policies','relations','workqueue','overview'].includes(dossierReturnPage))dossierReturnPage='applications';
+  if(!['applications','policies','relations','workqueue','overview','renewals'].includes(dossierReturnPage))dossierReturnPage='applications';
   renderDossier(trigger.dataset.dossierKey||'policy-main');
-  const back=document.getElementById('dossierBackButton');if(back)back.textContent='← Terug naar '+({applications:'aanvragen',policies:'polissen',relations:'relaties',workqueue:'werkvoorraad',overview:'overzicht'}[dossierReturnPage]||'overzicht');
+  const back=document.getElementById('dossierBackButton');if(back)back.textContent='← Terug naar '+({applications:'aanvragen',policies:'polissen',relations:'relaties',workqueue:'werkvoorraad',overview:'overzicht',renewals:'prolongaties'}[dossierReturnPage]||'overzicht');
   setAdminPage('dossier');
 }
 document.addEventListener('click',event=>{const trigger=event.target.closest('[data-open-dossier],.admin-open-dossier');if(trigger)openDossier(trigger);});
