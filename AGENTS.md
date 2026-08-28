@@ -62,8 +62,12 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Communicatie gebruikt dezelfde realtime werkwijze. De admin toont operationeel `Wachtrij`, `Berichten` en `Templates`, zonder refreshknop.
 - Overzichtslijsten tonen alleen gegevens die nodig zijn om een record te herkennen of een actie te starten. Laat interne dossiercodes, e-mailadressen en laatste-activiteitkolommen weg als die geen directe keuze ondersteunen.
 - Werkvoorraadtaken hebben alleen de statussen `Open` en `Afgerond`; gebruik geen status `Bezig`. Toon daar geen prioriteit, eigenaar of uiterste datum.
+- Een aanvraag die vóór indienen niet aan product- of acceptatieregels voldoet, kan niet worden ingediend en verschijnt niet als `Uitval`. Een niet-afgeronde klantflow wordt als `Concept` bewaard. `Ter akkoord` is alleen bedoeld voor een ingediende aanvraag met een afwijkend antwoord in de slotvragen en levert een taak in de werkvoorraad op.
+- Menselijke behandeling is een werkvoorraadtaak en geen technisch proces. De tab `Processen` toont alleen duurzame technische orkestratie. Als een bounce of inkomende reply menselijke opvolging nodig heeft, registreert de technische verwerking een open communicatietaak in de werkvoorraad en rondt het technische proces na succesvolle routering af.
 - Bedragen in aanvraag- en polisoverzichten staan rechts uitgelijnd.
 - Bij het openen van een dossier springt de actieve hoofdnavigatie mee naar `Aanvragen` of `Polissen`, ongeacht vanuit welk overzicht het dossier is geopend.
+- Plaats dossierwijzigingen bij het inhoudelijke onderdeel: `Polis wijzigen` bij `Verzekerde items` en `Relatie wijzigen` bij `Verzekeringnemer`; zet deze acties niet dubbel in de dossierkop.
+- Noem de verstreken tijd van een proces `Doorlooptijd`, niet `Leeftijd`. Een toekomstige interne activering is `Gepland` en geen externe wachtstatus.
 
 ## Prolongatie en mutatie
 
@@ -74,3 +78,4 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Een mutatie vóór of op het huidige termijn-einde levert na ANVA direct polis en nota op, ook als de ingangsdatum later is. Op de ingangsdatum wordt alleen de voorbereide versie actief.
 - Een mutatie ná de komende prolongatie blijft akkoord als delta, krijgt status `Akkoord – wacht op prolongatie`, wordt daarna op de vernieuwde polisversie geherbaseerd en opnieuw gevalideerd. De klant krijgt direct een bevestiging en de stukken pas na prolongatie en ANVA-verwerking.
 - Meerdere toekomstige mutaties worden chronologisch toegepast; iedere mutatie gebruikt de uitkomst van de vorige gebeurtenis.
+- Het prolongatieoverzicht blijft een compacte operationele lijst met `Einde huidige termijn`, `Nieuwe termijn`, `Polis`, `Premie oud → nieuw`, `Voorcontrole` en `Actie`. Toon daar geen relatie, geplande-mutatiekolom, vooraankondigingskolom of uitleg dat termijnen direct aansluiten.
