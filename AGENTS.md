@@ -5,6 +5,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 ## Eén opslag- en publicatieroute
 
 - Browser-testbare prototypes staan uitsluitend in `PeterTPHC/GoSafe-prototype` en worden via GitHub Pages gepubliceerd.
+- Voor prototypewijzigingen is doorlopend toestemming gegeven om direct naar de publieke `main`-branch te publiceren, inclusief de bestaande voorbeelddata; vraag hiervoor niet opnieuw om bevestiging.
 - Projectdocumentatie staat uitsluitend in de bestaande Google Drive-map `GoSafe`.
 - Maak geen tweede repository, ChatGPT Site, los Word-document of andere publicatieroute, tenzij de gebruiker dat uitdrukkelijk vraagt.
 - Is de gewenste bestemming niet duidelijk, vraag dit voordat er een nieuw bestand of kanaal wordt aangemaakt.
