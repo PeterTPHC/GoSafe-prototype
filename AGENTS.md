@@ -34,6 +34,17 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - In ieder aanvraag- en polisdossier staat een tab `Processen` met de voortgang op dossierniveau.
 - Processtatussen worden realtime bijgewerkt; voeg geen handmatige refreshknop toe.
 - Functioneel uitgangspunt: initiële API-snapshot, daarna status-events via SSE of WebSocket, inclusief automatische reconnect en zichtbaar signaal als de verbinding niet actueel is.
+- Gebruik voor hoofd- en kindprocessen dezelfde duurzame statussen: `requested`, `running`, `waiting_dependency`, `waiting_external`, `retry_scheduled`, `action_required`, `completed`, `cancelled` en `compensated`.
+- Een domeinwijziging en het bijbehorende outbox-event worden atomair opgeslagen. Externe callbacks en webhooks worden geauthenticeerd en via een deduplicerende inbox verwerkt.
+- Bij een onbekende externe uitkomst wordt eerst op correlation ID of idempotency key gereconcilieerd; stuur niet blind opnieuw.
+- Handmatig herstel verloopt via gecontroleerde commando's met actor en reden. Wijzig technische processtatussen niet rechtstreeks.
+
+## Documenten en communicatie
+
+- `P09 Documentgeneratie (PDF)` gebruikt een externe renderdienst. GoSafe bevriest bron- en templateversie, valideert het resultaat en slaat iedere afgegeven versie immutable op.
+- `P10 Transactionele communicatie` bevriest template, ontvanger, inhoud en exacte bijlagen en logt provideracceptatie, aflevering, bounce, klacht en fout afzonderlijk.
+- Vrijgavevolgorde: blokkerende bedrijfschecks → ANVA-akkoord → PDF valid/final in dossier → transactionele e-mail. Technisch voorbereiden mag, maar geen documentafgifte of klantmail vóór de vrijgavepoort.
+- ANVA verzorgt formele registratie, financiële boeking en incasso. GoSafe ontvangt statussen en start geen eigen incassoproces.
 
 ## Admin UX
 
