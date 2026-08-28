@@ -33,6 +33,8 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 
 - De globale procesmonitor gebruikt exact dezelfde admin-shell, navigatie en componenten als `admin.html`.
 - In ieder aanvraag- en polisdossier staat een tab `Processen` met de voortgang op dossierniveau.
+- Toon in proceslijsten hoofdprocessen zoals `Nieuwe polis`, `Mutatie`, `Prolongatie`, `Royement` en later `Import`. Documentgeneratie, transactionele communicatie, ANVA-registratie en vergelijkbare technische orkestratie zijn stappen of kindprocessen binnen zo'n hoofdproces en staan niet als losse gelijkwaardige procesregels in het dossier.
+- Iedere polis heeft minimaal één herkomstproces: `Nieuwe polis` voor een digitaal gesloten polis of later `Import` voor een gemigreerde polis. Sorteer lopende, geplande, wachtende en actievereisende processen vóór afgeronde processen.
 - Processtatussen worden realtime bijgewerkt; voeg geen handmatige refreshknop toe.
 - Functioneel uitgangspunt: initiële API-snapshot, daarna status-events via SSE of WebSocket, inclusief automatische reconnect en zichtbaar signaal als de verbinding niet actueel is.
 - Gebruik voor hoofd- en kindprocessen dezelfde duurzame statussen: `requested`, `running`, `waiting_dependency`, `waiting_external`, `retry_scheduled`, `action_required`, `completed`, `cancelled` en `compensated`.
@@ -78,4 +80,4 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Een mutatie vóór of op het huidige termijn-einde levert na ANVA direct polis en nota op, ook als de ingangsdatum later is. Op de ingangsdatum wordt alleen de voorbereide versie actief.
 - Een mutatie ná de komende prolongatie blijft akkoord als delta, krijgt status `Akkoord – wacht op prolongatie`, wordt daarna op de vernieuwde polisversie geherbaseerd en opnieuw gevalideerd. De klant krijgt direct een bevestiging en de stukken pas na prolongatie en ANVA-verwerking.
 - Meerdere toekomstige mutaties worden chronologisch toegepast; iedere mutatie gebruikt de uitkomst van de vorige gebeurtenis.
-- Het prolongatieoverzicht blijft een compacte operationele lijst met `Einde huidige termijn`, `Nieuwe termijn`, `Polis`, `Premie oud → nieuw`, `Voorcontrole` en `Actie`. Toon daar geen relatie, geplande-mutatiekolom, vooraankondigingskolom of uitleg dat termijnen direct aansluiten.
+- Het prolongatieoverzicht blijft een compacte operationele lijst met `Einde huidige termijn`, `Nieuwe termijn`, `Polis`, `Premie oud → nieuw` en `Voorcontrole`. Gebruik geen aparte actiekolom of niet-functionele resultaattelling; maak regels met uitval of een andere dossieractie rechtstreeks doorklikbaar. Toon daar ook geen relatie, geplande-mutatiekolom, vooraankondigingskolom of uitleg dat termijnen direct aansluiten.
