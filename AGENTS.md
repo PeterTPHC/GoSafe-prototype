@@ -15,6 +15,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Klantflow: `index.html`
 - Admin/polisdeel: `admin.html`
 - Realtime procesmonitor in admin: `admin.html#processes`
+- Realtime communicatiebeheer in admin: `admin.html#communications`
 - Prolongatievoorraad in admin: `admin.html#renewals`
 - Vaste doorverwijzing: `process-monitor.html`
 - Gedeelde assets: `assets/`
@@ -43,6 +44,10 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 
 - `P09 Documentgeneratie (PDF)` gebruikt een externe renderdienst. GoSafe bevriest bron- en templateversie, valideert het resultaat en slaat iedere afgegeven versie immutable op.
 - `P10 Transactionele communicatie` bevriest template, ontvanger, inhoud en exacte bijlagen en logt provideracceptatie, aflevering, bounce, klacht en fout afzonderlijk.
+- `P10` is afgerond zodra de provider het bericht met message ID accepteert. Delivery, bounce en complaint blijven als append-only events doorlopen; een `delivery_required`-policy kan alsnog een gerichte actie maken.
+- `P11 Inkomende e-mail en reply` verifieert en dedupliceert provider-events, verwerkt MIME en bijlagen veilig, koppelt via een opaque reply-token en maakt bij een inhoudelijke reply een taak. Een orphan of ambigue reply gaat altijd naar `action_required`.
+- Berichttypen, variabelen, bijlagenbeleid en bezorgbeleid zijn codegedefinieerd. De admin beheert alleen inhoudsversies; gepubliceerde versies zijn immutable.
+- Exacte bodies en bijlagen staan in beveiligde communicatierecords. Het algemene activiteitenlog bevat alleen een veilige samenvatting en referenties, nooit raw bodies, PDF/base64, geheimen of onnodige persoonsgegevens.
 - Vrijgavevolgorde: blokkerende bedrijfschecks → ANVA-akkoord → PDF valid/final in dossier → transactionele e-mail. Technisch voorbereiden mag, maar geen documentafgifte of klantmail vóór de vrijgavepoort.
 - ANVA verzorgt formele registratie, financiële boeking en incasso. GoSafe ontvangt statussen en start geen eigen incassoproces.
 
@@ -54,6 +59,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Toon tellingen alleen als ze een actie prioriteren, een filterresultaat verduidelijken of een actuele processtatus aangeven.
 - Behoud de vaste menugroepen: `Dagelijks werk`, `Bewaking`, `Administratie`, `Inzicht` en `Beheer`.
 - Houd processtatussen realtime en zichtbaar zonder refreshknop.
+- Communicatie gebruikt dezelfde realtime werkwijze. De admin toont operationeel `Wachtrij`, `Berichten` en `Templates`, zonder refreshknop.
 
 ## Prolongatie en mutatie
 

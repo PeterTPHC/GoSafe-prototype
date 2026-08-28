@@ -7,6 +7,7 @@ Werkprototype voor de GoSafe aanvraag-, Mijn GoSafe- en adminomgeving.
 - `index.html` – klantflow
 - `admin.html` – admin- en polisomgeving
 - `admin.html#processes` – realtime procesmonitor binnen de adminomgeving
+- `admin.html#communications` – realtime mailwachtrij, berichten/replies en templates
 - `admin.html#renewals` – realtime prolongatievoorraad, voorcontrole en uitzonderingen
 - `process-monitor.html` – vaste doorverwijzing naar de procesmonitor in de adminomgeving
 
