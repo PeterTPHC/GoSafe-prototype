@@ -95,8 +95,9 @@
 
 <div class="admin-page" data-admin-page="processes">
   <div class="admin-page-head"><div><h1>Processen</h1></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="adminProcessLiveAge">Laatste update zojuist</span></div></div></div>
+  <div class="admin-filterbar"><input class="grow" id="adminProcessSearch" type="search" placeholder="Zoek proces, dossier, polis of relatie"><select id="adminProcessTypeFilter"><option value="">Alle processen</option><option>Nieuwe polis</option><option>Mutatie</option><option>Prolongatie</option><option>Royement</option></select><select id="adminProcessStatusFilter"><option value="">Alle statussen</option><option value="running">Actief</option><option value="waiting_timer">Gepland</option><option value="waiting_external">Wacht extern</option><option value="retry_scheduled">Retry gepland</option><option value="action_required">Actie nodig</option><option value="completed">Afgerond</option></select><span class="admin-result-count" id="adminProcessResultCount">12 processen</span></div>
   <div class="admin-process-layout">
-    <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="adminProcessSearch" type="search" placeholder="Zoek proces, dossier, polis of relatie"><select id="adminProcessTypeFilter"><option value="">Alle processen</option><option>Nieuwe polis</option><option>Mutatie</option><option>Prolongatie</option><option>Royement</option></select><select id="adminProcessStatusFilter"><option value="">Alle statussen</option><option value="running">Actief</option><option value="waiting_timer">Gepland</option><option value="waiting_external">Wacht extern</option><option value="retry_scheduled">Retry gepland</option><option value="action_required">Actie nodig</option><option value="completed">Afgerond</option></select><span class="admin-result-count" id="adminProcessResultCount">12 processen</span></div><div class="admin-table-wrap"><table class="admin-table admin-process-table"><thead><tr><th>Proces</th><th>Dossier / polis</th><th>Status</th><th>Huidige stap</th><th>Doorlooptijd</th><th>SLA</th></tr></thead><tbody id="adminProcessListBody"></tbody></table></div></div>
+    <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-process-table"><thead><tr><th>Proces</th><th>Dossier / polis</th><th>Status</th><th>Huidige stap</th><th>Doorlooptijd</th><th>SLA</th></tr></thead><tbody id="adminProcessListBody"></tbody></table></div></div>
     <aside class="admin-card admin-process-detail" id="adminProcessDetail"></aside>
   </div>
 </div>
@@ -377,7 +378,7 @@
     <button data-dossier-tab="holder" type="button">Verzekeringnemer</button>
     <button data-dossier-tab="item-documents" type="button">Itemdocumenten</button>
     <button data-dossier-tab="policy-documents" type="button">Polisdocumenten</button>
-    <button data-dossier-tab="processes" type="button">Processen <span class="admin-dossier-tab-count" id="dossierProcessTabCount">0</span></button>
+    <button data-dossier-tab="processes" type="button">Processen</button>
     <button data-dossier-tab="activities" type="button">Activiteiten</button>
     <button class="admin-dossier-context-tab" id="dossierContextTab" data-dossier-tab="context" type="button" hidden>Wijzigen</button>
   </div>
@@ -437,6 +438,6 @@
 </main>
 </div>
 </div>
-</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260828-admin-ux-v5"></script><script src="assets/communications.js?v=20260828-communication-v5"></script>
+</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260831-admin-ux-v6"></script><script src="assets/communications.js?v=20260828-communication-v5"></script>
 </body>
 </html>

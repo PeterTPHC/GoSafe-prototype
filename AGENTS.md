@@ -34,7 +34,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - De globale procesmonitor gebruikt exact dezelfde admin-shell, navigatie en componenten als `admin.html`.
 - In ieder aanvraag- en polisdossier staat een tab `Processen` met de voortgang op dossierniveau.
 - Toon in proceslijsten hoofdprocessen zoals `Nieuwe polis`, `Mutatie`, `Prolongatie`, `Royement` en later `Import`. Documentgeneratie, transactionele communicatie, ANVA-registratie en vergelijkbare technische orkestratie zijn stappen of kindprocessen binnen zo'n hoofdproces en staan niet als losse gelijkwaardige procesregels in het dossier.
-- Iedere polis heeft minimaal één herkomstproces: `Nieuwe polis` voor een digitaal gesloten polis of later `Import` voor een gemigreerde polis. Sorteer lopende, geplande, wachtende en actievereisende processen vóór afgeronde processen.
+- Iedere polis heeft minimaal één herkomstproces: `Nieuwe polis` voor een digitaal gesloten polis of later `Import` voor een gemigreerde polis. Een proces krijgt status `Actief` zodra de uitvoering is gestart en blijft actief zolang nog een stap openstaat, ook wanneer die stap wacht op een toekomstige interne activering. Gebruik `Gepland` alleen voor een proces dat nog niet is gestart. Sorteer actieve en andere niet-afgeronde processen vóór afgeronde processen.
 - Processtatussen worden realtime bijgewerkt; voeg geen handmatige refreshknop toe.
 - Functioneel uitgangspunt: initiële API-snapshot, daarna status-events via SSE of WebSocket, inclusief automatische reconnect en zichtbaar signaal als de verbinding niet actueel is.
 - Gebruik voor hoofd- en kindprocessen dezelfde duurzame statussen: `requested`, `running`, `waiting_dependency`, `waiting_external`, `retry_scheduled`, `action_required`, `completed`, `cancelled` en `compensated`.
@@ -69,7 +69,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Bedragen in aanvraag- en polisoverzichten staan rechts uitgelijnd.
 - Bij het openen van een dossier springt de actieve hoofdnavigatie mee naar `Aanvragen` of `Polissen`, ongeacht vanuit welk overzicht het dossier is geopend.
 - Plaats dossierwijzigingen bij het inhoudelijke onderdeel: `Polis wijzigen` bij `Verzekerde items` en `Relatie wijzigen` bij `Verzekeringnemer`; zet deze acties niet dubbel in de dossierkop.
-- Noem de verstreken tijd van een proces `Doorlooptijd`, niet `Leeftijd`. Een toekomstige interne activering is `Gepland` en geen externe wachtstatus.
+- Noem de verstreken tijd van een proces `Doorlooptijd`, niet `Leeftijd`. Toon bij de dossiertab `Processen` geen telling; de lijst zelf toont de relevante processen.
 
 ## Prolongatie en mutatie
 
