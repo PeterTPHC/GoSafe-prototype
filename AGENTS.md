@@ -15,7 +15,8 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Klantflow: `index.html`
 - Admin/polisdeel: `admin.html`
 - Realtime procesmonitor in admin: `admin.html#processes`
-- Realtime communicatiebeheer in admin: `admin.html#communications`
+- Uitgaande e-mailbewaking in admin: `admin.html#communications`
+- Generiek inhoud- en vertaalbeheer in admin: `admin.html#content`
 - Prolongatievoorraad in admin: `admin.html#renewals`
 - Vaste doorverwijzing: `process-monitor.html`
 - Gedeelde assets: `assets/`
@@ -47,8 +48,9 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - `P09 Documentgeneratie (PDF)` gebruikt een externe renderdienst. GoSafe bevriest bron- en templateversie, valideert het resultaat en slaat iedere afgegeven versie immutable op.
 - `P10 Transactionele communicatie` bevriest template, ontvanger, inhoud en exacte bijlagen en logt provideracceptatie, aflevering, bounce, klacht en fout afzonderlijk.
 - `P10` is afgerond zodra de provider het bericht met message ID accepteert. Delivery, bounce en complaint blijven als append-only events doorlopen; een `delivery_required`-policy kan alsnog een gerichte actie maken.
-- `P11 Inkomende e-mail en reply` verifieert en dedupliceert provider-events, verwerkt MIME en bijlagen veilig, koppelt via een opaque reply-token en maakt bij een inhoudelijke reply een taak. Een orphan of ambigue reply gaat altijd naar `action_required`.
-- Berichttypen, variabelen, bijlagenbeleid en bezorgbeleid zijn codegedefinieerd. De admin beheert alleen inhoudsversies; gepubliceerde versies zijn immutable.
+- Inhoudelijke inkomende klantmail, replies en operationele mailboxafhandeling vallen buiten scope. Alleen providerterugmeldingen op uitgaande e-mail, zoals acceptatie, aflevering, soft/hard bounce, complaint en failed, worden verwerkt en aan het uitgaande bericht gekoppeld.
+- Aanvraag en polis bewaren een communicatietaal. Bij het klaarzetten van een e-mail bevriest GoSafe de gebruikte taal, geadresseerde, afzender, inhoudssnapshot, bijlagen en het geplande verzendmoment.
+- Berichttypen, variabelen, bijlagenbeleid en bezorgbeleid zijn codegedefinieerd. De adminmodule `Inhoud en vertalingen` beheert generieke systeemtekst per taal. Een beheerder kan optioneel een concept bewaren of de actieve tekst direct vervangen; toon geen versienummers of functionele planning. Technisch blijft de exact gebruikte inhoudssnapshot immutable bewaard.
 - Exacte bodies en bijlagen staan in beveiligde communicatierecords. Het algemene activiteitenlog bevat alleen een veilige samenvatting en referenties, nooit raw bodies, PDF/base64, geheimen of onnodige persoonsgegevens.
 - Vrijgavevolgorde: blokkerende bedrijfschecks → ANVA-akkoord → PDF valid/final in dossier → transactionele e-mail. Technisch voorbereiden mag, maar geen documentafgifte of klantmail vóór de vrijgavepoort.
 - ANVA verzorgt formele registratie, financiële boeking en incasso. GoSafe ontvangt statussen en start geen eigen incassoproces.
@@ -61,11 +63,14 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Toon tellingen alleen als ze een actie prioriteren, een filterresultaat verduidelijken of een actuele processtatus aangeven.
 - Behoud de vaste menugroepen: `Dagelijks werk`, `Bewaking`, `Administratie`, `Inzicht` en `Beheer`.
 - Houd processtatussen realtime en zichtbaar zonder refreshknop.
-- Communicatie gebruikt dezelfde realtime werkwijze. De admin toont operationeel `Wachtrij`, `Berichten` en `Templates`, zonder refreshknop.
+- Communicatie gebruikt dezelfde realtime werkwijze. Onder `Bewaking` toont `E-mails` uitsluitend uitgaande berichten in de tabs `Gepland` en `Verzonden`, zonder refreshknop. Toon bij beide datum en tijd; providerterugmeldingen zijn statussen of events bij het verzonden bericht.
+- Op aanvraag- en polisniveau toont de tab `Communicatie` wat is verstuurd en wat klaarstaat. `Hele e-mail` opent een zelfstandig scherm met afzender, ontvanger, taal, onderwerp, volledig opgemaakt bericht, statusverloop en links naar beschikbare bijlagen. Toon een toekomstige bijlage als `Nog niet beschikbaar`.
+- `Gelogd` betekent dat GoSafe een bericht of event duurzaam heeft vastgelegd. `Afgeleverd` betekent dat de provider aflevering bij de ontvangende mailserver heeft bevestigd; dit bewijst niet dat de ontvanger de e-mail heeft gelezen.
+- `Inhoud en vertalingen` is één generieke vertaalmodule en gebruikt één consistente filterbalk. Maak geen schakelaar tussen e-mail en overige content als aparte beheermodules.
 - Overzichtslijsten tonen alleen gegevens die nodig zijn om een record te herkennen of een actie te starten. Laat interne dossiercodes, e-mailadressen en laatste-activiteitkolommen weg als die geen directe keuze ondersteunen.
 - Werkvoorraadtaken hebben alleen de statussen `Open` en `Afgerond`; gebruik geen status `Bezig`. Toon daar geen prioriteit, eigenaar of uiterste datum.
 - Een aanvraag die vóór indienen niet aan product- of acceptatieregels voldoet, kan niet worden ingediend en verschijnt niet als `Uitval`. Een niet-afgeronde klantflow wordt als `Concept` bewaard. `Ter akkoord` is alleen bedoeld voor een ingediende aanvraag met een afwijkend antwoord in de slotvragen en levert een taak in de werkvoorraad op.
-- Menselijke behandeling is een werkvoorraadtaak en geen technisch proces. De tab `Processen` toont alleen duurzame technische orkestratie. Als een bounce of inkomende reply menselijke opvolging nodig heeft, registreert de technische verwerking een open communicatietaak in de werkvoorraad en rondt het technische proces na succesvolle routering af.
+- Menselijke behandeling is een werkvoorraadtaak en geen technisch proces. De tab `Processen` toont alleen duurzame technische orkestratie. Als een hard bounce, complaint of blijvende verzendfout menselijke opvolging nodig heeft, registreert de technische verwerking een open communicatietaak in de werkvoorraad.
 - Bedragen in aanvraag- en polisoverzichten staan rechts uitgelijnd.
 - Bij het openen van een dossier springt de actieve hoofdnavigatie mee naar `Aanvragen` of `Polissen`, ongeacht vanuit welk overzicht het dossier is geopend.
 - Plaats dossierwijzigingen bij het inhoudelijke onderdeel: `Polis wijzigen` bij `Verzekerde items` en `Relatie wijzigen` bij `Verzekeringnemer`; zet deze acties niet dubbel in de dossierkop.
