@@ -17,7 +17,7 @@
 <aside class="admin-sidebar">
   <div class="admin-nav-group"><div class="admin-nav-label">Dagelijks werk</div>
     <button class="admin-nav active" data-admin-target="overview" type="button">Overzicht</button>
-    <button class="admin-nav" data-admin-target="workqueue" type="button">Werkvoorraad <span class="admin-nav-badge">14</span></button>
+    <button class="admin-nav" data-admin-target="workqueue" type="button">Werkvoorraad <span class="admin-nav-badge">13</span></button>
     <button class="admin-nav" data-admin-target="applications" type="button">Aanvragen <span class="admin-nav-badge">4</span></button>
     <button class="admin-nav" data-admin-target="policies" type="button">Polissen</button>
     <button class="admin-nav" data-admin-target="renewals" type="button">Prolongaties <span class="admin-nav-badge">2</span></button>
@@ -72,14 +72,13 @@
 
 <div class="admin-page" data-admin-page="workqueue">
   <div class="admin-page-head"><div><h1>Werkvoorraad</h1></div><div class="admin-actions"><button class="admin-btn primary" type="button">Nieuwe interne taak</button></div></div>
-  <div class="admin-filterbar"><input class="grow" placeholder="Zoek op relatie, polis, aanvraag of taak"/><select><option>Alle typen</option><option>Aanvraag</option><option>Mutatie</option><option>Betaling</option><option>Relatie</option><option>Communicatie</option></select><select><option>Open</option><option>Afgerond</option></select><span class="admin-result-count">14 open taken</span></div>
+  <div class="admin-filterbar"><input class="grow" placeholder="Zoek op relatie, polis, aanvraag of taak"/><select><option>Alle typen</option><option>Aanvraag</option><option>Mutatie</option><option>Betaling</option><option>Relatie</option><option>Communicatie</option></select><select><option>Open</option><option>Afgerond</option></select><span class="admin-result-count">13 open taken</span></div>
   <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Type</th><th>Relatie</th><th>Polis / aanvraag</th><th>Taak</th><th>Status</th></tr></thead><tbody>
     <tr><td>Aanvraag</td><td><span class="admin-link admin-open-dossier" data-dossier-key="application-main">Voorbeeldbedrijf A</span></td><td>DOS-2026-00831</td><td>Slotvragen beoordelen</td><td><span class="admin-chip amber">Open</span></td></tr>
     <tr><td>Mutatie</td><td>Voorbeeldklant B</td><td>POL-2026-00312</td><td>Mutatie handmatig beoordelen</td><td><span class="admin-chip amber">Open</span></td></tr>
     <tr><td>Betaling</td><td>Voorbeeldbedrijf C</td><td>POL-2025-00917</td><td>Mislukte incasso beoordelen</td><td><span class="admin-chip amber">Open</span></td></tr>
     <tr><td>Relatie</td><td>Voorbeeldbedrijf D</td><td>AAN-2026-00807</td><td>Handmatige KvK-controle</td><td><span class="admin-chip amber">Open</span></td></tr>
     <tr><td>Communicatie</td><td><span class="admin-link admin-open-dossier" data-dossier-key="policy-main">Voorbeeld Media B.V.</span></td><td>POL-2026-00184</td><td>E-mailadres controleren na hard bounce</td><td><span class="admin-chip amber">Open</span></td></tr>
-    <tr><td>Communicatie</td><td><span class="admin-link admin-open-dossier" data-dossier-key="policy-main">Voorbeeld Media B.V.</span></td><td>POL-2026-00184</td><td>Klantreply beantwoorden</td><td><span class="admin-chip amber">Open</span></td></tr>
   </tbody></table></div></div>
 </div>
 
@@ -107,7 +106,7 @@
   <div class="admin-page-head"><div><h1>E-mails</h1></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="communicationLiveAge">Laatste update zojuist</span></div></div></div>
   <div class="admin-communication-tabs" role="tablist" aria-label="E-mailonderdelen">
     <button class="active" data-communication-tab="queue" type="button">Gepland</button>
-    <button data-communication-tab="messages" type="button">Verzonden en ontvangen</button>
+    <button data-communication-tab="messages" type="button">Verzonden</button>
   </div>
 
   <section class="admin-communication-panel active" data-communication-panel="queue">
@@ -119,7 +118,7 @@
 
   <section class="admin-communication-panel" data-communication-panel="messages">
     <div class="admin-communication-layout">
-      <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationMessageSearch" type="search" placeholder="Zoek e-mail, dossier of e-mailadres"><select id="communicationDirectionFilter"><option value="">In- en uitgaand</option><option value="out">Uitgaand</option><option value="in">Inkomend</option></select><select id="communicationMessageStatus"><option value="">Alle statussen</option><option value="delivered">Afgeleverd</option><option value="hard_bounce">Hard bounce</option><option value="action_required">Actie nodig</option><option value="logged">Verwerkt</option></select><span class="admin-result-count" id="communicationMessageCount"></span></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>Richting</th><th>E-mail</th><th>Dossier / polis</th><th>Contact</th><th>Status</th><th>Datum en tijd</th></tr></thead><tbody id="communicationMessageBody"></tbody></table></div></div>
+      <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationMessageSearch" type="search" placeholder="Zoek e-mail, dossier of e-mailadres"><select id="communicationMessageStatus"><option value="">Alle statussen</option><option value="delivered">Afgeleverd</option><option value="hard_bounce">Hard bounce</option><option value="action_required">Actie nodig</option></select><span class="admin-result-count" id="communicationMessageCount"></span></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>E-mail</th><th>Dossier / polis</th><th>Ontvanger</th><th>Status</th><th>Datum en tijd</th></tr></thead><tbody id="communicationMessageBody"></tbody></table></div></div>
       <aside class="admin-card admin-process-detail" id="communicationMessageDetail"></aside>
     </div>
   </section>
