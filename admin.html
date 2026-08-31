@@ -24,7 +24,7 @@
   </div>
   <div class="admin-nav-group"><div class="admin-nav-label">Bewaking</div>
     <button class="admin-nav" data-admin-target="processes" type="button">Processen <span class="admin-nav-badge">1</span></button>
-    <button class="admin-nav" data-admin-target="communications" type="button">Communicatie <span class="admin-nav-badge">1</span></button>
+    <button class="admin-nav" data-admin-target="communications" type="button">E-mails <span class="admin-nav-badge">1</span></button>
     <button class="admin-nav" data-admin-target="activities" type="button">Activiteiten</button>
   </div>
   <div class="admin-nav-group"><div class="admin-nav-label">Administratie</div>
@@ -104,22 +104,22 @@
 </div>
 
 <div class="admin-page" data-admin-page="communications">
-  <div class="admin-page-head"><div><h1>Communicatie</h1></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="communicationLiveAge">Laatste update zojuist</span></div></div></div>
-  <div class="admin-communication-tabs" role="tablist" aria-label="Communicatieonderdelen">
-    <button class="active" data-communication-tab="queue" type="button">Wachtrij</button>
-    <button data-communication-tab="messages" type="button">Berichten</button>
+  <div class="admin-page-head"><div><h1>E-mails</h1></div><div class="admin-process-live"><i></i><div><strong>Realtime verbonden</strong><span id="communicationLiveAge">Laatste update zojuist</span></div></div></div>
+  <div class="admin-communication-tabs" role="tablist" aria-label="E-mailonderdelen">
+    <button class="active" data-communication-tab="queue" type="button">Gepland</button>
+    <button data-communication-tab="messages" type="button">Verzonden en ontvangen</button>
   </div>
 
   <section class="admin-communication-panel active" data-communication-panel="queue">
     <div class="admin-communication-layout">
-      <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationQueueSearch" type="search" placeholder="Zoek dossier, polis, ontvanger of bericht"><select id="communicationQueueStatus"><option value="">Alle statussen</option><option value="action_required">Actie nodig</option><option value="waiting_dependency">Wacht op afhankelijkheid</option><option value="queued">In wachtrij</option><option value="waiting_external">Wacht op provider</option></select><span class="admin-result-count" id="communicationQueueCount"></span></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>Bericht</th><th>Dossier / polis</th><th>Ontvanger</th><th>Status</th><th>Actuele stap</th><th>Sinds</th></tr></thead><tbody id="communicationQueueBody"></tbody></table></div></div>
+      <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationQueueSearch" type="search" placeholder="Zoek dossier, polis, ontvanger of e-mail"><select id="communicationQueueStatus"><option value="">Alle statussen</option><option value="action_required">Actie nodig</option><option value="waiting_dependency">Gepland</option><option value="queued">Klaar voor verzending</option><option value="waiting_external">Wordt verzonden</option></select><span class="admin-result-count" id="communicationQueueCount"></span></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>E-mail</th><th>Dossier / polis</th><th>Ontvanger</th><th>Status</th><th>Volgende stap</th><th>Moment</th></tr></thead><tbody id="communicationQueueBody"></tbody></table></div></div>
       <aside class="admin-card admin-process-detail" id="communicationQueueDetail"></aside>
     </div>
   </section>
 
   <section class="admin-communication-panel" data-communication-panel="messages">
     <div class="admin-communication-layout">
-      <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationMessageSearch" type="search" placeholder="Zoek bericht, thread, dossier of e-mailadres"><select id="communicationDirectionFilter"><option value="">In- en uitgaand</option><option value="out">Uitgaand</option><option value="in">Inkomend</option></select><select id="communicationMessageStatus"><option value="">Alle statussen</option><option value="delivered">Afgeleverd</option><option value="hard_bounce">Hard bounce</option><option value="action_required">Actie nodig</option><option value="logged">Gelogd</option></select><span class="admin-result-count" id="communicationMessageCount"></span></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>Richting</th><th>Bericht</th><th>Dossier / polis</th><th>Contact</th><th>Status</th><th>Moment</th></tr></thead><tbody id="communicationMessageBody"></tbody></table></div></div>
+      <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationMessageSearch" type="search" placeholder="Zoek e-mail, dossier of e-mailadres"><select id="communicationDirectionFilter"><option value="">In- en uitgaand</option><option value="out">Uitgaand</option><option value="in">Inkomend</option></select><select id="communicationMessageStatus"><option value="">Alle statussen</option><option value="delivered">Afgeleverd</option><option value="hard_bounce">Hard bounce</option><option value="action_required">Actie nodig</option><option value="logged">Verwerkt</option></select><span class="admin-result-count" id="communicationMessageCount"></span></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>Richting</th><th>E-mail</th><th>Dossier / polis</th><th>Contact</th><th>Status</th><th>Datum en tijd</th></tr></thead><tbody id="communicationMessageBody"></tbody></table></div></div>
       <aside class="admin-card admin-process-detail" id="communicationMessageDetail"></aside>
     </div>
   </section>
@@ -127,12 +127,17 @@
 </div>
 
 <div class="admin-page" data-admin-page="content">
-  <div class="admin-page-head"><div><h1>Inhoud</h1></div></div>
-  <div class="admin-content-tabs"><button class="active" type="button">E-mails</button><button type="button" disabled>Overige content</button></div>
+  <div class="admin-page-head"><div><h1>Inhoud en vertalingen</h1></div></div>
+  <div class="admin-filterbar admin-content-filterbar"><input class="grow" id="communicationTemplateSearch" type="search" placeholder="Zoek tekst of systeemonderdeel"><select id="communicationTemplateLanguage"><option value="">Alle talen</option><option value="nl-NL">Nederlands</option><option value="en-GB">Engels</option></select><select id="communicationTemplateStatus"><option value="">Alles</option><option value="published">Actief</option><option value="draft">Concept aanwezig</option></select></div>
   <div class="admin-communication-layout">
-    <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationTemplateSearch" type="search" placeholder="Zoek inhoud of berichttype"><select id="communicationTemplateLanguage"><option value="">Alle talen</option><option value="nl-NL">Nederlands</option><option value="en-GB">Engels</option></select><select id="communicationTemplateStatus"><option value="">Alle versies</option><option value="published">Gepubliceerd</option><option value="draft">Concept aanwezig</option></select></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>Inhoud</th><th>Taalversies</th><th>Actieve versie</th><th>Volgende versie</th><th></th></tr></thead><tbody id="communicationTemplateBody"></tbody></table></div></div>
+    <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>Systeemtekst</th><th>Onderdeel</th><th>Talen</th><th>Status</th><th></th></tr></thead><tbody id="communicationTemplateBody"></tbody></table></div></div>
     <aside class="admin-card admin-template-editor" id="communicationTemplateDetail"></aside>
   </div>
+</div>
+
+<div class="admin-page" data-admin-page="email-detail">
+  <div class="admin-page-head admin-dossier-back"><div><button class="admin-btn text" id="emailDetailBack" type="button">← Terug</button></div></div>
+  <div id="emailDetailContent"></div>
 </div>
 
 <div class="admin-page" data-admin-page="applications">
@@ -410,7 +415,7 @@
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="communications">
     <div class="admin-process-panel-head"><div><h2>Communicatie voor dit dossier</h2></div></div>
-    <div class="admin-dossier-communication-layout"><div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Moment</th><th>Bericht</th><th>Ontvanger</th><th>Status</th><th>Bijlagen</th><th></th></tr></thead><tbody id="dossierCommunicationBody"></tbody></table></div></div><aside class="admin-card admin-template-editor" id="dossierCommunicationPreview"><div class="admin-card-body admin-empty-inline">Open een bericht voor de preview.</div></aside></div>
+    <div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Moment</th><th>Bericht</th><th>Ontvanger</th><th>Status</th><th>Bijlagen</th><th></th></tr></thead><tbody id="dossierCommunicationBody"></tbody></table></div></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="processes">
     <div class="admin-process-panel-head"><div><h2>Processen voor dit dossier</h2></div><div class="admin-process-live compact"><i></i><div><strong>Realtime verbonden</strong><span id="dossierProcessLiveAge">Laatste update zojuist</span></div></div></div>
