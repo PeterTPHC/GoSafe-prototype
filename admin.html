@@ -43,6 +43,7 @@
       <button class="admin-subnav-btn" data-product-target="changes" type="button">Wijzigingssets</button>
       <button class="admin-subnav-btn" data-product-target="api" type="button">API test</button>
     </div>
+    <button class="admin-nav" data-admin-target="content" type="button">Inhoud</button>
     <button class="admin-nav" data-admin-target="users" type="button">Gebruikers &amp; rechten</button>
   </div>
 </aside>
@@ -107,7 +108,6 @@
   <div class="admin-communication-tabs" role="tablist" aria-label="Communicatieonderdelen">
     <button class="active" data-communication-tab="queue" type="button">Wachtrij</button>
     <button data-communication-tab="messages" type="button">Berichten</button>
-    <button data-communication-tab="templates" type="button">Templates</button>
   </div>
 
   <section class="admin-communication-panel active" data-communication-panel="queue">
@@ -124,12 +124,15 @@
     </div>
   </section>
 
-  <section class="admin-communication-panel" data-communication-panel="templates">
-    <div class="admin-communication-layout">
-      <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationTemplateSearch" type="search" placeholder="Zoek berichttype of template"><select id="communicationTemplateStatus"><option value="">Alle versies</option><option value="published">Gepubliceerd</option><option value="draft">Concept aanwezig</option></select><span class="admin-result-count" id="communicationTemplateCount"></span></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>Berichttype</th><th>Taal</th><th>Actieve versie</th><th>Volgende versie</th><th>Bezorgbeleid</th><th></th></tr></thead><tbody id="communicationTemplateBody"></tbody></table></div></div>
-      <aside class="admin-card admin-template-editor" id="communicationTemplateDetail"></aside>
-    </div>
-  </section>
+</div>
+
+<div class="admin-page" data-admin-page="content">
+  <div class="admin-page-head"><div><h1>Inhoud</h1></div></div>
+  <div class="admin-content-tabs"><button class="active" type="button">E-mails</button><button type="button" disabled>Overige content</button></div>
+  <div class="admin-communication-layout">
+    <div class="admin-card"><div class="admin-filterbar admin-process-filterbar"><input class="grow" id="communicationTemplateSearch" type="search" placeholder="Zoek inhoud of berichttype"><select id="communicationTemplateLanguage"><option value="">Alle talen</option><option value="nl-NL">Nederlands</option><option value="en-GB">Engels</option></select><select id="communicationTemplateStatus"><option value="">Alle versies</option><option value="published">Gepubliceerd</option><option value="draft">Concept aanwezig</option></select></div><div class="admin-table-wrap"><table class="admin-table admin-communication-table"><thead><tr><th>Inhoud</th><th>Taalversies</th><th>Actieve versie</th><th>Volgende versie</th><th></th></tr></thead><tbody id="communicationTemplateBody"></tbody></table></div></div>
+    <aside class="admin-card admin-template-editor" id="communicationTemplateDetail"></aside>
+  </div>
 </div>
 
 <div class="admin-page" data-admin-page="applications">
@@ -378,6 +381,7 @@
     <button data-dossier-tab="holder" type="button">Verzekeringnemer</button>
     <button data-dossier-tab="item-documents" type="button">Itemdocumenten</button>
     <button data-dossier-tab="policy-documents" type="button">Polisdocumenten</button>
+    <button data-dossier-tab="communications" type="button">Communicatie</button>
     <button data-dossier-tab="processes" type="button">Processen</button>
     <button data-dossier-tab="activities" type="button">Activiteiten</button>
     <button class="admin-dossier-context-tab" id="dossierContextTab" data-dossier-tab="context" type="button" hidden>Wijzigen</button>
@@ -403,6 +407,10 @@
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="policy-documents">
     <div class="admin-card"><div class="admin-card-head"><div><h2>Polisdocumenten</h2></div></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Document</th><th>Soort</th><th>Afgegeven</th><th>Geldig vanaf</th><th>Status</th></tr></thead><tbody id="dossierPolicyDocumentsBody"></tbody></table></div></div>
+  </div>
+  <div class="admin-dossier-panel" data-dossier-panel="communications">
+    <div class="admin-process-panel-head"><div><h2>Communicatie voor dit dossier</h2></div></div>
+    <div class="admin-dossier-communication-layout"><div class="admin-card"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Moment</th><th>Bericht</th><th>Ontvanger</th><th>Status</th><th>Bijlagen</th><th></th></tr></thead><tbody id="dossierCommunicationBody"></tbody></table></div></div><aside class="admin-card admin-template-editor" id="dossierCommunicationPreview"><div class="admin-card-body admin-empty-inline">Open een bericht voor de preview.</div></aside></div>
   </div>
   <div class="admin-dossier-panel" data-dossier-panel="processes">
     <div class="admin-process-panel-head"><div><h2>Processen voor dit dossier</h2></div><div class="admin-process-live compact"><i></i><div><strong>Realtime verbonden</strong><span id="dossierProcessLiveAge">Laatste update zojuist</span></div></div></div>
