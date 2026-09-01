@@ -1,5 +1,3 @@
-From https://github.com/PeterTPHC/GoSafe-prototype
- * branch            main       -> FETCH_HEAD
 # GoSafe – vaste werkwijze
 
 Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze repository.
@@ -20,6 +18,8 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Realtime procesmonitor in admin: `admin.html#processes`
 - Uitgaande e-mailbewaking in admin: `admin.html#communications`
 - Generiek inhoud- en vertaalbeheer in admin: `admin.html#content`
+- Gebruikers en profielen in admin: `admin.html#users`
+- Admin-login, activatie en herstel: authenticatielaag binnen `admin.html`
 - Prolongatievoorraad in admin: `admin.html#renewals`
 - Vaste doorverwijzing: `process-monitor.html`
 - Gedeelde assets: `assets/`
@@ -90,8 +90,17 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Actieve sessies worden ingetrokken zodra een gebruiker wordt geblokkeerd of een kritisch recht verliest. Productpublicatie en polismutatie vereisen afzonderlijke expliciete permissions en worden nooit uit alleen een schermrol afgeleid.
 - Interne admingebruikers en klanten zijn aparte accounttypen met gescheiden loginroutes; een klantaccount kan nooit een adminprofiel krijgen.
 - Een admingebruiker krijgt precies één configureerbaar profiel. Profielen zijn beheerbare permissionbundels en de permissioncatalogus kan worden uitgebreid; de combinatie productbeheer/productpublicatie met polis- of relatiewijzigingen blijft verboden.
-- Beheerders beheren nooit wachtwoorden. Nieuwe admingebruikers activeren via een eenmalige tijdelijke uitnodigingslink en stellen zelf hun wachtwoord in; herstel loopt via een eenmalige tijdelijke herstellink. Alleen hashes of een gespecialiseerde identity-provider bewaren credentials en tokens.
-- Gebruikersbeheer ondersteunt de statussen `Uitgenodigd`, `Actief` en `Geblokkeerd`, opnieuw uitnodigen, wachtwoordherstel versturen, MFA-status en MFA-reset, en actieve sessies intrekken. Deze acties worden append-only gelogd.
+- Adminauthenticatie loopt via een gespecialiseerde OIDC/OAuth 2.1 identity-provider. GoSafe bewaart geen adminwachtwoorden, wachtwoordhashes of reset-/activatietokens; alleen veilige providerreferenties en audit-events.
+- Admin- en klantauthenticatie gebruiken gescheiden clients, routes en audiences. Valideer issuer, audience, nonce, accounttype en status; accepteer nooit een klanttoken op een admin-endpoint.
+- TOTP-MFA is verplicht vóór activatie. E-mail en sms zijn geen admin-MFA-factor. Een uitnodiging is eenmalig en 72 uur geldig; een wachtwoordherstellink is eenmalig en 30 minuten geldig.
+- Gebruik een BFF-sessie met `HttpOnly`, `Secure` en `SameSite`; bewaar geen tokens in browseropslag. Idle timeout is 30 minuten, absolute timeout 8 uur en access-tokenlooptijd maximaal 15 minuten.
+- Kritieke acties vereisen herauthenticatie van maximaal 15 minuten oud: productpublicatie, gebruiker- of profielwijziging, MFA-reset, sessie-intrekking, procesherstel en financiële mutatie.
+- De centrale rechtencatalogus gebruikt stabiele `resource.action`-codes: `dossier.read`, `application.review`, `task.manage`, `policy.mutate`, `relation.mutate`, `process.read`, `process.retry`, `communication.read`, `communication.delivery.manage`, `content.manage`, `finance.read`, `finance.manage`, `report.read`, `product.read`, `product.write`, `product.publish`, `user.read`, `user.write`, `profile.read`, `profile.write` en `audit.read`.
+- Eerste profielmatrix: `Behandelaar` voor dossier-/aanvraag-/taak-/polis-/relatiebehandeling; `Productbeheerder` alleen voor product lezen/schrijven/publiceren; `Finance` voor dossier- en financieel beheer/rapportage; `Inhoudbeheerder` voor content en communicatielezen; `Alleen lezen` voor dossier/proces/communicatie/rapport; `Gebruikersbeheerder` voor gebruikers, profielen en IAM-audit.
+- Autorisatie werkt deny-by-default op ieder backendrequest en controleert permission, resource en functiescheiding. V1-rechten gelden organisatiebreed voor GoSafe Nederland; leg objectcontext al wel vast voor latere scopes.
+- Profielwijzigingen verhogen de autorisatieversie en gelden bij het eerstvolgende request. Blokkering of verlies van een kritisch recht trekt sessies direct in. Voorkom dat de laatste actieve gebruiker met `user.write` en `profile.write` wordt geblokkeerd of deze rechten verliest.
+- Gebruikers en profielen worden niet hard verwijderd. Een profiel kan alleen inactief worden als er geen gebruikers aan gekoppeld zijn. IAM-mutaties en kritieke allow/deny-beslissingen worden append-only gelogd.
+- De uitvoerbare productiecontracten staan in hoofdstuk 15.6 van `GoSafe - Systeemuitwerking` en in de tabbladen Processen, Processtappen, Velden, Regels, API, Datamodel, Schermen en Besluiten van `GoSafe - Functionele specificatie`.
 
 ## Prolongatie en mutatie
 
