@@ -1146,3 +1146,52 @@ const productApiRun=document.getElementById('productApiRun');if(productApiRun)pr
 
 let adminToastTimer;
 function showAdminToast(message){const toast=document.getElementById('productAdminToast');if(!toast)return;toast.textContent=message;toast.classList.add('visible');window.clearTimeout(adminToastTimer);adminToastTimer=window.setTimeout(()=>toast.classList.remove('visible'),2600);}
+
+// Gebruikers en rechten
+const adminPermissionProfiles={
+  handler:{name:'Behandelaar',dossiers:'Beheren',policy:'Polissen en relaties wijzigen',product:'Geen toegang',extra:'Werkvoorraad, aanvragen, polissen, relaties en acceptatie.'},
+  product:{name:'Productbeheerder',dossiers:'Alleen lezen',policy:'Geen mutaties',product:'Beheren en publiceren',extra:'Producten, tarieven, categorieën, regels en wijzigingssets.'},
+  finance:{name:'Finance',dossiers:'Alleen lezen',policy:'Geen mutaties',product:'Geen toegang',extra:'Financieel en financiële rapportages.'},
+  content:{name:'Inhoudbeheerder',dossiers:'Alleen lezen',policy:'Geen mutaties',product:'Geen toegang',extra:'Inhoud en vertalingen beheren.'},
+  audit:{name:'Alleen lezen',dossiers:'Alleen lezen',policy:'Geen mutaties',product:'Alleen lezen',extra:'Toegestane dossiers, processen en rapportages inzien.'},
+  users:{name:'Gebruikersbeheerder',dossiers:'Geen toegang',policy:'Geen mutaties',product:'Geen toegang',extra:'Gebruikers uitnodigen, blokkeren en rechtenprofielen toekennen.'}
+};
+const adminUsers={
+  sanne:{name:'Sanne de Boer',email:'sanne@voorbeeld.nl',profile:'handler',status:'Actief'},
+  milan:{name:'Milan Vermeer',email:'milan@voorbeeld.nl',profile:'product',status:'Actief'},
+  eva:{name:'Eva Smit',email:'eva@voorbeeld.nl',profile:'users',status:'Actief'},
+  daan:{name:'Daan Jansen',email:'daan@voorbeeld.nl',profile:'finance',status:'Geblokkeerd'}
+};
+let selectedAdminUser='sanne';
+function renderPermissionSummary(target,profileKey){
+  if(!target)return;const profile=adminPermissionProfiles[profileKey]||adminPermissionProfiles.audit;
+  target.innerHTML=`<div class="admin-permission-summary-row"><span>Dossiers</span><strong>${adminEscape(profile.dossiers)}</strong></div><div class="admin-permission-summary-row"><span>Polis- en relatiewijzigingen</span><strong>${adminEscape(profile.policy)}</strong></div><div class="admin-permission-summary-row"><span>Productbeheer</span><strong>${adminEscape(profile.product)}</strong></div><div class="admin-permission-summary-row"><span>Overige toegang</span><strong>${adminEscape(profile.extra)}</strong></div><div class="admin-permission-summary-note">Dit profiel combineert nooit productpublicatie met polis- of relatiewijzigingen.</div>`;
+}
+function openAdminUser(userId){
+  const user=adminUsers[userId];if(!user)return;selectedAdminUser=userId;
+  document.querySelectorAll('.admin-user-row').forEach(row=>row.classList.toggle('active',row.dataset.userId===userId));
+  const name=document.getElementById('adminUserDetailName');if(name)name.textContent=user.name;
+  const email=document.getElementById('adminUserDetailEmail');if(email)email.textContent=user.email;
+  const profile=document.getElementById('adminUserProfile');if(profile)profile.value=user.profile;
+  const status=document.getElementById('adminUserStatus');if(status)status.value=user.status;
+  const block=document.getElementById('adminUserBlockButton');if(block)block.textContent=user.status==='Actief'?'Blokkeren':'Activeren';
+  renderPermissionSummary(document.getElementById('adminPermissionSummary'),user.profile);
+}
+function updateAdminUserRow(userId){
+  const user=adminUsers[userId],row=document.querySelector(`.admin-user-row[data-user-id="${userId}"]`);if(!user||!row)return;const profile=adminPermissionProfiles[user.profile];
+  const cells=row.cells;if(!cells?.length)return;cells[1].textContent=profile.name;cells[2].innerHTML=user.profile==='handler'?'<span class="admin-chip green">Wijzigen</span>':'<span class="admin-chip gray">Geen</span>';cells[3].innerHTML=user.profile==='product'?'<span class="admin-chip blue">Beheren</span>':'<span class="admin-chip gray">Geen</span>';cells[4].innerHTML=`<span class="admin-chip ${user.status==='Actief'?'green':'gray'}">${adminEscape(user.status)}</span>`;
+}
+document.getElementById('adminUsersBody')?.addEventListener('click',event=>{const row=event.target.closest('.admin-user-row');if(row)openAdminUser(row.dataset.userId);});
+document.getElementById('adminUserProfile')?.addEventListener('change',event=>renderPermissionSummary(document.getElementById('adminPermissionSummary'),event.target.value));
+document.getElementById('adminUserSave')?.addEventListener('click',()=>{
+  const user=adminUsers[selectedAdminUser];if(!user)return;user.profile=document.getElementById('adminUserProfile')?.value||user.profile;user.status=document.getElementById('adminUserStatus')?.value||user.status;
+  updateAdminUserRow(selectedAdminUser);showAdminToast(`Rechten van ${user.name} opgeslagen`);openAdminUser(selectedAdminUser);
+});
+document.getElementById('adminUserBlockButton')?.addEventListener('click',()=>{
+  const user=adminUsers[selectedAdminUser];if(!user)return;user.status=user.status==='Actief'?'Geblokkeerd':'Actief';
+  const status=document.getElementById('adminUserStatus');if(status)status.value=user.status;updateAdminUserRow(selectedAdminUser);showAdminToast(user.status==='Actief'?'Gebruiker geactiveerd':'Gebruiker geblokkeerd; actieve sessies worden ingetrokken');openAdminUser(selectedAdminUser);
+});
+function toggleAdminUserEditor(show){const editor=document.getElementById('adminUserEditor');if(editor)editor.hidden=!show;if(show){renderPermissionSummary(document.getElementById('newUserPermissionSummary'),document.getElementById('newUserProfile')?.value||'handler');editor?.scrollIntoView({behavior:'smooth',block:'nearest'});}}
+document.getElementById('userAddButton')?.addEventListener('click',()=>toggleAdminUserEditor(true));
+['adminUserEditorClose','adminUserEditorCancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>toggleAdminUserEditor(false)));
+doc
