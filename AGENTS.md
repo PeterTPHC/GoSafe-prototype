@@ -79,7 +79,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 
 ## Gebruikers en rechten
 
-- Scheid bedrijfsrechten in vaste profielen. `Behandelaar` mag aanvragen, relaties en polissen behandelen en polissen muteren, maar heeft geen productbeheer. `Productbeheerder` mag productinstellingen en wijzigingssets beheren en publiceren, maar mag geen polis of relatie muteren.
+- Beheer gebruikers en rechten op twee afzonderlijke schermen: `Gebruikers` voor basisgegevens en één toegekend profiel, en `Profielen` voor het toevoegen en bewerken van profielen en hun rechten.\n- Profielen zijn configureerbare verzamelingen rechten. De rechtencatalogus kan tijdens de doorontwikkeling worden uitgebreid zonder de gebruikersstructuur te wijzigen.\n- `Behandelaar` mag aanvragen, relaties en polissen behandelen en polissen muteren, maar heeft geen productbeheer. `Productbeheerder` mag productinstellingen en wijzigingssets beheren en publiceren, maar mag geen polis of relatie muteren.
 - `Gebruikersbeheerder` beheert gebruikers en rechten, maar krijgt daardoor niet automatisch polis- of productrechten. Vermijd één algemene adminrol die alle bedrijfsrechten stilzwijgend combineert.
 - Andere basisprofielen zijn `Finance`, `Inhoudbeheerder` en `Alleen lezen`. Geef ieder profiel alleen de schermen en commando's die voor die taak nodig zijn.
 - Autorisatie wordt altijd server-side op ieder commando afgedwongen; het verbergen van menu's en knoppen is alleen UX. Leg toekenning, wijziging, blokkering en gebruik van kritieke rechten vast in het activiteitenlog.
