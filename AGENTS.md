@@ -1,3 +1,5 @@
+From https://github.com/PeterTPHC/GoSafe-prototype
+ * branch            main       -> FETCH_HEAD
 # GoSafe – vaste werkwijze
 
 Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze repository.
@@ -83,7 +85,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - `Gebruikersbeheerder` beheert gebruikers en rechten, maar krijgt daardoor niet automatisch polis- of productrechten. Vermijd één algemene adminrol die alle bedrijfsrechten stilzwijgend combineert.
 - Andere basisprofielen zijn `Finance`, `Inhoudbeheerder` en `Alleen lezen`. Geef ieder profiel alleen de schermen en commando's die voor die taak nodig zijn.
 - Autorisatie wordt altijd server-side op ieder commando afgedwongen; het verbergen van menu's en knoppen is alleen UX. Leg toekenning, wijziging, blokkering en gebruik van kritieke rechten vast in het activiteitenlog.
-- Actieve sessies worden ingetrokken zodra een gebruiker wordt geblokkeerd of een kritisch recht verliest. Productpublicatie en polismutatie vereisen afzonderlijke expliciete permissions en worden nooit uit alleen een schermrol afgeleid.
+- Actieve sessies worden ingetrokken zodra een gebruiker wordt geblokkeerd of een kritisch recht verliest. Productpublicatie en polismutatie vereisen afzonderlijke expliciete permissions en worden nooit uit alleen een schermrol afgeleid.\n- Interne admingebruikers en klanten zijn aparte accounttypen met gescheiden loginroutes; een klantaccount kan nooit een adminprofiel krijgen.\n- Een admingebruiker krijgt precies één configureerbaar profiel. Profielen zijn beheerbare permissionbundels en de permissioncatalogus kan worden uitgebreid; de combinatie productbeheer/productpublicatie met polis- of relatiewijzigingen blijft verboden.\n- Beheerders beheren nooit wachtwoorden. Nieuwe admingebruikers activeren via een eenmalige tijdelijke uitnodigingslink en stellen zelf hun wachtwoord in; herstel loopt via een eenmalige tijdelijke herstellink. Alleen hashes of een gespecialiseerde identity-provider bewaren credentials en tokens.\n- Gebruikersbeheer ondersteunt de statussen `Uitgenodigd`, `Actief` en `Geblokkeerd`, opnieuw uitnodigen, wachtwoordherstel versturen, MFA-status en MFA-reset, en actieve sessies intrekken. Deze acties worden append-only gelogd.
 
 ## Prolongatie en mutatie
 
