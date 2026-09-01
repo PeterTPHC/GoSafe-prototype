@@ -81,6 +81,29 @@ button{cursor:pointer}
   overflow:hidden;
   text-overflow:ellipsis;
 }
+.product-select{
+  min-width:220px;
+  max-width:280px;
+  min-height:40px;
+  font-size:14px;
+  font-weight:700;
+}
+.api-banner{
+  margin:0 0 18px;
+  padding:12px 14px;
+  border-radius:11px;
+  background:#fff7e8;
+  border:1px solid #ecd7a3;
+  color:#6e5317;
+  font-size:14px;
+}
+.api-banner.error{
+  background:#fdeeee;
+  border-color:#e7b6b6;
+  color:var(--danger);
+}
+#itemFormError{margin:12px 0 0;display:none}
+#itemFormError.visible{display:block}
 .header-badge{
   border:1px solid var(--line);
   border-radius:999px;
