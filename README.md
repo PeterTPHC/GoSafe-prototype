@@ -4,7 +4,8 @@ Werkprototype voor de GoSafe aanvraag-, Mijn GoSafe- en adminomgeving.
 
 ## Browsermockups
 
-- `index.html` – klantflow (aanvraagstraat praat met de Product API op https://gosafe.zeeroverhenk.nl)
+- `index.html` – klantflow (mockup met prototypemenu; backup)
+- Live aanvraagstraat zonder menu: https://gosafe.zeeroverhenk.nl/ (backend-repo `web/`)
 - `admin.html` – admin- en polisomgeving
 - `admin.html#processes` – realtime procesmonitor binnen de adminomgeving
 - `admin.html#communications` – realtime mailwachtrij, berichten/replies en templates

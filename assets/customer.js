@@ -11,13 +11,24 @@ function setScreen(name){
   device.classList.toggle('admin-mode', name === 'admin');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-window.setScreen = setScreen;
 screenButtons.forEach(btn => btn.addEventListener('click', () => setScreen(btn.dataset.screen)));
 deviceButtons.forEach(btn => btn.addEventListener('click', () => {
   const mobile = btn.dataset.device === 'mobile';
   device.classList.toggle('mobile', mobile);
   deviceButtons.forEach(b => b.classList.toggle('active', b === btn));
 }));
+
+document.getElementById('goAdd')?.addEventListener('click', () => setScreen('item'));
+document.getElementById('goAddEmpty')?.addEventListener('click', () => setScreen('item'));
+document.getElementById('cancelItem')?.addEventListener('click', () => setScreen('overview'));
+document.getElementById('saveOverview')?.addEventListener('click', () => setScreen('overview'));
+document.getElementById('saveAnother')?.addEventListener('click', () => {
+  document.querySelectorAll('#screen-item input').forEach(i => i.value = '');
+  document.getElementById('mainCategory').value = '';
+  document.getElementById('subCategory').innerHTML = '<option value="">Kies eerst een hoofdcategorie</option>';
+  document.getElementById('subCategory').disabled = true;
+  document.getElementById('receiptSelected').textContent = 'Selecteer een aankoopbewijs';
+});
 
 const categories = {
   camera:['Spiegelreflexcamera (DSLR)','Systeemcamera','Cinema camera','Compactcamera','Camerabody'],
@@ -30,6 +41,15 @@ const categories = {
   drones:['Drones (zonder vliegrisicoverzekering)','Accessoires voor drones'],
   accessories:['Accu’s & Batterijen','Adapters & voedingen','Cameratassen & koffers','Camera mounts / cages','Kabels (HDMI, audio, stroom)','Filters (ND, UV, polarisatie)']
 };
+const mainCategory = document.getElementById('mainCategory');
+const subCategory = document.getElementById('subCategory');
+mainCategory?.addEventListener('change', () => {
+  const opts = categories[mainCategory.value] || [];
+  subCategory.innerHTML = opts.length
+    ? '<option value="">Kies een subcategorie</option>' + opts.map(v => `<option>${v}</option>`).join('')
+    : '<option value="">Kies eerst een hoofdcategorie</option>';
+  subCategory.disabled = !opts.length;
+});
 
 const receiptSelect = document.getElementById('receiptSelect');
 const receiptButton = document.getElementById('receiptSelectButton');
@@ -41,12 +61,60 @@ document.querySelectorAll('.receipt-option').forEach(opt => {
   });
 });
 
+const basePremium = 220;
+const taxRate = .084;
+const policyCostAmount = 5;
+const rentalIn = document.getElementById('rentalIn');
+const rentalOut = document.getElementById('rentalOut');
+const rentalLimit = document.getElementById('rentalLimit');
+
 function euro(v){
   return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(v);
 }
-function updatePremium(){
-  window.GoSafeApp?.refresh?.();
+function currentPremiumParts(){
+  const inhuurPremium = rentalIn?.checked ? Number(rentalLimit.selectedOptions[0].dataset.premium) : 0;
+  const verhuurPremium = rentalOut?.checked ? basePremium * .25 : 0;
+  const premiumBeforeTax = basePremium + inhuurPremium + verhuurPremium;
+  const tax = (premiumBeforeTax + policyCostAmount) * taxRate;
+  const total = premiumBeforeTax + policyCostAmount + tax;
+  return {inhuurPremium, verhuurPremium, premiumBeforeTax, tax, total};
 }
+function updateClosePremium(parts){
+  const closeInhuurRow = document.getElementById('closeInhuurRow');
+  const closeVerhuurRow = document.getElementById('closeVerhuurRow');
+  if(closeInhuurRow) closeInhuurRow.style.display = rentalIn?.checked ? 'flex' : 'none';
+  if(closeVerhuurRow) closeVerhuurRow.style.display = rentalOut?.checked ? 'flex' : 'none';
+  if(document.getElementById('closeInhuurPremium')) document.getElementById('closeInhuurPremium').textContent = euro(parts.inhuurPremium);
+  if(document.getElementById('closeVerhuurPremium')) document.getElementById('closeVerhuurPremium').textContent = euro(parts.verhuurPremium);
+  if(document.getElementById('closeTax')) document.getElementById('closeTax').textContent = euro(parts.tax);
+  if(document.getElementById('closeTotal')) document.getElementById('closeTotal').textContent = euro(parts.total) + ' per jaar';
+  const summary = document.getElementById('closeCoverageSummary');
+  if(summary){
+    const lines = [];
+    if(rentalIn?.checked) lines.push(`<div class="summary-addon-line"><span>Ingehuurde apparatuur · verzekerd tot ${euro(Number(rentalLimit.value))}</span><strong>+ ${euro(parts.inhuurPremium)} p/j</strong></div>`);
+    if(rentalOut?.checked) lines.push(`<div class="summary-addon-line"><span>Verhuur van eigen apparatuur</span><strong>+ ${euro(parts.verhuurPremium)} p/j</strong></div>`);
+    summary.innerHTML = lines.length ? lines.join('') : '<div class="summary-addon-line"><span>Geen aanvullende dekkingen gekozen</span><strong>—</strong></div>';
+  }
+}
+function updatePremium(){
+  document.getElementById('rentalInAmount')?.classList.toggle('visible', rentalIn?.checked);
+  const inhuurRow = document.getElementById('inhuurRow');
+  const verhuurRow = document.getElementById('verhuurRow');
+  if(inhuurRow) inhuurRow.style.display = rentalIn?.checked ? 'flex' : 'none';
+  if(verhuurRow) verhuurRow.style.display = rentalOut?.checked ? 'flex' : 'none';
+
+  const parts = currentPremiumParts();
+  if(document.getElementById('inhuurPremium')) document.getElementById('inhuurPremium').textContent = '+ ' + euro(parts.inhuurPremium);
+  if(document.getElementById('verhuurPremium')) document.getElementById('verhuurPremium').textContent = '+ ' + euro(parts.verhuurPremium);
+  if(document.getElementById('taxPremium')) document.getElementById('taxPremium').textContent = euro(parts.tax);
+  if(document.getElementById('policyCosts')) document.getElementById('policyCosts').textContent = euro(policyCostAmount);
+  if(document.getElementById('totalPremium')) document.getElementById('totalPremium').textContent = euro(parts.total);
+  updateClosePremium(parts);
+}
+rentalIn?.addEventListener('change', updatePremium);
+rentalOut?.addEventListener('change', updatePremium);
+rentalLimit?.addEventListener('change', updatePremium);
+updatePremium();
 
 
 // Jouw gegevens

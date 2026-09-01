@@ -10,7 +10,7 @@
 <div class="prototype-toolbar">
 <strong>GoSafe prototype</strong>
 <div class="toolbar-group">
-<button class="toolbar-btn active" data-screen="overview">Aanvraag</button><button class="toolbar-btn" data-screen="empty">Overzicht leeg</button>
+<button class="toolbar-btn active" data-screen="overview">Overzicht gevuld</button><button class="toolbar-btn" data-screen="empty">Overzicht leeg</button>
 <button class="toolbar-btn" data-screen="item">Item toevoegen</button>
 <button class="toolbar-btn" data-screen="customer">Jouw gegevens</button>
 <button class="toolbar-btn" data-screen="close">Controleren &amp; afsluiten</button>
@@ -30,29 +30,82 @@
 <div class="brand-wrap">
 <div class="brand">GoSafe</div>
 <div class="header-divider"></div>
-<select class="select product-select" id="productSelect" aria-label="Product">
-<option value="">Product laden…</option>
-</select>
+<div class="product-name">Apparatuurverzekering</div>
 </div>
 <div class="header-context">Aanvraag</div>
 </header>
 <main class="main">
-<div class="api-banner" id="apiBanner" hidden></div>
-<section class="screen" id="screen-overview">
+<section class="screen active" id="screen-overview">
 <div class="page-heading">
 <div>
-<h1 id="overviewHeading">Jouw apparatuur</h1>
-<p id="overviewIntro">Voeg items toe die je wilt verzekeren. Je ziet per item direct de jaarpremie uit de Product API.</p>
+<h1>Jouw apparatuur</h1>
+<p>Voeg de apparatuur toe die je wilt verzekeren. Je ziet per item direct de jaarpremie.</p>
 </div>
 <button class="btn btn-primary" id="goAdd">+ Item toevoegen</button>
 </div>
 <div class="overview-layout">
 <div class="overview-main">
 <div class="card items-card">
-<div id="applicationItemsList"></div>
+<div class="item-row">
+<div>
+<div class="item-title">Camera A · Sony FX6</div>
+<div class="item-meta">Camera’s / Videocamera’s</div>
+<div class="item-proof">Aankoopbewijs gekoppeld</div>
+</div>
+<div>
+<div class="item-meta">Verzekerd bedrag</div>
+<div class="money">€ 6.500,00</div>
+</div>
+<div>
+<div class="item-meta">Jaarpremie</div>
+<div class="money">€ 162,50</div>
+</div>
+<div class="actions">
+<button class="icon-btn" title="Bewerken">✎</button>
+<button class="icon-btn" title="Verwijderen">×</button>
+</div>
+</div>
+<div class="item-row">
+<div>
+<div class="item-title">Lens 24–70 · Sony FE 24–70 GM II</div>
+<div class="item-meta">Camera’s / Objectieven</div>
+<div class="item-proof">Geen aankoopbewijs gekoppeld</div>
+</div>
+<div>
+<div class="item-meta">Verzekerd bedrag</div>
+<div class="money">€ 2.300,00</div>
+</div>
+<div>
+<div class="item-meta">Jaarpremie</div>
+<div class="money">€ 57,50</div>
+</div>
+<div class="actions">
+<button class="icon-btn" title="Bewerken">✎</button>
+<button class="icon-btn" title="Verwijderen">×</button>
+</div>
+</div>
+<div class="item-row incomplete-row">
+<div>
+<div class="item-title">Sony A7 IV</div>
+<div class="item-meta">Camera’s / Fotocamera’s</div>
+<div class="status-chip">Item niet compleet</div>
+</div>
+<div>
+<div class="item-meta">Verzekerd bedrag</div>
+<div class="money">Nog invullen</div>
+</div>
+<div>
+<div class="item-meta">Jaarpremie</div>
+<div class="money">Nog niet berekend</div>
+</div>
+<div class="actions">
+<button class="icon-btn" title="Aanvullen">✎</button>
+<button class="icon-btn" title="Verwijderen">×</button>
+</div>
+</div>
 <div class="items-total">
 <span>Premie complete items</span>
-<strong id="itemsTotal">€ 0,00 per jaar</strong>
+<strong>€ 220,00 per jaar</strong>
 </div>
 </div>
 <div class="card addons">
@@ -89,27 +142,28 @@
 <div class="cart-kicker">Premieoverzicht</div>
 <h2>Je betaalt per jaar</h2>
 <div class="breakdown">
-<div class="breakdown-row"><span>Premie eigen items</span><strong id="ownItemsPremium">€ 0,00</strong></div>
-<div class="breakdown-row muted" id="inhuurRow" style="display:none"><span>Inhuur</span><strong id="inhuurPremium">+ € 0,00</strong></div>
-<div class="breakdown-row muted" id="verhuurRow" style="display:none"><span id="verhuurLabel">Verhuur</span><strong id="verhuurPremium">+ € 0,00</strong></div>
-<div class="breakdown-row muted"><span>Poliskosten</span><strong id="policyCosts">€ 0,00</strong></div>
-<div class="breakdown-row muted"><span id="taxLabel">Assurantiebelasting</span><strong id="taxPremium">€ 0,00</strong></div>
-<div class="breakdown-row total"><span>Totaal per jaar</span><span id="totalPremium">€ 0,00</span></div>
+<div class="breakdown-row"><span>Premie eigen items</span><strong>€ 220,00</strong></div>
+<div class="breakdown-row muted" id="inhuurRow" style="display:none"><span>Inhuur</span><strong id="inhuurPremium">+ € 150,00</strong></div>
+<div class="breakdown-row muted" id="verhuurRow" style="display:none"><span>Verhuur · 25%</span><strong id="verhuurPremium">+ € 55,00</strong></div>
+<div class="breakdown-row muted"><span>Poliskosten</span><strong id="policyCosts">€ 5,00</strong></div>
+<div class="breakdown-row muted"><span>Assurantiebelasting · 8,4%</span><strong id="taxPremium">€ 18,90</strong></div>
+<div class="breakdown-row total"><span>Totaal per jaar</span><span id="totalPremium">€ 243,90</span></div>
 </div>
-<div class="cart-status" id="cartStatus">
-<strong>Voeg minstens één compleet item toe.</strong>
-</div>
+<div class="cart-status">
+<strong>Je kunt nog niet sluiten.</strong><br/>
+      1 item is niet compleet. Vul dit item aan of verwijder het.
+    </div>
 <div class="cart-actions">
 <button class="btn btn-primary" disabled="" id="closeButton">Verzekering sluiten</button>
 </div>
 </aside>
 </div>
 </section>
-<section class="screen active" id="screen-empty">
+<section class="screen" id="screen-empty">
 <div class="page-heading">
 <div>
-<h1 id="emptyHeading">Jouw apparatuur</h1>
-<p>Voeg je eerste item toe om je verzekering samen te stellen en de jaarpremie te berekenen.</p>
+<h1>Jouw apparatuur</h1>
+<p>Voeg de apparatuur toe die je wilt verzekeren. Je ziet per item direct de jaarpremie.</p>
 </div>
 </div>
 <div class="card empty-card">
@@ -123,15 +177,15 @@
 </section><section class="screen" id="screen-item">
 <div class="page-heading">
 <div>
-<h1 id="itemFormTitle">Item toevoegen</h1>
-<p id="itemFormIntro">Vul de gegevens in van één apparaat dat je wilt verzekeren.</p>
+<h1>Item toevoegen</h1>
+<p>Vul de gegevens in van één apparaat dat je wilt verzekeren.</p>
 </div>
 </div>
 <div class="card form-card">
 <div class="form-grid">
 <div class="field">
 <label class="field-label" for="mainCategory">Hoofdcategorie *</label>
-<select class="select" id="mainCategory"><option value="">Kies een hoofdcategorie</option></select>
+<select class="select" id="mainCategory"><option value="">Kies een hoofdcategorie</option><option value="camera">Camera’s</option><option value="lenses">Lenzen &amp; Optiek</option><option value="audio">Geluidsapparatuur</option><option value="lighting">Belichting</option><option value="support">Statieven &amp; Ondersteuning</option><option value="storage">Opslag &amp; Media</option><option value="computer">Computers &amp; Tablets</option><option value="drones">Drones</option><option value="accessories">Accessoires</option></select>
 </div>
 <div class="field">
 <label class="field-label" for="subCategory">Subcategorie *</label>
@@ -189,10 +243,9 @@
 </div>
 </div>
 <div class="receipt-actions">
-<button class="btn" id="uploadReceipt" type="button">Nieuw aankoopbewijs uploaden</button>
-<input accept=".pdf,.jpg,.jpeg,.png" hidden id="receiptFile" type="file"/>
+<button class="btn" type="button">Nieuw aankoopbewijs uploaden</button>
+
 </div>
-<p class="field-error" id="itemFormError"></p>
 </div>
 <div class="form-actions">
 <button class="btn btn-quiet" id="cancelItem" type="button">Annuleren</button>
@@ -337,7 +390,20 @@
 <div><h2>Samenvatting van je verzekering</h2><p>Je apparatuur, aanvullende dekkingen en totale jaarprijs in één overzicht.</p></div>
 <button class="btn btn-link" id="editItemsFromClose" type="button">Wijzig apparatuur</button>
 </div>
-<div class="summary-items" id="closeItemsList"></div>
+<div class="summary-items">
+<div class="summary-item">
+<div class="summary-item-name"><strong>Camera A · Sony FX6</strong><small>Camera’s · Cinema camera</small></div>
+<div><div class="summary-mini-label">Verzekerd</div><div class="summary-mini-value">€ 6.500,00</div></div>
+<div><div class="summary-mini-label">Eigen risico</div><div class="summary-mini-value">€ 250,00</div></div>
+<div><div class="summary-mini-label">Premie p/j</div><div class="summary-mini-value">€ 162,50</div></div>
+</div>
+<div class="summary-item">
+<div class="summary-item-name"><strong>Lens 24–70 · Sony FE 24–70 GM II</strong><small>Lenzen &amp; Optiek · Zoomlens</small></div>
+<div><div class="summary-mini-label">Verzekerd</div><div class="summary-mini-value">€ 2.300,00</div></div>
+<div><div class="summary-mini-label">Eigen risico</div><div class="summary-mini-value">€ 250,00</div></div>
+<div><div class="summary-mini-label">Premie p/j</div><div class="summary-mini-value">€ 57,50</div></div>
+</div>
+</div>
 <div class="summary-bottom">
 <div class="summary-block">
 <h3>Aanvullende dekkingen</h3>
@@ -346,12 +412,12 @@
 <div class="summary-block">
 <h3>Kosten per jaar</h3>
 <div class="summary-costs">
-<div class="summary-cost-row"><span>Premie</span><strong id="closeOwnPremium">€ 0,00</strong></div>
+<div class="summary-cost-row"><span>Premie</span><strong>€ 220,00</strong></div>
 <div class="summary-cost-row" id="closeInhuurRow" style="display:none"><span>Inhuur</span><strong id="closeInhuurPremium">€ 0,00</strong></div>
-<div class="summary-cost-row" id="closeVerhuurRow" style="display:none"><span id="closeVerhuurLabel">Verhuur</span><strong id="closeVerhuurPremium">€ 0,00</strong></div>
-<div class="summary-cost-row"><span>Poliskosten</span><strong id="closePolicyCosts">€ 0,00</strong></div>
-<div class="summary-cost-row"><span id="closeTaxLabel">Assurantiebelasting</span><strong id="closeTax">€ 0,00</strong></div>
-<div class="summary-cost-row total"><span>Je betaalt</span><strong id="closeTotal">€ 0,00 per jaar</strong></div>
+<div class="summary-cost-row" id="closeVerhuurRow" style="display:none"><span>Verhuur · 25%</span><strong id="closeVerhuurPremium">€ 0,00</strong></div>
+<div class="summary-cost-row"><span>Poliskosten</span><strong>€ 5,00</strong></div>
+<div class="summary-cost-row"><span>Assurantiebelasting · 8,4%</span><strong id="closeTax">€ 18,90</strong></div>
+<div class="summary-cost-row total"><span>Je betaalt</span><strong id="closeTotal">€ 243,90 per jaar</strong></div>
 </div>
 <div class="summary-payline">Automatische incasso · jaarlijks</div>
 </div>
@@ -700,7 +766,6 @@ Je kunt de verzekering wel ter acceptatie aanbieden. Een collega van GoSafe beoo
 </div>
 </div>
 
-<script src="assets/customer.js?v=20260901a"></script>
-<script src="assets/application.js?v=20260901a"></script>
+<script src="assets/customer.js"></script>
 </body>
 </html>
