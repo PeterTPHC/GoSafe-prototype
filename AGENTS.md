@@ -59,4 +59,38 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 
 - Ontwerp de admin als operationele werkomgeving: toon eerst dossiers, uitzonderingen en benodigde acties.
 - Gebruik overal dezelfde admin-shell, navigatie, paginakoppen, kaarten, tabellen, statussen en acties.
-- Voeg alleen uitleg toe als die nodig is om een keuze veilig te kunnen maken; vermijd i
+- Voeg alleen uitleg toe als die nodig is om een keuze veilig te kunnen maken; vermijd introductietekst die de paginatitel of tabel herhaalt.
+- Toon tellingen alleen als ze een actie prioriteren, een filterresultaat verduidelijken of een actuele processtatus aangeven.
+- Behoud de vaste menugroepen: `Dagelijks werk`, `Bewaking`, `Administratie`, `Inzicht` en `Beheer`.
+- Houd processtatussen realtime en zichtbaar zonder refreshknop.
+- Communicatie gebruikt dezelfde realtime werkwijze. Onder `Bewaking` toont `E-mails` uitsluitend uitgaande berichten in de tabs `Gepland` en `Verzonden`, zonder refreshknop. Toon bij beide datum en tijd; providerterugmeldingen zijn statussen of events bij het verzonden bericht.
+- Op aanvraag- en polisniveau toont de tab `Communicatie` wat is verstuurd en wat klaarstaat. `Hele e-mail` opent een zelfstandig scherm met afzender, ontvanger, taal, onderwerp, volledig opgemaakt bericht, statusverloop en links naar beschikbare bijlagen. Toon een toekomstige bijlage als `Nog niet beschikbaar`.
+- `Gelogd` betekent dat GoSafe een bericht of event duurzaam heeft vastgelegd. `Afgeleverd` betekent dat de provider aflevering bij de ontvangende mailserver heeft bevestigd; dit bewijst niet dat de ontvanger de e-mail heeft gelezen.
+- `Inhoud en vertalingen` is één generieke vertaalmodule en gebruikt één consistente filterbalk. Maak geen schakelaar tussen e-mail en overige content als aparte beheermodules.
+- Overzichtslijsten tonen alleen gegevens die nodig zijn om een record te herkennen of een actie te starten. Laat interne dossiercodes, e-mailadressen en laatste-activiteitkolommen weg als die geen directe keuze ondersteunen.
+- Werkvoorraadtaken hebben alleen de statussen `Open` en `Afgerond`; gebruik geen status `Bezig`. Toon daar geen prioriteit, eigenaar of uiterste datum.
+- Een aanvraag die vóór indienen niet aan product- of acceptatieregels voldoet, kan niet worden ingediend en verschijnt niet als `Uitval`. Een niet-afgeronde klantflow wordt als `Concept` bewaard. `Ter akkoord` is alleen bedoeld voor een ingediende aanvraag met een afwijkend antwoord in de slotvragen en levert een taak in de werkvoorraad op.
+- Menselijke behandeling is een werkvoorraadtaak en geen technisch proces. De tab `Processen` toont alleen duurzame technische orkestratie. Als een hard bounce, complaint of blijvende verzendfout menselijke opvolging nodig heeft, registreert de technische verwerking een open communicatietaak in de werkvoorraad.
+- Bedragen in aanvraag- en polisoverzichten staan rechts uitgelijnd.
+- Bij het openen van een dossier springt de actieve hoofdnavigatie mee naar `Aanvragen` of `Polissen`, ongeacht vanuit welk overzicht het dossier is geopend.
+- Plaats dossierwijzigingen bij het inhoudelijke onderdeel: `Polis wijzigen` bij `Verzekerde items` en `Relatie wijzigen` bij `Verzekeringnemer`; zet deze acties niet dubbel in de dossierkop.
+- Noem de verstreken tijd van een proces `Doorlooptijd`, niet `Leeftijd`. Toon bij de dossiertab `Processen` geen telling; de lijst zelf toont de relevante processen.
+
+## Gebruikers en rechten
+
+- Scheid bedrijfsrechten in vaste profielen. `Behandelaar` mag aanvragen, relaties en polissen behandelen en polissen muteren, maar heeft geen productbeheer. `Productbeheerder` mag productinstellingen en wijzigingssets beheren en publiceren, maar mag geen polis of relatie muteren.
+- `Gebruikersbeheerder` beheert gebruikers en rechten, maar krijgt daardoor niet automatisch polis- of productrechten. Vermijd één algemene adminrol die alle bedrijfsrechten stilzwijgend combineert.
+- Andere basisprofielen zijn `Finance`, `Inhoudbeheerder` en `Alleen lezen`. Geef ieder profiel alleen de schermen en commando's die voor die taak nodig zijn.
+- Autorisatie wordt altijd server-side op ieder commando afgedwongen; het verbergen van menu's en knoppen is alleen UX. Leg toekenning, wijziging, blokkering en gebruik van kritieke rechten vast in het activiteitenlog.
+- Actieve sessies worden ingetrokken zodra een gebruiker wordt geblokkeerd of een kritisch recht verliest. Productpublicatie en polismutatie vereisen afzonderlijke expliciete permissions en worden nooit uit alleen een schermrol afgeleid.
+
+## Prolongatie en mutatie
+
+- Vooraankondiging is een los, automatisch communicatieproces en maakt geen polisversie of financiële boeking.
+- De prolongatievoorraad kijkt automatisch vooruit, toetst toekomstige productregels en geplande mutaties en maakt verwachte uitval vóór de prolongatiedag zichtbaar.
+- De definitieve prolongatie start automatisch op de laatste dag van de lopende termijn; de nieuwe termijn start de kalenderdag erna. Bijvoorbeeld: geldig tot en met 25 augustus, nieuwe termijn vanaf 26 augustus.
+- GoSafe orkestreert en berekent. ANVA verzorgt formele registratie, financiële boeking en incasso; voeg geen GoSafe-incassostap toe aan het prolongatieproces.
+- Een mutatie vóór of op het huidige termijn-einde levert na ANVA direct polis en nota op, ook als de ingangsdatum later is. Op de ingangsdatum wordt alleen de voorbereide versie actief.
+- Een mutatie ná de komende prolongatie blijft akkoord als delta, krijgt status `Akkoord – wacht op prolongatie`, wordt daarna op de vernieuwde polisversie geherbaseerd en opnieuw gevalideerd. De klant krijgt direct een bevestiging en de stukken pas na prolongatie en ANVA-verwerking.
+- Meerdere toekomstige mutaties worden chronologisch toegepast; iedere mutatie gebruikt de uitkomst van de vorige gebeurtenis.
+- Het prolongatieoverzicht blijft een compacte operationele lijst met `Einde huidige termijn`, `Nieuwe termijn`, `Polis`, `Premie oud → nieuw` en `Voorcontrole`. Gebruik geen aparte actiekolom of niet-functionele resultaattelling; maak regels met uitval of een andere dossieractie rechtstreeks doorklikbaar. Toon daar ook geen relatie, geplande-mutatiekolom, vooraankondigingskolom of uitleg dat termijnen direct aansluiten.
