@@ -2,7 +2,7 @@ const rightsCatalog={view_dossiers:'Dossiers bekijken',mutate_policy:'Polissen e
 const profiles={handler:{name:'Behandelaar',rights:['view_dossiers','mutate_policy']},product:{name:'Productbeheerder',rights:['view_dossiers','manage_products','publish_products']},finance:{name:'Finance',rights:['view_dossiers','finance']},content:{name:'Inhoudbeheerder',rights:['view_dossiers','manage_content']},audit:{name:'Alleen lezen',rights:['view_dossiers']},users:{name:'Gebruikersbeheerder',rights:['manage_users']}};
 const users={sanne:{name:'Voorbeeld behandelaar',email:'behandelaar@voorbeeld.nl',profile:'handler',status:'Actief',mfa:'Actief'},milan:{name:'Voorbeeld productbeheerder',email:'productbeheer@voorbeeld.nl',profile:'product',status:'Actief',mfa:'Niet ingesteld'},eva:{name:'Voorbeeld gebruikersbeheerder',email:'gebruikersbeheer@voorbeeld.nl',profile:'users',status:'Uitgenodigd',mfa:'Niet ingesteld'},daan:{name:'Voorbeeld financegebruiker',email:'finance@voorbeeld.nl',profile:'finance',status:'Geblokkeerd',mfa:'Actief'}};
 let selectedUser='sanne',selectedProfile='handler';
-const usersStyles=document.createElement('link');usersStyles.rel='stylesheet';usersStyles.href='assets/users.css?v=20260901-admin-access-v1';document.head.appendChild(usersStyles);
+const usersStyles=document.createElement('link');usersStyles.rel='stylesheet';usersStyles.href='assets/users.css?v=20260901-admin-access-v2';document.head.appendChild(usersStyles);
 const usersPage=document.querySelector('[data-admin-page="users"]');
 if(usersPage)usersPage.innerHTML=`
 <div class="admin-page-head"><div><h1>Gebruikers &amp; rechten</h1></div></div>
