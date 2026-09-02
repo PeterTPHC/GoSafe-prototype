@@ -344,7 +344,7 @@ function adminMutationValidation(){
   const data=dossierData[activeDossierKey]||dossierData['policy-main'];
   const activeItems=adminMutationItems.filter(item=>!item.removed);
   const total=activeItems.reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
-  const computerTotal=activeItems.filter(item=>item.mainCategory==='Computers & Tablets').reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
+  const computerTotal=activeItems.filter(item=>adminEffectiveCategoryRules(data.product,item).includes('Computerapparatuur')).reduce((sum,item)=>sum+Number(item.amountNumber||0),0);
   const otherTotal=total-computerTotal;
   const completeItems=activeItems.every(item=>item.brand?.trim()&&item.model?.trim()&&item.mainCategory&&item.subCategory&&item.serial?.trim()&&Number(item.amountNumber)>0);
   const holderCountry=data.holder.address?.countryCode||'NL';
@@ -753,9 +753,21 @@ syncInheritanceInput('productCategoryDeductibleMode','productCategoryDeductible'
 document.querySelectorAll('.product-category-row[data-product="Apparatuurverzekering"]').forEach(row=>{
   if(row.dataset.mainCategory==='Camera’s'){row.dataset.rule='Serienummer verplicht';row.dataset.ruleSource='Camera’s';}
   if(row.dataset.mainCategory==='Lenzen & Optiek'){row.dataset.rule='Clausule CL233 toevoegen';row.dataset.ruleSource='Lenzen & Optiek';}
+  if(row.dataset.mainCategory==='Computers & Tablets'){row.dataset.rule='Computerapparatuur';row.dataset.ruleSource='Computers & Tablets';}
+});
+document.querySelectorAll('.product-category-row[data-product="Instrumentenverzekering"]').forEach(row=>{
+  if(['Laptop voor muziekproductie','Tablet voor muziekproductie'].includes(row.dataset.categoryName)){row.dataset.rule='Computerapparatuur';row.dataset.ruleSource=row.dataset.categoryName;}
 });
 applyCategoryInheritanceDisplay();
 filterProductCategories();
+
+function adminEffectiveCategoryRules(product,item){
+  const category=item.subCategory||String(item.category||'').split(' / ').slice(-1)[0]||'';
+  const mainCategory=item.mainCategory||String(item.category||'').split(' / ')[0]||'';
+  const rows=[...document.querySelectorAll('.product-category-row')].filter(row=>row.dataset.product===product);
+  const row=rows.find(candidate=>candidate.dataset.categoryName===category)||rows.find(candidate=>candidate.dataset.categoryName===mainCategory);
+  return (row?.dataset.rule||'').split('|').map(value=>value.trim()).filter(Boolean);
+}
 
 function filterCategoryRuleOptions(){
   const q=(document.getElementById('productCategoryRuleSearch')?.value||'').trim().toLowerCase();
@@ -816,6 +828,7 @@ let editingProductRuleRow=null;
 function syncProductRuleTypeConfig(){
   const type=document.getElementById('productRuleType')?.value||'Serienummer verplicht';
   const serial=document.getElementById('productRuleSerialConfig');if(serial)serial.hidden=type!=='Serienummer verplicht';
+  const computer=document.getElementById('productRuleComputerConfig');if(computer)computer.hidden=type!=='Computerapparatuur';
   const clause=document.getElementById('productRuleClauseConfig');if(clause)clause.hidden=type!=='Clausule toevoegen';
 }
 function openProductRuleEditor(row=null){
@@ -856,7 +869,8 @@ document.getElementById('productRuleSave')?.addEventListener('click',()=>{
   if(type==='Clausule toevoegen'&&!clause){if(editorError){editorError.textContent='Selecteer de clausule die deze regel moet toevoegen.';editorError.classList.add('visible');}return;}
   const duplicate=[...document.querySelectorAll('.product-rule-row')].find(row=>row!==editingProductRuleRow&&(row.dataset.ruleCode||'').toUpperCase()===code);
   if(duplicate){if(editorError){editorError.textContent='Deze regelcode bestaat al binnen dit product.';editorError.classList.add('visible');}return;}
-  callProductApi('API-P07-CATEGORY-RULE-UPSERT',{ruleId:editingProductRuleRow?.dataset.ruleId||null,code,name,typeKey:type==='Serienummer verplicht'?'serial_number_required':'attach_clause',typeVersion:1,config:type==='Clausule toevoegen'?{clauseId:clause}:{},description,status});
+  const typeKey=type==='Serienummer verplicht'?'serial_number_required':type==='Computerapparatuur'?'computer_equipment':'attach_clause';
+  callProductApi('API-P07-CATEGORY-RULE-UPSERT',{ruleId:editingProductRuleRow?.dataset.ruleId||null,code,name,typeKey,typeVersion:1,config:type==='Clausule toevoegen'?{clauseId:clause}:{},description,status});
   let row=editingProductRuleRow;
   if(!row){row=document.createElement('tr');row.className='product-rule-row';document.querySelector('.product-category-rules-table tbody')?.prepend(row);}
   row.dataset.product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';row.dataset.ruleName=name;row.dataset.ruleCode=code;row.dataset.ruleType=type;row.dataset.ruleDescription=description;row.dataset.ruleStatus=status;row.dataset.ruleClause=type==='Clausule toevoegen'?clause:'';
@@ -1047,19 +1061,14 @@ const acceptanceTypeDefinitions={
   max_item_count:{name:'Maximaal aantal objecten',code:'ACC-MAX-COUNT',unit:'objecten',outcome:'Uitval',defaultValue:'100',description:'Het systeem telt alle objecten in de aanvraag.'},
   max_total_amount:{name:'Maximaal totaal verzekerd bedrag',code:'ACC-MAX-TOTAL',unit:'EUR',outcome:'Uitval',defaultValue:'100000',description:'Het systeem telt de verzekerde bedragen van alle items bij elkaar op.'},
   allowed_country:{name:'Woon-/vestigingsland',code:'ACC-COUNTRY-NL',unit:'land',outcome:'Uitval',defaultValue:'Nederland',description:'De verzekeringnemer moet wonen of gevestigd zijn in het ingestelde land.'},
-  computer_ratio:{name:'Maximum aandeel computerapparatuur',code:'ACC-COMPUTER-RATIO',unit:'procent',outcome:'Uitval',defaultValue:'100',description:'De som van geselecteerde computercategorieën mag niet hoger zijn dan het ingestelde percentage van de overige verzekerde items.'}
-};
-const acceptanceCategoriesByProduct={
-  'Apparatuurverzekering':['Laptops','Tablets (iPads, etc.)','Computers voor bewerking'],
-  'Instrumentenverzekering':['Laptop voor muziekproductie','Tablet voor muziekproductie']
+  computer_ratio:{name:'Maximum aandeel computerapparatuur',code:'ACC-COMPUTER-RATIO',unit:'procent',outcome:'Uitval',defaultValue:'100',description:'De som van items met de effectieve categorieregel Computerapparatuur mag niet hoger zijn dan het ingestelde percentage van de overige verzekerde items.'}
 };
 let editingAcceptanceRow=null;
 function acceptanceSettingHtml(row){
   const value=row.dataset.acceptanceValue||'';
   if(row.dataset.acceptanceType==='allowed_country')return 'Alleen '+productEscape(value);
   if(row.dataset.acceptanceType==='computer_ratio'){
-    const categories=(row.dataset.acceptanceCategories||'').split('|').filter(Boolean);
-    return '<strong>'+productEscape(value)+'% van overige items</strong><small>'+productEscape(categories.join(', '))+'</small>';
+    return '<strong>'+productEscape(value)+'% van overige items</strong><small>Classificatie via categorieregel Computerapparatuur</small>';
   }
   if(row.dataset.acceptanceUnit==='EUR')return productEscape(formatProductEuro(value));
   return productEscape(value+' '+(row.dataset.acceptanceUnit||''));
@@ -1078,17 +1087,11 @@ function filterProductAcceptance(){
   });
   const name=document.getElementById('productAcceptanceProductName');if(name)name.textContent=product;
 }
-function rebuildAcceptanceCategoryOptions(selected=[]){
-  const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
-  const box=document.getElementById('productAcceptanceCategoryOptions');if(!box)return;
-  box.innerHTML=(acceptanceCategoriesByProduct[product]||[]).map(category=>'<label><input type="checkbox" value="'+productEscape(category)+'" '+(selected.includes(category)?'checked':'')+'><span>'+productEscape(category)+'</span></label>').join('');
-}
 function syncAcceptanceEditorType(){
   const type=document.getElementById('productAcceptanceType')?.value||'max_item_amount';
   const definition=acceptanceTypeDefinitions[type];
   const country=document.getElementById('productAcceptanceCountryField');if(country)country.hidden=type!=='allowed_country';
   const valueField=document.getElementById('productAcceptanceValueField');if(valueField)valueField.hidden=type==='allowed_country';
-  const categories=document.getElementById('productAcceptanceCategoryConfig');if(categories)categories.hidden=type!=='computer_ratio';
   const label=document.getElementById('productAcceptanceValueLabel');if(label)label.textContent=type==='computer_ratio'?'Maximale verhouding (%)':type==='max_item_count'?'Maximum aantal':'Maximum bedrag';
   const value=document.getElementById('productAcceptanceValue');if(value&&!editingAcceptanceRow)value.value=definition.defaultValue;
   const outcome=document.getElementById('productAcceptanceOutcomeLabel');if(outcome)outcome.textContent='Bij afwijking: uitval';
@@ -1102,7 +1105,6 @@ function openAcceptanceEditor(row){
   document.getElementById('productAcceptanceCountry').value=type==='allowed_country'?(row.dataset.acceptanceValue||'Nederland'):'Nederland';
   document.getElementById('productAcceptanceStatus').value=row.dataset.acceptanceStatus||'Actief';
   document.getElementById('productAcceptanceEffective').value=row.dataset.acceptanceEffective||'2026-01-01';
-  rebuildAcceptanceCategoryOptions((row.dataset.acceptanceCategories||'').split('|').filter(Boolean));
   const title=document.getElementById('productAcceptanceEditorTitle');if(title)title.textContent=row.dataset.acceptanceName;
   document.getElementById('productAcceptanceEditorError')?.classList.remove('visible');syncAcceptanceEditorType();
   document.getElementById('productAcceptanceEditor')?.classList.add('visible');
@@ -1117,13 +1119,12 @@ document.getElementById('productAcceptanceSave')?.addEventListener('click',()=>{
   const status=document.getElementById('productAcceptanceStatus')?.value||'Actief';
   const effective=document.getElementById('productAcceptanceEffective')?.value||'';
   const value=type==='allowed_country'?(document.getElementById('productAcceptanceCountry')?.value||''):String(Number(document.getElementById('productAcceptanceValue')?.value));
-  const categories=[...document.querySelectorAll('#productAcceptanceCategoryOptions input:checked')].map(input=>input.value);
-  const invalid=!effective||!value||value==='NaN'||(type!=='allowed_country'&&Number(value)<0)||(type==='computer_ratio'&&!categories.length);
-  if(invalid){const error=document.getElementById('productAcceptanceEditorError');if(error){error.textContent=type==='computer_ratio'?'Vul een geldige verhouding, minimaal één categorie en een ingangsdatum in.':'Vul een geldige waarde en ingangsdatum in.';error.classList.add('visible');}return;}
+  const invalid=!effective||!value||value==='NaN'||(type!=='allowed_country'&&Number(value)<0);
+  if(invalid){const error=document.getElementById('productAcceptanceEditorError');if(error){error.textContent='Vul een geldige waarde en ingangsdatum in.';error.classList.add('visible');}return;}
   const product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';
   const row=editingAcceptanceRow;
-  callProductApi('API-PRODUCT-ACCEPTANCE-PUT',{criterionId:row.dataset.acceptanceCode,typeKey:type,config:{value,categories},status,effectiveDate:effective,outcome:'fallout'});
-  row.dataset.product=product;row.dataset.acceptanceType=type;row.dataset.acceptanceCode=definition.code+(product==='Instrumentenverzekering'?'-INS':'');row.dataset.acceptanceName=definition.name;row.dataset.acceptanceValue=value;row.dataset.acceptanceUnit=definition.unit;row.dataset.acceptanceOutcome=definition.outcome;row.dataset.acceptanceStatus=status;row.dataset.acceptanceEffective=effective;row.dataset.acceptanceCategories=type==='computer_ratio'?categories.join('|'):'';
+  callProductApi('API-PRODUCT-ACCEPTANCE-PUT',{criterionId:row.dataset.acceptanceCode,typeKey:type,config:{value},status,effectiveDate:effective,outcome:'fallout'});
+  row.dataset.product=product;row.dataset.acceptanceType=type;row.dataset.acceptanceCode=definition.code+(product==='Instrumentenverzekering'?'-INS':'');row.dataset.acceptanceName=definition.name;row.dataset.acceptanceValue=value;row.dataset.acceptanceUnit=definition.unit;row.dataset.acceptanceOutcome=definition.outcome;row.dataset.acceptanceStatus=status;row.dataset.acceptanceEffective=effective;
   renderAcceptanceRow(row);setProductNextVersion(row,'concept','Tarieven 2027');filterProductAcceptance();showAdminToast('Acceptatiecriterium opgeslagen in de wijzigingsset');closeAcceptanceEditor();
 });
 initializeProductVersionStates();
