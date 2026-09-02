@@ -102,6 +102,15 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Gebruikers en profielen worden niet hard verwijderd. Een profiel kan alleen inactief worden als er geen gebruikers aan gekoppeld zijn. IAM-mutaties en kritieke allow/deny-beslissingen worden append-only gelogd.
 - De uitvoerbare productiecontracten staan in hoofdstuk 15.6 van `GoSafe - Systeemuitwerking` en in de tabbladen Processen, Processtappen, Velden, Regels, API, Datamodel, Schermen en Besluiten van `GoSafe - Functionele specificatie`.
 
+## Productregels en acceptatie
+
+- Scheid codegedefinieerde regeltypen van beheerbare regelinstanties en parameters. De admin biedt nooit vrije code, formules of technische veldpaden.
+- Categorieregels v1 zijn `Serienummer verplicht` en `Clausule toevoegen`. Productbrede acceptatiecriteria, vaste veldvalidaties en rekenparameters zijn geen categorieregels.
+- De computerregel is één productbreed acceptatiecriterium `computer_ratio`, niet één regel per item. Per product configureert beheer de meetellende eindcategorieën en de maximale verhouding; initieel is deze verhouding `1.00`.
+- Bereken `C` als de som van de verzekerde bedragen van computeritems en `O` als de som van de overige actieve items. De state voldoet als `C = 0` of `C <= O × ratio`; `C > 0` zonder overige items voldoet niet. Een incomplete state is niet evalueerbaar.
+- Hercontroleer na iedere relevante itemwijziging en bij aanvraag, mutatie, herbasering en prolongatie. In de klantflow mag een concept worden opgeslagen, maar een mislukte of niet-evalueerbare productcontrole blokkeert indienen en maakt geen aanvraagstatus `Uitval`. Bij prolongatie wordt een bestaande afwijking `action_required`.
+- Definitieve berekeningen bewaren criteriumtype/-versie, configuratie, subtotalen en uitkomst immutable in de productberekeningssnapshot.
+
 ## Prolongatie en mutatie
 
 - Vooraankondiging is een los, automatisch communicatieproces en maakt geen polisversie of financiële boeking.
