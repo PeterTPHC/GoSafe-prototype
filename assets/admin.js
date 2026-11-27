@@ -762,6 +762,7 @@ function setProductPage(name){
   syncProductNav(name);
   if(name==='versions')renderProductVersions();
   document.querySelector('.admin-main')?.scrollTo?.({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 document.querySelectorAll('[data-product-target]').forEach(btn=>btn.addEventListener('click',()=>{
   setAdminPage('products');
