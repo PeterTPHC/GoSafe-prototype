@@ -573,7 +573,6 @@ setupDossierList({bodyId:'policyListBody',searchId:'policyListSearch',statusId:'
 // Productbeheer prototype interactions
 const productAdminPage=document.querySelector('.product-admin-page');
 let selectedAdminProduct='';
-let pendingProductPage='categories';
 // Het klikprototype gebruikt dezelfde functionele contracten als productie, maar met een
 // lokale adapter. In productie wordt alleen deze adapter vervangen door de echte Product API;
 // de admin leest of schrijft nooit rechtstreeks in de productconfiguratiedatabase.
@@ -588,20 +587,144 @@ const productApiAdapter={
   }
 };
 window.GoSafeProductApiPrototype=productApiAdapter;
-function callProductApi(apiId,payload){return productApiAdapter.request(apiId,{productId:document.getElementById('productAdminProduct')?.value||null,changeSetId:'CHANGESET-TARIEVEN-2027',...payload});}
+function callProductApi(apiId,payload){return productApiAdapter.request(apiId,{productId:document.getElementById('productAdminProduct')?.value||null,changeSetId:productConceptVersion(selectedAdminProduct)?.id||null,...payload});}
+
+// Productversies: één actieve versie, hoogstens één concept; publiceren maakt een concept gepland tot de ingangsdatum.
+const productVersionData={
+  Apparatuurverzekering:{short:'Apparatuur',versions:[
+    {id:'APP-V3',number:3,name:'Tarieven 2027',status:'concept',effective:'2027-01-01',note:'',updated:'26 nov 2026 · 16:40',by:'Voorbeeld productbeheerder'},
+    {id:'APP-V2',number:2,name:'Productinstellingen 2026',status:'active',effective:'2026-01-01',published:'15 dec 2025',by:'Voorbeeld productbeheerder'},
+    {id:'APP-V1',number:1,name:'Lancering',status:'expired',effective:'2025-09-01',end:'2025-12-31'}
+  ]},
+  Instrumentenverzekering:{short:'Instrumenten',versions:[
+    {id:'INS-V2',number:2,name:'Productinstellingen 2026',status:'active',effective:'2026-01-01',published:'15 dec 2025',by:'Voorbeeld productbeheerder'},
+    {id:'INS-V1',number:1,name:'Lancering',status:'expired',effective:'2025-09-01',end:'2025-12-31'}
+  ]}
+};
+const productVersionStatus={concept:['gray','Concept'],scheduled:['blue','Gepland'],active:['green','Actief'],expired:['gray','Vervallen']};
+const productVersionStatusOrder={concept:0,scheduled:1,active:2,expired:3};
+let viewedProductVersionId='';
+function productVersions(product=selectedAdminProduct){return productVersionData[product]?.versions||[];}
+function productActiveVersion(product=selectedAdminProduct){return productVersions(product).find(v=>v.status==='active');}
+function productConceptVersion(product=selectedAdminProduct){return productVersions(product).find(v=>v.status==='concept');}
+function productScheduledVersion(product=selectedAdminProduct){return productVersions(product).find(v=>v.status==='scheduled');}
+function productViewedVersion(){return productVersions().find(v=>v.id===viewedProductVersionId)||productActiveVersion();}
+function productConceptName(){return productConceptVersion()?.name||'Concept';}
+function productVersionLabel(version){return version?'Versie '+version.number+' · '+version.name:'—';}
+function productVersionChip(version){const [tone,label]=productVersionStatus[version.status]||['gray',version.status];return '<span class="admin-chip '+tone+'">'+label+'</span>';}
+function productDayBefore(value){const date=new Date(value+'T12:00:00');date.setDate(date.getDate()-1);return date.toISOString().slice(0,10);}
+function productVersionValidity(version){
+  if(version.status==='expired')return formatProductDate(version.effective)+' – '+formatProductDate(version.end);
+  if(version.status==='active'){const next=productScheduledVersion();return next?formatProductDate(version.effective)+' – '+formatProductDate(productDayBefore(next.effective)):'Sinds '+formatProductDate(version.effective);}
+  return 'Vanaf '+formatProductDate(version.effective);
+}
+function productConceptRows(product=selectedAdminProduct){
+  const selector='.product-category-row,.product-rule-row,.product-setting-row,.product-conditions-row,.product-ipid-row,.product-addon-row,.product-acceptance-row';
+  return [...document.querySelectorAll(selector)].filter(row=>row.dataset.product===product&&row.dataset.versionState==='concept');
+}
+function productConceptChangeHtml(row){
+  const areas=[['product-category-row','Categorieën','categories'],['product-rule-row','Categorieregels','category-rules'],['product-setting-row','Algemene instellingen','costs'],['product-conditions-row','Voorwaarden','costs'],['product-ipid-row','IPID','costs'],['product-addon-row','Aanvullende dekkingen','addons'],['product-acceptance-row','Acceptatiecriteria','acceptance']];
+  const [,area,page]=areas.find(([cls])=>row.classList.contains(cls))||['','Onderdeel','versions'];
+  const name=row.classList.contains('product-conditions-row')?'Geselecteerde voorwaarden':row.classList.contains('product-ipid-row')?'Geselecteerd document':(row.dataset.categoryName||row.dataset.ruleName||row.dataset.settingName||row.dataset.acceptanceName||row.querySelector('.admin-primary')?.textContent||'');
+  return '<div><strong>'+productEscape(name)+'</strong><em>'+productEscape(area)+'</em><button class="admin-btn text" data-concept-part="'+page+'" type="button">Openen</button></div>';
+}
+function closeProductEditors(){
+  closeProductCategoryEdit();closeProductRuleEditor();closeProductSettingEditor();closeProductConditionsEditor();closeProductIpidEditor();closeProductAddonEditor();closeAcceptanceEditor();
+}
+function renderProductChoiceVersions(){
+  document.querySelectorAll('[data-product-choice-versions]').forEach(box=>{
+    const product=box.dataset.productChoiceVersions,active=productActiveVersion(product),next=productConceptVersion(product)||productScheduledVersion(product);
+    box.innerHTML='<div>'+productVersionChip(active)+'<small>Versie '+active.number+'</small></div>'+(next?'<div>'+productVersionChip(next)+'<small>Versie '+next.number+' · '+productEscape(next.name)+'</small></div>':'<div><small>Geen nieuwe versie</small></div>');
+  });
+}
+function renderProductVersionContext(){
+  const box=document.getElementById('productVersionContext'),version=productViewedVersion();if(!box||!version)return;
+  const editing=version.status==='concept',concept=productConceptVersion();
+  productAdminPage?.classList.toggle('product-readonly',!editing);
+  const detail=editing?'Ingang '+formatProductDate(version.effective)+' · wijzigingen worden in dit concept opgeslagen':productVersionValidity(version)+' · alleen lezen';
+  const action=editing?'':concept?'<button class="admin-btn text" id="productVersionSwitch" data-version-action="concept" type="button">Concept bewerken</button>':'<button class="admin-btn text" id="productVersionSwitch" data-version-action="create" type="button">Conceptversie aanmaken</button>';
+  box.innerHTML=productVersionChip(version)+'<div><strong>'+productEscape(productVersionLabel(version))+'</strong><small>'+productEscape(detail)+'</small></div>'+action;
+  const ctx=document.getElementById('productCategoryConceptContext');if(ctx)ctx.textContent=editing?version.name+' · '+formatProductDate(version.effective):'—';
+}
+function productVersionCardHtml(label,version){
+  const rows=[['Geldigheid',productVersionValidity(version)]];
+  if(version.status==='concept'){const count=productConceptRows().length;rows.push(['Wijzigingen',count?count+(count===1?' onderdeel':' onderdelen'):'Nog geen']);rows.push(['Laatst bewerkt',version.updated+' · '+version.by]);}
+  else if(version.published)rows.push(['Gepubliceerd',version.published+' · '+version.by]);
+  const button=version.status==='concept'?'<button class="admin-btn primary" data-product-edit-concept type="button">Bewerken</button>':'<button class="admin-btn" data-product-view-version="'+version.id+'" type="button">Bekijken</button>';
+  return '<div class="admin-card product-version-card"><div class="admin-card-body"><span class="product-version-card-label">'+label+'</span><div class="product-version-card-title"><strong>'+productEscape(productVersionLabel(version))+'</strong>'+productVersionChip(version)+'</div><dl>'+rows.map(([k,v])=>'<div><dt>'+k+'</dt><dd>'+productEscape(v)+'</dd></div>').join('')+'</dl><div class="admin-actions">'+button+'</div></div></div>';
+}
+function renderProductVersions(){
+  const summary=document.getElementById('productVersionSummary'),tbody=document.getElementById('productVersionRows');if(!summary||!tbody||!selectedAdminProduct)return;
+  const active=productActiveVersion(),scheduled=productScheduledVersion(),concept=productConceptVersion();
+  let cards=productVersionCardHtml('Huidige versie',active);
+  if(scheduled)cards+=productVersionCardHtml('Nieuwe versie',scheduled);
+  if(concept)cards+=productVersionCardHtml(scheduled?'Volgende concept':'Nieuwe versie',concept);
+  if(!scheduled&&!concept)cards+='<div class="admin-card product-version-card is-empty"><div class="admin-card-body"><span class="product-version-card-label">Nieuwe versie</span><div class="product-version-card-title"><strong>Geen nieuwe versie</strong></div><dl><div><dt>Basis voor concept</dt><dd>'+productEscape(productVersionLabel(active))+'</dd></div></dl><div class="admin-actions"><button class="admin-btn primary" data-product-create-concept type="button">Conceptversie aanmaken</button></div></div></div>';
+  summary.innerHTML=cards;
+  document.getElementById('productCreateConcept')?.toggleAttribute('hidden',!!concept||!scheduled);
+  tbody.innerHTML=[...productVersions()].sort((a,b)=>productVersionStatusOrder[a.status]-productVersionStatusOrder[b.status]||b.number-a.number).map(version=>{
+    const action=version.status==='concept'?'<button class="admin-btn text" data-product-edit-concept type="button">Bewerken</button>':'<button class="admin-btn text" data-product-view-version="'+version.id+'" type="button">Bekijken</button>';
+    return '<tr class="product-version-row'+(version.id===viewedProductVersionId?' selected':'')+'"><td><div class="admin-primary">Versie '+version.number+'</div><div class="admin-secondary">'+productEscape(version.name)+'</div></td><td>'+productEscape(productVersionValidity(version))+'</td><td>'+productVersionChip(version)+'</td><td>'+action+'</td></tr>';
+  }).join('');
+  renderProductChoiceVersions();
+}
+function openProductConceptForm(){
+  const form=document.getElementById('productConceptForm');if(!form)return;
+  document.getElementById('productConceptEditor').hidden=true;
+  const base=productScheduledVersion()||productActiveVersion();
+  document.getElementById('productConceptName').value='';
+  document.getElementById('productConceptEffective').value='';
+  document.getElementById('productConceptNote').value='';
+  document.getElementById('productConceptBase').value='Kopie van '+productVersionLabel(base);
+  document.getElementById('productConceptFormError').classList.remove('visible');
+  form.hidden=false;form.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+  document.getElementById('productConceptName').focus();
+}
+function closeProductConceptForm(){const form=document.getElementById('productConceptForm');if(form)form.hidden=true;}
+function productConceptDateError(value){
+  if(!value)return 'Vul een ingangsdatum in.';
+  if(value<=new Date().toISOString().slice(0,10))return 'De ingangsdatum moet in de toekomst liggen.';
+  const latest=productScheduledVersion()||productActiveVersion();
+  if(value<=latest.effective)return 'De ingangsdatum moet na '+formatProductDate(latest.effective)+' liggen ('+productVersionLabel(latest)+').';
+  return '';
+}
+function showProductFormError(id,message){const el=document.getElementById(id);if(!el)return false;el.textContent=message;el.classList.toggle('visible',!!message);return !message;}
+function openProductConceptEditor(){
+  const concept=productConceptVersion(),editor=document.getElementById('productConceptEditor');if(!concept||!editor)return;
+  viewedProductVersionId=concept.id;closeProductConceptForm();
+  document.getElementById('productConceptEditorTitle').textContent=productVersionLabel(concept);
+  document.getElementById('productConceptEditName').value=concept.name;
+  document.getElementById('productConceptEditEffective').value=concept.effective;
+  document.getElementById('productConceptEditNote').value=concept.note||'';
+  showProductFormError('productConceptEditorError','');
+  const rows=productConceptRows();
+  document.getElementById('productConceptChanges').innerHTML=rows.length?rows.map(productConceptChangeHtml).join(''):'<div class="product-concept-empty">Nog geen wijzigingen. Kies hieronder het onderdeel dat je wilt aanpassen.</div>';
+  editor.hidden=false;renderProductVersions();renderProductVersionContext();
+  editor.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+}
+function closeProductConceptEditor(){const editor=document.getElementById('productConceptEditor');if(editor)editor.hidden=true;}
+function viewProductVersion(id){
+  viewedProductVersionId=id;closeProductEditors();renderProductVersionContext();
+  setProductPage('categories');
+}
 function showProductChooser(){
   selectedAdminProduct='';
   productAdminPage?.classList.add('choosing-product');
+  productAdminPage?.classList.remove('product-page-api');
   const current=document.getElementById('productCurrentName');if(current)current.textContent='—';
-  closeProductCategoryEdit();
+  closeProductEditors();renderProductChoiceVersions();syncProductNav('');
 }
-function selectAdminProduct(name){
+function selectAdminProduct(name,page='versions'){
+  const changed=selectedAdminProduct!==name;
   selectedAdminProduct=name;
+  if(changed){viewedProductVersionId='';closeProductConceptForm();closeProductConceptEditor();}
   const select=document.getElementById('productAdminProduct');if(select)select.value=name;
   const current=document.getElementById('productCurrentName');if(current)current.textContent=name;
+  const icon=document.getElementById('productSelectedIcon');if(icon)icon.textContent=(productVersionData[name]?.short||name).charAt(0);
   const apiProduct=document.getElementById('productApiProduct');if(apiProduct)apiProduct.value=name;
   productAdminPage?.classList.remove('choosing-product');
   [
+    'API-PRODUCT-VERSION-LIST',
     'API-PRODUCT-CATEGORY-SETTINGS-GET',
     'API-P07-CATEGORY-RULE-TYPE-LIST',
     'API-P07-CATEGORY-RULE-LIST',
@@ -614,8 +737,7 @@ function selectAdminProduct(name){
     'API-PRODUCT-ACCEPTANCE-GET',
     'API-PRODUCT-CHANGESET-GET'
   ].forEach(apiId=>callProductApi(apiId,{operation:'read'}));
-  setProductPage(pendingProductPage||'categories');
-  closeProductCategoryEdit();
+  closeProductEditors();
   filterProductCategories();
   filterProductRuleCatalog();
   filterCategoryRuleOptions();
@@ -624,20 +746,77 @@ function selectAdminProduct(name){
   filterProductIpids();
   filterProductAddons();
   filterProductAcceptance();
+  renderProductVersionContext();
+  setProductPage(page);
+}
+function syncProductNav(page){
+  document.querySelectorAll('[data-product-nav]').forEach(group=>group.classList.toggle('open',group.dataset.productNav===selectedAdminProduct));
+  document.querySelectorAll('[data-product-target]').forEach(el=>el.classList.toggle('active',el.dataset.productTarget===page&&(!el.dataset.productScope||el.dataset.productScope===selectedAdminProduct)));
 }
 function setProductPage(name){
+  if(name!=='api'&&!selectedAdminProduct){showProductChooser();return;}
+  productAdminPage?.classList.toggle('product-page-api',name==='api');
+  productAdminPage?.classList.toggle('product-page-versions',name==='versions');
+  if(name==='api')productAdminPage?.classList.remove('choosing-product');
   document.querySelectorAll('[data-product-page]').forEach(el=>el.classList.toggle('active',el.dataset.productPage===name));
-  document.querySelectorAll('[data-product-target]').forEach(el=>el.classList.toggle('active',el.dataset.productTarget===name));
+  syncProductNav(name);
+  if(name==='versions')renderProductVersions();
   document.querySelector('.admin-main')?.scrollTo?.({top:0,behavior:'smooth'});
 }
 document.querySelectorAll('[data-product-target]').forEach(btn=>btn.addEventListener('click',()=>{
   setAdminPage('products');
-  pendingProductPage=btn.dataset.productTarget;
-  if(selectedAdminProduct)setProductPage(pendingProductPage);else showProductChooser();
+  const scope=btn.dataset.productScope,page=btn.dataset.productTarget;
+  if(scope&&scope!==selectedAdminProduct)selectAdminProduct(scope,page);else setProductPage(page);
 }));
-document.querySelector('.admin-nav[data-admin-target="products"]')?.addEventListener('click',()=>{pendingProductPage='categories';showProductChooser();});
-document.querySelectorAll('[data-product-choice]').forEach(btn=>btn.addEventListener('click',()=>selectAdminProduct(btn.dataset.productChoice)));
+document.querySelectorAll('[data-product-open]').forEach(btn=>btn.addEventListener('click',()=>{setAdminPage('products');selectAdminProduct(btn.dataset.productOpen,'versions');}));
+document.querySelector('.admin-nav[data-admin-target="products"]')?.addEventListener('click',showProductChooser);
+document.querySelectorAll('[data-product-choice]').forEach(btn=>btn.addEventListener('click',()=>selectAdminProduct(btn.dataset.productChoice,'versions')));
 document.getElementById('productChangeProduct')?.addEventListener('click',showProductChooser);
+document.getElementById('productBackToVersions')?.addEventListener('click',()=>setProductPage('versions'));
+document.getElementById('productCreateConcept')?.addEventListener('click',openProductConceptForm);
+['productConceptFormClose','productConceptFormCancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductConceptForm));
+document.getElementById('productConceptEditorClose')?.addEventListener('click',closeProductConceptEditor);
+document.addEventListener('click',event=>{
+  if(event.target.closest('[data-product-create-concept]')){openProductConceptForm();return;}
+  if(event.target.closest('[data-product-edit-concept]')){setProductPage('versions');openProductConceptEditor();return;}
+  const view=event.target.closest('[data-product-view-version]');if(view){viewProductVersion(view.dataset.productViewVersion);return;}
+  const part=event.target.closest('[data-concept-part]');if(part){const concept=productConceptVersion();if(concept)viewedProductVersionId=concept.id;closeProductEditors();renderProductVersionContext();setProductPage(part.dataset.conceptPart);return;}
+  const sw=event.target.closest('#productVersionSwitch');if(sw){setProductPage('versions');if(sw.dataset.versionAction==='create')openProductConceptForm();else openProductConceptEditor();}
+});
+document.getElementById('productConceptCreateSave')?.addEventListener('click',()=>{
+  const name=document.getElementById('productConceptName').value.trim(),effective=document.getElementById('productConceptEffective').value,note=document.getElementById('productConceptNote').value.trim();
+  if(!showProductFormError('productConceptFormError',!name?'Vul een naam in.':productConceptDateError(effective)))return;
+  const versions=productVersions(),base=productScheduledVersion()||productActiveVersion();
+  const number=Math.max(...versions.map(v=>v.number))+1;
+  const prefix=selectedAdminProduct==='Instrumentenverzekering'?'INS':'APP';
+  const concept={id:prefix+'-V'+number,number,name,status:'concept',effective,note,basedOn:base.id,updated:adminNowLabel(),by:adminActorName()};
+  versions.unshift(concept);
+  callProductApi('API-PRODUCT-VERSION-CREATE',{baseVersionId:base.id,name,effectiveDate:effective,internalNote:note});
+  showAdminToast(productVersionLabel(concept)+' aangemaakt als concept');
+  openProductConceptEditor();
+});
+document.getElementById('productConceptSave')?.addEventListener('click',()=>{
+  const concept=productConceptVersion();if(!concept)return;
+  const name=document.getElementById('productConceptEditName').value.trim(),effective=document.getElementById('productConceptEditEffective').value;
+  if(!showProductFormError('productConceptEditorError',!name?'Vul een naam in.':productConceptDateError(effective)))return;
+  Object.assign(concept,{name,effective,note:document.getElementById('productConceptEditNote').value.trim(),updated:adminNowLabel(),by:adminActorName()});
+  productConceptRows().forEach(row=>{row.dataset.versionSet=name;renderProductNextVersion(row);});
+  callProductApi('API-PRODUCT-CHANGESET-PUT',{name,effectiveDate:effective,internalNote:concept.note});
+  document.getElementById('productConceptEditorTitle').textContent=productVersionLabel(concept);
+  renderProductVersions();renderProductVersionContext();showAdminToast('Concept opgeslagen');
+});
+document.getElementById('productConceptPublish')?.addEventListener('click',()=>{
+  const concept=productConceptVersion();if(!concept)return;
+  const rows=productConceptRows();
+  if(!showProductFormError('productConceptEditorError',!rows.length?'Dit concept bevat nog geen wijzigingen.':productConceptDateError(document.getElementById('productConceptEditEffective').value)))return;
+  callProductApi('API-P07-PRODUCT-CHANGESET-PUBLISH',{operation:'publish',effectiveDate:concept.effective});
+  Object.assign(concept,{status:'scheduled',published:adminNowLabel(),by:adminActorName()});
+  rows.forEach(row=>setProductNextVersion(row,'scheduled','',concept.effective));
+  viewedProductVersionId='';closeProductConceptEditor();renderProductVersions();renderProductVersionContext();
+  showAdminToast(productVersionLabel(concept)+' gepubliceerd · actief vanaf '+formatProductDate(concept.effective));
+});
+function adminActorName(){return typeof users!=='undefined'&&typeof signedInUserId!=='undefined'&&users[signedInUserId]?users[signedInUserId].name:'Beheerder';}
+function adminNowLabel(){return new Date().toLocaleString('nl-NL',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Amsterdam'}).replace(' om ',' · ').replace(',',' ·');}
 function productEscape(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));}
 
 function editProductCategory(row){
@@ -683,7 +862,7 @@ function closeProductCategoryEdit(){
 document.querySelectorAll('.product-open-category').forEach(btn=>btn.addEventListener('click',e=>editProductCategory(e.currentTarget.closest('.product-category-row'))));
 ['productCloseCategoryEdit','productCancelCategoryEdit'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductCategoryEdit));
 document.getElementById('productSaveCategoryChange')?.addEventListener('click',e=>{
-  const row=document.querySelector('.product-category-row.selected');if(row){callProductApi('API-PRODUCT-CATEGORY-SETTINGS-PUT',{scopeType:row.dataset.level,scopeId:row.dataset.categoryName,rateMode:document.getElementById('productCategoryRateMode')?.value,rate:document.getElementById('productCategoryRate')?.value,deductibleMode:document.getElementById('productCategoryDeductibleMode')?.value,deductible:document.getElementById('productCategoryDeductible')?.value});row.dataset.upcoming='Concept · Tarieven 2027';setProductNextVersion(row,'concept','Tarieven 2027');}
+  const row=document.querySelector('.product-category-row.selected');if(row){callProductApi('API-PRODUCT-CATEGORY-SETTINGS-PUT',{scopeType:row.dataset.level,scopeId:row.dataset.categoryName,rateMode:document.getElementById('productCategoryRateMode')?.value,rate:document.getElementById('productCategoryRate')?.value,deductibleMode:document.getElementById('productCategoryDeductibleMode')?.value,deductible:document.getElementById('productCategoryDeductible')?.value});row.dataset.upcoming='Concept · '+productConceptName();setProductNextVersion(row,'concept',productConceptName());}
   e.currentTarget.textContent='Opgeslagen';
   window.setTimeout(()=>e.currentTarget.textContent='Opslaan',1200);
 });
@@ -706,22 +885,6 @@ document.getElementById('productCategorySearch')?.addEventListener('input',filte
 document.getElementById('productAdminProduct')?.addEventListener('change',()=>{closeProductCategoryEdit();filterProductCategories();filterProductRuleCatalog();filterCategoryRuleOptions();filterProductSettings();filterProductConditions();filterProductIpids();filterProductAddons();filterProductAcceptance();});
 
 
-const productChangeEditor=document.getElementById('productChangeEditor');
-document.getElementById('productOpenActiveChangeSet')?.addEventListener('click',()=>{setProductPage('changes');toggleProductChangeEditor(true);});
-
-function toggleProductChangeEditor(show=true){if(productChangeEditor) productChangeEditor.classList.toggle('visible',show);}
-['productNewChangeSet','productNewChangeSetInline'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',()=>{setProductPage('changes');toggleProductChangeEditor(true);});});
-document.querySelectorAll('.product-edit-draft').forEach(el=>el.addEventListener('click',()=>{setProductPage('changes');toggleProductChangeEditor(true);}));
-const productCloseChangeSet=document.getElementById('productCloseChangeSet');if(productCloseChangeSet)productCloseChangeSet.addEventListener('click',()=>toggleProductChangeEditor(false));
-document.getElementById('productSaveChangeSet')?.addEventListener('click',()=>{callProductApi('API-PRODUCT-CHANGESET-PUT',{internalNote:document.getElementById('productChangeInternalNote')?.value||''});showAdminToast('Wijzigingsset en interne notitie opgeslagen via de Product API.');});
-document.querySelector('.product-change-actions .primary')?.addEventListener('click',()=>{callProductApi('API-P07-PRODUCT-CHANGESET-PUBLISH',{operation:'publish'});showAdminToast('Wijzigingsset gecontroleerd en gepubliceerd via de Product API.');});
-
-function syncProductVersionContext(){
-  const select=document.getElementById('productConfigView'),box=document.getElementById('productVersionContext');if(!select||!box)return;
-  const views={current:{chip:'green',label:'Actief',copy:'Geldig sinds 1 jan 2026'},'change-2027':{chip:'gray',label:'Concept',copy:'Tarieven 2027 · nog niet gepubliceerd'},'scheduled-2027':{chip:'blue',label:'Gepland',copy:'Productdocumenten 2027 · vanaf 1 mrt 2027'}};
-  const view=views[select.value]||views.current;box.innerHTML='<span class="admin-chip '+view.chip+'">'+view.label+'</span><small>'+view.copy+'</small>';
-}
-document.getElementById('productConfigView')?.addEventListener('change',()=>{closeProductCategoryEdit();syncProductVersionContext();});
 function applyCategoryInheritanceDisplay(){
   document.querySelectorAll('.product-category-row').forEach(row=>{
     const name=row.dataset.categoryName||'';
@@ -876,7 +1039,7 @@ document.getElementById('productRuleSave')?.addEventListener('click',()=>{
   row.dataset.product=document.getElementById('productAdminProduct')?.value||'Apparatuurverzekering';row.dataset.ruleName=name;row.dataset.ruleCode=code;row.dataset.ruleType=type;row.dataset.ruleDescription=description;row.dataset.ruleStatus=status;row.dataset.ruleClause=type==='Clausule toevoegen'?clause:'';
   const chipClass=status==='Actief'?'green':status==='Concept'?'gray':'amber';
   row.innerHTML='<td><div class="admin-primary">'+productEscape(name)+'</div><div class="admin-secondary">'+productEscape(code)+'</div></td><td>'+productEscape(type)+'</td><td>'+(editingProductRuleRow?productEscape(editingProductRuleRow.children[2]?.textContent||'Nog niet gekoppeld'):'Nog niet gekoppeld')+'</td><td><span class="admin-chip '+chipClass+'">'+productEscape(status)+'</span></td><td class="product-next-version"></td><td><button class="admin-btn text product-edit-rule" type="button">Bewerken</button></td>';
-  setProductNextVersion(row,'concept','Tarieven 2027');
+  setProductNextVersion(row,'concept',productConceptName());
   syncRuleLinkOption(row);const search=document.getElementById('productRuleSearch');const statusFilter=document.getElementById('productRuleStatusFilter');if(search)search.value='';if(statusFilter)statusFilter.value='';filterCategoryRuleOptions();filterProductRuleCatalog();showAdminToast(status==='Actief'?'Regel opgeslagen en direct beschikbaar om te koppelen':'Regel opgeslagen als '+status.toLowerCase());closeProductRuleEditor();
 });
 
@@ -906,13 +1069,9 @@ function initializeProductVersionStates(){
   ensureProductVersionColumn('.product-ipid-table','.product-ipid-row');
   ensureProductVersionColumn('.product-addons-table','.product-addon-row');
   ensureProductVersionColumn('.product-acceptance-table','.product-acceptance-row');
-  document.querySelectorAll('.product-rule-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.ruleCode==='REG-SERIAL-REQ')setProductNextVersion(row,'concept','Tarieven 2027');else if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.ruleCode==='CLA-CL233')setProductNextVersion(row,'scheduled','', '2027-03-01');});
-  document.querySelectorAll('.product-setting-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.settingKey==='minimum_annual_premium')setProductNextVersion(row,'concept','Tarieven 2027');else if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.settingKey==='policy_costs_renewal')setProductNextVersion(row,'scheduled','', '2027-01-01');});
-  document.querySelectorAll('.product-conditions-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering')setProductNextVersion(row,'scheduled','', '2027-03-01');});
-  document.querySelectorAll('.product-ipid-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering')setProductNextVersion(row,'concept','Productdocumenten 2027');});
-  document.querySelectorAll('.product-addon-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.addonType==='inhire')setProductNextVersion(row,'concept','Tarieven 2027');else if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.addonType==='rental')setProductNextVersion(row,'scheduled','', '2027-01-01');});
-  document.querySelectorAll('.product-acceptance-row').forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.acceptanceType==='computer_ratio')setProductNextVersion(row,'concept','Tarieven 2027');else if(row.dataset.product==='Apparatuurverzekering'&&row.dataset.acceptanceType==='max_total_amount')setProductNextVersion(row,'scheduled','', '2027-01-01');});
-  syncProductVersionContext();
+  const seeds=[['.product-setting-row','settingKey','minimum_annual_premium'],['.product-addon-row','addonType','inhire'],['.product-acceptance-row','acceptanceType','computer_ratio']];
+  seeds.forEach(([selector,key,value])=>document.querySelectorAll(selector).forEach(row=>{if(row.dataset.product==='Apparatuurverzekering'&&row.dataset[key]===value)setProductNextVersion(row,'concept','Tarieven 2027');}));
+  renderProductChoiceVersions();
 }
 
 let editingProductSettingRow=null;
@@ -946,7 +1105,7 @@ document.getElementById('productSettingSave')?.addEventListener('click',()=>{
   editingProductSettingRow.dataset.settingValue=String(value);editingProductSettingRow.dataset.settingEffective=effective;
   const valueCell=editingProductSettingRow.querySelector('.product-setting-value');if(valueCell)valueCell.textContent=formatProductEuro(value);
   if(editingProductSettingRow.children[3])editingProductSettingRow.children[3].textContent=formatProductDate(effective);
-  setProductNextVersion(editingProductSettingRow,'concept','Tarieven 2027');filterProductSettings();showAdminToast('Productinstelling opgeslagen in de wijzigingsset');closeProductSettingEditor();
+  setProductNextVersion(editingProductSettingRow,'concept',productConceptName());filterProductSettings();showAdminToast('Productinstelling opgeslagen in het concept');closeProductSettingEditor();
 });
 
 const productConditionCatalog={
@@ -984,8 +1143,8 @@ document.getElementById('productConditionsSave')?.addEventListener('click',()=>{
   const ids=[...document.querySelectorAll('#productConditionOptions label:not([hidden]) input:checked')].map(input=>input.value);
   if(!ids.length){document.getElementById('productConditionsEditorError')?.classList.add('visible');return;}
   callProductApi('API-PRODUCT-CONDITIONS-PUT',{conditionVersionIds:ids});
-  editingProductConditionsRow.dataset.conditionIds=ids.join('|');renderProductConditionsRow(editingProductConditionsRow);setProductNextVersion(editingProductConditionsRow,'concept','Productdocumenten 2027');
-  showAdminToast('Voorwaarden opgeslagen in de wijzigingsset');closeProductConditionsEditor();
+  editingProductConditionsRow.dataset.conditionIds=ids.join('|');renderProductConditionsRow(editingProductConditionsRow);setProductNextVersion(editingProductConditionsRow,'concept',productConceptName());
+  showAdminToast('Voorwaarden opgeslagen in het concept');closeProductConditionsEditor();
 });
 
 const productIpidCatalog={
@@ -1004,7 +1163,7 @@ function openProductIpidEditor(row){
 function closeProductIpidEditor(){editingProductIpidRow=null;document.getElementById('productIpidEditor')?.classList.remove('visible');document.getElementById('productIpidEditorError')?.classList.remove('visible');}
 document.querySelector('.product-ipid-table tbody')?.addEventListener('click',e=>{const button=e.target.closest('.product-edit-ipid');if(button)openProductIpidEditor(button.closest('.product-ipid-row'));});
 ['productIpidEditorClose','productIpidEditorCancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',closeProductIpidEditor));
-document.getElementById('productIpidSave')?.addEventListener('click',()=>{if(!editingProductIpidRow)return;const selected=document.querySelector('#productIpidOptions label:not([hidden]) input:checked');if(!selected){document.getElementById('productIpidEditorError')?.classList.add('visible');return;}callProductApi('API-PRODUCT-IPID-PUT',{ipidDocumentVersionId:selected.value});editingProductIpidRow.dataset.ipidId=selected.value;renderProductIpidRow(editingProductIpidRow);setProductNextVersion(editingProductIpidRow,'concept','Productdocumenten 2027');showAdminToast('IPID opgeslagen in de wijzigingsset');closeProductIpidEditor();});
+document.getElementById('productIpidSave')?.addEventListener('click',()=>{if(!editingProductIpidRow)return;const selected=document.querySelector('#productIpidOptions label:not([hidden]) input:checked');if(!selected){document.getElementById('productIpidEditorError')?.classList.add('visible');return;}callProductApi('API-PRODUCT-IPID-PUT',{ipidDocumentVersionId:selected.value});editingProductIpidRow.dataset.ipidId=selected.value;renderProductIpidRow(editingProductIpidRow);setProductNextVersion(editingProductIpidRow,'concept',productConceptName());showAdminToast('IPID opgeslagen in het concept');closeProductIpidEditor();});
 
 let editingProductAddonRow=null;
 function parseAddonTiers(value){return String(value||'').split('|').filter(Boolean).map(pair=>{const [amount,premium]=pair.split(':').map(Number);return {amount,premium};}).filter(tier=>Number.isFinite(tier.amount)&&Number.isFinite(tier.premium));}
@@ -1053,7 +1212,7 @@ document.getElementById('productAddonSave')?.addEventListener('click',()=>{
     const cell=editingProductAddonRow.querySelector('.product-addon-value');if(cell)cell.textContent=String(percentage).replace('.',',')+'%';
   }
   callProductApi('API-PRODUCT-ADDONS-PUT',editingProductAddonRow.dataset.addonType==='inhire'?{inhireTiers:parseAddonTiers(editingProductAddonRow.dataset.addonTiers)}:{rentalSurchargePercentage:Number(editingProductAddonRow.dataset.addonPercentage)});
-  setProductNextVersion(editingProductAddonRow,'concept','Tarieven 2027');showAdminToast('Aanvullende dekking opgeslagen in de wijzigingsset');closeProductAddonEditor();
+  setProductNextVersion(editingProductAddonRow,'concept',productConceptName());showAdminToast('Aanvullende dekking opgeslagen in het concept');closeProductAddonEditor();
 });
 
 const acceptanceTypeDefinitions={
@@ -1125,7 +1284,7 @@ document.getElementById('productAcceptanceSave')?.addEventListener('click',()=>{
   const row=editingAcceptanceRow;
   callProductApi('API-PRODUCT-ACCEPTANCE-PUT',{criterionId:row.dataset.acceptanceCode,typeKey:type,config:{value},status,effectiveDate:effective,outcome:'fallout'});
   row.dataset.product=product;row.dataset.acceptanceType=type;row.dataset.acceptanceCode=definition.code+(product==='Instrumentenverzekering'?'-INS':'');row.dataset.acceptanceName=definition.name;row.dataset.acceptanceValue=value;row.dataset.acceptanceUnit=definition.unit;row.dataset.acceptanceOutcome=definition.outcome;row.dataset.acceptanceStatus=status;row.dataset.acceptanceEffective=effective;
-  renderAcceptanceRow(row);setProductNextVersion(row,'concept','Tarieven 2027');filterProductAcceptance();showAdminToast('Acceptatiecriterium opgeslagen in de wijzigingsset');closeAcceptanceEditor();
+  renderAcceptanceRow(row);setProductNextVersion(row,'concept',productConceptName());filterProductAcceptance();showAdminToast('Acceptatiecriterium opgeslagen in het concept');closeAcceptanceEditor();
 });
 initializeProductVersionStates();
 filterProductSettings();
