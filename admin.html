@@ -44,6 +44,12 @@
       <button class="admin-subnav-btn" data-product-target="api" type="button">API test</button>
     </div>
     <button class="admin-nav" data-admin-target="content" type="button">Inhoud</button>
+    <button class="admin-nav" data-admin-target="anva" type="button">ANVA</button>
+    <div class="admin-anva-subnav" aria-label="ANVA submenu">
+      <button class="admin-subnav-btn" data-anva-target="anva-connection" type="button">Koppeling</button>
+      <button class="admin-subnav-btn" data-anva-target="anva-templates" type="button">XML-sjablonen</button>
+    </div>
+    <button class="admin-nav" data-admin-target="settings" type="button">Systeemsettings</button>
     <button class="admin-nav" data-admin-target="users" type="button">Gebruikers &amp; rechten</button>
   </div>
 </aside>
@@ -364,6 +370,11 @@
 </div>
 
 <div class="admin-page" data-admin-page="users"></div>
+<div class="admin-page" data-admin-page="anva"></div>
+<div class="admin-page" data-admin-page="anva-connection"></div>
+<div class="admin-page" data-admin-page="anva-templates"></div>
+<div class="admin-page" data-admin-page="anva-template"></div>
+<div class="admin-page" data-admin-page="settings"></div>
 
 <div class="admin-page" data-admin-page="dossier">
   <div class="admin-page-head admin-dossier-back"><div><button class="admin-btn text" id="dossierBackButton" type="button">← Terug naar overzicht</button></div></div>
@@ -439,6 +450,6 @@
 </main>
 </div>
 </div>
-</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260831-admin-ux-v6"></script><script src="assets/communications.js?v=20261127-iam-impersonation-v1"></script>
+</section><div class="admin-toast" id="productAdminToast" role="status" aria-live="polite"></div><script src="assets/admin.js?v=20260831-admin-ux-v6"></script><script src="assets/communications.js?v=20261127-anva-settings-v1"></script><script src="assets/integrations.js?v=20261127-anva-settings-v1"></script>
 </body>
 </html>

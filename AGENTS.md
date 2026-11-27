@@ -21,6 +21,8 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Gebruikers en profielen in admin: `admin.html#users`
 - Admin-login, activatie en herstel: authenticatielaag binnen `admin.html`
 - Prolongatievoorraad in admin: `admin.html#renewals`
+- ANVA-inrichting in admin: `admin.html#anva` (keuze), `admin.html#anva-connection` (koppeling) en `admin.html#anva-templates` (XML-sjablonen)
+- Systeemsettings in admin: `admin.html#settings`
 - Vaste doorverwijzing: `process-monitor.html`
 - Gedeelde assets: `assets/`
 
@@ -65,6 +67,9 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - Voeg alleen uitleg toe als die nodig is om een keuze veilig te kunnen maken; vermijd introductietekst die de paginatitel of tabel herhaalt.
 - Toon tellingen alleen als ze een actie prioriteren, een filterresultaat verduidelijken of een actuele processtatus aangeven.
 - Behoud de vaste menugroepen: `Dagelijks werk`, `Bewaking`, `Administratie`, `Inzicht` en `Beheer`.
+- `ANVA` onder `Beheer` opent eerst een keuze tussen `Koppeling` en `XML-sjablonen`; zet die niet samen op één pagina. `Koppeling` toont bovenaan de koppelingsstatus (`Actief`, `Niet actief` bij onvolledige gegevens, `Storing` bij een mislukte test), houdt technische URL's achter `Technische gegevens` en behoudt de verbindingstest. Het secret wordt na opslaan nooit meer getoond.
+- `XML-sjablonen` toont eerst een overzicht met status, laatst aangepast en door wie; het detail bewerkt één sjabloon met velden en `{{#if}}`-voorwaarden (geen vrije code) en een voorbeeld op testpolissen. Direct opslaan kan alleen als het sjabloon voor alle testpolissen geldige XML oplevert; een concept mag ongeldig zijn.
+- Systeembrede instellingen (wachtrij, prolongatiestarttijd en later andere settings) staan onder `Beheer` → `Systeemsettings`, niet bij een product.
 - Houd processtatussen realtime en zichtbaar zonder refreshknop.
 - Communicatie gebruikt dezelfde realtime werkwijze. Onder `Bewaking` toont `E-mails` uitsluitend uitgaande berichten in de tabs `Gepland` en `Verzonden`, zonder refreshknop. Toon bij beide datum en tijd; providerterugmeldingen zijn statussen of events bij het verzonden bericht.
 - Op aanvraag- en polisniveau toont de tab `Communicatie` wat is verstuurd en wat klaarstaat. `Hele e-mail` opent een zelfstandig scherm met afzender, ontvanger, taal, onderwerp, volledig opgemaakt bericht, statusverloop en links naar beschikbare bijlagen. Toon een toekomstige bijlage als `Nog niet beschikbaar`.
@@ -95,7 +100,7 @@ Dit bestand is leidend voor iedere Codex- of ChatGPT-werksessie in deze reposito
 - TOTP-MFA is verplicht vóór activatie. E-mail en sms zijn geen admin-MFA-factor. Een uitnodiging is eenmalig en 72 uur geldig; een wachtwoordherstellink is eenmalig en 30 minuten geldig.
 - Gebruik een BFF-sessie met `HttpOnly`, `Secure` en `SameSite`; bewaar geen tokens in browseropslag. Idle timeout is 30 minuten, absolute timeout 8 uur en access-tokenlooptijd maximaal 15 minuten.
 - Kritieke acties vereisen herauthenticatie van maximaal 15 minuten oud: productpublicatie, gebruiker- of profielwijziging, MFA-reset, sessie-intrekking, procesherstel en financiële mutatie.
-- De centrale rechtencatalogus gebruikt stabiele `resource.action`-codes: `dossier.read`, `application.review`, `task.manage`, `policy.mutate`, `relation.mutate`, `process.read`, `process.retry`, `communication.read`, `communication.delivery.manage`, `content.manage`, `finance.read`, `finance.manage`, `report.read`, `product.read`, `product.write`, `product.publish`, `user.read`, `user.write`, `user.impersonate`, `profile.read`, `profile.write` en `audit.read`.
+- De centrale rechtencatalogus gebruikt stabiele `resource.action`-codes: `dossier.read`, `application.review`, `task.manage`, `policy.mutate`, `relation.mutate`, `process.read`, `process.retry`, `communication.read`, `communication.delivery.manage`, `content.manage`, `finance.read`, `finance.manage`, `report.read`, `product.read`, `product.write`, `product.publish`, `integration.manage`, `system.manage`, `user.read`, `user.write`, `user.impersonate`, `profile.read`, `profile.write` en `audit.read`. `integration.manage` geeft toegang tot ANVA-koppeling en XML-sjablonen, `system.manage` tot Systeemsettings; geen basisprofiel krijgt ze automatisch.
 - Eerste profielmatrix: `Behandelaar` voor dossier-/aanvraag-/taak-/polis-/relatiebehandeling; `Productbeheerder` alleen voor product lezen/schrijven/publiceren; `Finance` voor dossier- en financieel beheer/rapportage; `Inhoudbeheerder` voor content en communicatielezen; `Alleen lezen` voor dossier/proces/communicatie/rapport; `Gebruikersbeheerder` voor gebruikers, profielen, testen als gebruiker en IAM-audit.
 - Autorisatie werkt deny-by-default op ieder backendrequest en controleert permission, resource en functiescheiding. V1-rechten gelden organisatiebreed voor GoSafe Nederland; leg objectcontext al wel vast voor latere scopes.
 - Profielwijzigingen verhogen de autorisatieversie en gelden bij het eerstvolgende request. Blokkering of verlies van een kritisch recht trekt sessies direct in. Voorkom dat de laatste actieve gebruiker met `user.write` en `profile.write` wordt geblokkeerd of deze rechten verliest.

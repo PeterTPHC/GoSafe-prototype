@@ -5,6 +5,7 @@ const rightsCatalog=[
   {group:'Inhoud',rights:[['content.manage','Inhoud en vertalingen beheren']]},
   {group:'Financieel en rapportage',rights:[['finance.read','Financieel bekijken'],['finance.manage','Financieel beheren'],['report.read','Rapportages bekijken']]},
   {group:'Productbeheer',rights:[['product.read','Producten bekijken'],['product.write','Producten bewerken'],['product.publish','Producten publiceren']]},
+  {group:'Systeem',rights:[['integration.manage','ANVA-koppeling en XML-sjablonen beheren'],['system.manage','Systeemsettings beheren']]},
   {group:'Gebruikers en audit',rights:[['user.read','Gebruikers bekijken'],['user.write','Gebruikers beheren'],['user.impersonate','Testen als gebruiker'],['profile.read','Profielen bekijken'],['profile.write','Profielen beheren'],['audit.read','Auditlog bekijken']]}
 ];
 const rightLabels=Object.fromEntries(rightsCatalog.flatMap(group=>group.rights));
@@ -258,9 +259,9 @@ document.getElementById('saveProfileButton').addEventListener('click',()=>{
 });
 
 // Rechten per scherm en actie. Verbergen is alleen UX; de server controleert ieder commando.
-const pageRights={overview:['dossier.read'],workqueue:['task.manage'],applications:['dossier.read'],policies:['dossier.read'],renewals:['dossier.read'],processes:['process.read'],communications:['communication.read'],activities:['dossier.read','audit.read'],relations:['dossier.read'],finance:['finance.read'],reports:['report.read'],products:['product.read'],content:['content.manage'],users:['user.read','profile.read'],dossier:['dossier.read'],'email-detail':['communication.read'],'policy-mutation':['policy.mutate'],'relation-mutation':['relation.mutate']};
-const navOrder=['overview','workqueue','applications','policies','renewals','processes','communications','activities','relations','finance','reports','products','content','users'];
-const guardedReads=[['.admin-open-dossier,[data-open-dossier]','dossier.read'],['[data-dossier-tab="processes"]','process.read'],['[data-dossier-tab="communications"],[data-open-full-email]','communication.read'],['.admin-search','dossier.read']];
+const pageRights={overview:['dossier.read'],workqueue:['task.manage'],applications:['dossier.read'],policies:['dossier.read'],renewals:['dossier.read'],processes:['process.read'],communications:['communication.read'],activities:['dossier.read','audit.read'],relations:['dossier.read'],finance:['finance.read'],reports:['report.read'],products:['product.read'],content:['content.manage'],anva:['integration.manage'],'anva-connection':['integration.manage'],'anva-templates':['integration.manage'],'anva-template':['integration.manage'],settings:['system.manage'],users:['user.read','profile.read'],dossier:['dossier.read'],'email-detail':['communication.read'],'policy-mutation':['policy.mutate'],'relation-mutation':['relation.mutate']};
+const navOrder=['overview','workqueue','applications','policies','renewals','processes','communications','activities','relations','finance','reports','products','content','anva','settings','users'];
+const guardedReads=[['.admin-open-dossier,[data-open-dossier]','dossier.read'],['[data-dossier-tab="processes"]','process.read'],['[data-dossier-tab="communications"],[data-open-full-email]','communication.read'],['.admin-search','dossier.read'],['.admin-anva-subnav','integration.manage']];
 const guardedWrites=[
   ['#dossierStartMutation,#mutationSubmit,#mutationItemEditorSave,[data-mutation-edit],[data-mutation-remove]','policy.mutate'],
   ['#dossierEditHolder,#relationMutationSubmit,[data-admin-page="relations"] .admin-page-head .admin-btn.primary','relation.mutate'],
@@ -270,6 +271,8 @@ const guardedWrites=[
   ['[data-template-action="save"],[data-template-action="publish"]','content.manage'],
   ['#productNewChangeSet,#productNewChangeSetInline,#productSaveChangeSet,#productSettingSave,#productSaveCategoryChange,#productRuleSave,#productNewCategoryRule,#productIpidSave,#productConditionsSave,#productAddonSave,#productAcceptanceSave,#productAddInhireTier,.product-remove-tier','product.write'],
   ['.product-change-actions .primary','product.publish'],
+  ['#anvaSaveConnection,#anvaTestConnection,#anvaSendTestXml,#anvaReplaceSecret,#anvaSaveDraft,#anvaSaveTemplate,#anvaDiscardDraft','integration.manage'],
+  ['#settingsSave','system.manage'],
   ['#addUserButton,#saveUserButton,[data-user-action]','user.write'],
   ['#addProfileButton,#saveProfileButton,#duplicateProfileButton','profile.write'],
   ['[data-impersonate]','user.impersonate']

@@ -1,0 +1,85 @@
+/* ANVA en systeemsettings */
+.admin-nav[data-admin-target="anva"]:before{content:'⇄'}
+.admin-nav[data-admin-target="settings"]:before{content:'\2699\FE0E'}
+.admin-anva-subnav{display:none;flex-direction:column;gap:1px;margin:2px 0 6px 12px;padding-left:8px;border-left:1px solid rgba(255,255,255,.16)}
+.admin-nav.active+.admin-anva-subnav{display:flex}
+
+.anva-choice-card{display:flex;flex-direction:column}
+.anva-choice-status{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-height:22px}
+.anva-choice-status small{display:inline!important}
+
+.anva-status-card{margin-bottom:16px;border-left:4px solid #cbd5d0}
+.anva-status-card.anva-status-green{border-left-color:#2f9a64}.anva-status-card.anva-status-amber{border-left-color:#e0a82e}.anva-status-card.anva-status-red{border-left-color:#c94a4a}
+.anva-status-main{display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.anva-status-main>div{flex:1}.anva-status-main strong{font-size:15px}.anva-status-main p{margin:4px 0 0;color:var(--muted);font-size:11px;line-height:1.45}
+.anva-status-dot{width:12px;height:12px;margin-top:4px;border-radius:50%;background:#9aa7a1;flex:0 0 12px}
+.anva-status-green .anva-status-dot{background:#2f9a64;box-shadow:0 0 0 4px #e8f5ed}.anva-status-amber .anva-status-dot{background:#e0a82e;box-shadow:0 0 0 4px #fff4db}.anva-status-red .anva-status-dot{background:#c94a4a;box-shadow:0 0 0 4px #fdeaea}
+.anva-status-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.anva-status-facts>div{padding:12px 18px;border-right:1px solid var(--line)}.anva-status-facts>div:last-child{border-right:0}
+.anva-status-facts span{display:block;margin-bottom:4px;color:var(--muted);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.anva-status-facts strong{font-size:11px;line-height:1.4}
+.anva-rejected-link{color:#9c3131!important;font-weight:850;text-decoration:underline;cursor:pointer;font-size:inherit}
+
+.anva-connection-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:16px;align-items:start}
+.anva-form{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.anva-form label,.anva-readonly{display:grid;gap:5px}
+.anva-form label>span,.anva-readonly>span,.anva-xml-label>span,.anva-preview-select>span,.settings-form label>span{color:#526478;font-size:10px;font-weight:800}
+.anva-field-wide{grid-column:1/-1}
+.anva-segmented{display:inline-flex;width:max-content;padding:3px;border-radius:8px;background:#eef2f0}
+.anva-segmented button{appearance:none;border:0;background:transparent;padding:6px 14px;border-radius:6px;font:inherit;font-size:11px;font-weight:800;color:#58625e;cursor:pointer}
+.anva-segmented button.active{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(20,40,30,.14)}
+.anva-secret-set{display:flex;align-items:center;justify-content:space-between;min-height:34px;padding:0 4px 0 9px;border:1px dashed #cbd5d0;border-radius:7px;background:#f7f9f8;font-size:10px;color:#506158}
+.anva-advanced{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.anva-advanced summary{cursor:pointer;color:var(--brand);font-size:11px;font-weight:850}
+.anva-advanced[open] summary{margin-bottom:12px}
+.anva-readonly code{display:block;padding:7px 9px;border-radius:7px;background:#f3f6f4;font-size:10px;color:#3c4a57;overflow-wrap:anywhere}
+.anva-form-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:16px}
+.anva-form-actions .admin-btn{width:auto;grid-column:auto}
+.anva-help{margin:0 0 12px;color:var(--muted);font-size:10px;line-height:1.45}
+.anva-test-steps{list-style:none;margin:14px 0 4px;padding:0;display:grid;gap:6px}
+.anva-test-steps li{display:flex;align-items:center;gap:8px;font-size:11px}
+.anva-test-steps li span{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:900;background:#eff1f2;color:#58625e}
+.anva-test-steps li.ok span{background:#e8f5ed;color:#176944}.anva-test-steps li.failed span{background:#fdeaea;color:#9c3131}.anva-test-steps li.skipped{color:var(--muted)}
+.anva-test-meta{color:var(--muted);font-size:10px}
+.anva-xml-label{display:grid;gap:5px;margin-bottom:10px}
+.anva-code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace!important;font-size:11px!important;line-height:1.55;white-space:pre;tab-size:2}
+textarea.anva-code{min-height:90px;resize:vertical}
+.anva-response{margin-top:12px;padding:10px 12px;border-radius:8px;font-size:11px}
+.anva-response.ok{background:#f1f8f4}.anva-response.fail{background:#fdeaea;color:#9c3131}
+.anva-response p{margin:4px 0 0}.anva-response span{display:block;margin:8px 0 4px;color:var(--muted);font-size:9px;font-weight:800;text-transform:uppercase}
+.anva-code-block{margin:0;padding:12px 14px;border-radius:8px;background:#17231d;color:#dfe9e3;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;line-height:1.55;white-space:pre;overflow:auto}
+
+.anva-template-row{cursor:pointer}.anva-template-row:hover td{background:#f7faf8}
+.anva-key{padding:1px 5px;border-radius:4px;background:#eef2f0;font-size:10px}
+.anva-draft-note{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:10px 14px;border-radius:8px;background:#fff4db;color:#5c4200;font-size:11px}
+.anva-draft-note .admin-btn{width:auto;color:#8a6200}
+.anva-template-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.anva-template-layout textarea.anva-editor{height:520px!important;min-height:320px!important;max-height:none!important}
+.anva-form-actions .admin-btn:disabled{opacity:.45;cursor:not-allowed}
+.anva-fields{display:grid;gap:6px;margin-top:12px}
+.anva-fields>span{color:#526478;font-size:10px;font-weight:800}
+.anva-fields>div{display:flex;flex-wrap:wrap;gap:4px;max-height:96px;overflow:auto}
+.anva-fields small{color:var(--muted);font-size:10px}
+.anva-field-chip{appearance:none;border:1px solid #d8e0dc;border-radius:999px;background:#fff;padding:3px 7px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;color:#315f7e;cursor:pointer}
+.anva-field-chip:hover{border-color:var(--brand);background:#f1f6f3}
+.anva-preview-card{position:sticky;top:14px}
+.anva-preview-select{display:grid;gap:5px;margin-bottom:10px}
+.anva-preview{max-height:520px}
+.anva-preview mark{padding:0 2px;border-radius:3px;background:#2f6b4c;color:#fff}
+.anva-preview mark.unknown{background:#b03a3a}
+.anva-check{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:0 0 10px;padding:8px 11px;border-radius:8px;font-size:11px}
+.anva-check strong{font-weight:850}
+.anva-check.ok{background:#e8f5ed;color:#176944}.anva-check.warn{background:#fff4db;color:#8a6200}.anva-check.fail{background:#fdeaea;color:#9c3131}
+.anva-check code{font-size:10px}
+#anvaTemplateValidation .anva-check{margin:12px 0 0}
+
+.settings-sections{display:grid;gap:16px;max-width:880px}
+.settings-scope{color:var(--muted)!important;font-weight:700!important}
+.settings-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.settings-form label{display:grid;gap:5px;align-content:start}
+.settings-form small{color:var(--muted);font-size:10px;line-height:1.4}
+.settings-actions{justify-content:space-between}.settings-actions small{color:var(--muted);font-size:10px}
+
+@media(max-width:1100px){.anva-connection-layout,.anva-template-layout{grid-template-columns:1fr}.anva-preview-card{position:static}.anva-status-facts{grid-template-columns:1fr 1fr}.anva-status-facts>div:nth-child(2){border-right:0}}
+@media(max-width:700px){.anva-form,.settings-form,.anva-status-facts{grid-template-columns:1fr}.anva-status-facts>div{border-right:0;border-bottom:1px solid var(--line)}}
+.anva-form .admin-input[aria-invalid="true"]{border-color:#d98b8b;background:#fff8f8}
